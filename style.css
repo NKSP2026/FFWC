@@ -1,22 +1,27 @@
 body {
     margin: 0;
     font-family: Arial;
-    background: #eee;
 }
 
+/* Container */
 .container {
     position: relative;
+    width: 100vw;
     height: 100vh;
+    overflow: hidden;
 }
 
+/* Hintergrundbild (komplett sichtbar) */
 .background {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url("bg.jpg") center/cover;
-    filter: brightness(0.8);
+    background: url("bg.jpg") no-repeat center;
+    background-size: contain;   /* WICHTIG: ganzes Bild sichtbar */
+    background-color: black;    /* füllt Ränder */
 }
 
+/* Titel */
 .title {
     position: absolute;
     top: 60px;
@@ -26,33 +31,46 @@ body {
     text-shadow: 2px 2px 5px black;
 }
 
+/* Wappen */
 .wappen {
     position: absolute;
-    top: 80px;
-    right: 250px;
-    width: 220px;
+    top: 20px;
+    right: 20px;
+    width: 260px;   /* größer */
 }
 
+/* Menü rechts unter Wappen */
 .menu {
     position: absolute;
-    top: 200px;
-    right: 80px;
+    top: 200px;   /* unter Wappen */
+    right: 20px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    align-items: flex-end;
 }
 
+/* Buttons */
 .menu button {
-    width: 260px;
-    padding: 12px;
-    border-radius: 8px;
-    background: #4a6a7d;
-    color: white;
+    width: 300px;              /* größer */
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;         /* fette Schrift */
     border: none;
+    border-radius: 10px;
+    background: #4a6a7d;
+    color: black;              /* schwarze Schrift */
     cursor: pointer;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
 }
 
+/* Hover */
+.menu button:hover {
+    background: #5f859c;
+}
+
+/* Löschen Button */
 .delete {
-    background: red;
-    color: black;
+    background: red !important;
+    color: black !important;
 }
