@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Geräte Suche</title>
+</head>
+<body>
+
+<h2>Einsatzgeräte Suche</h2>
+
+<input id="search" placeholder="z.B. Tauchpumpe" oninput="liveSearch()">
+<button>Suchen</button>
+<button onclick="window.history.back()">Abbruch</button>
+
+<br><br>
+
+<select id="results" size="10" style="width:400px;"></select>
+
+<div id="output"></div>
+
+<script>
+
+const daten = [
+    "Tauchpumpe - HLF Crimmitschau",
+    "Tauchpumpe - LF Frankenhausen",
+    "Trennschleifer - Gerätehaus Gablenz",
+    "Tauwerk - HLF Mannichswalde"
+];
+
+function liveSearch(){
+    const value = document.getElementById("search").value.toLowerCase();
+    const list = document.getElementById("results");
+    list.innerHTML = "";
+
+    daten.forEach(d => {
+        if(d.toLowerCase().includes(value)){
+            let option = document.createElement("option");
+            option.text = d;
+            option.onclick = () => show(d);
+            list.add(option);
+        }
+    });
+}
+
+function show(text){
+    document.getElementById("output").innerHTML += "<p>"+text+"</p>";
+}
+
+</script>
+
+</body>
+</html>
