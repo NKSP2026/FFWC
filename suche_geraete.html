@@ -1,51 +1,31 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>Geräte Suche</title>
-</head>
+<head><meta charset="UTF-8"></head>
 <body>
 
-<h2>Einsatzgeräte Suche</h2>
+<input id="s" oninput="search()">
+<select id="list" size="10"></select>
+<div id="out"></div>
 
-<input id="search" placeholder="z.B. Tauchpumpe" oninput="liveSearch()">
-<button>Suchen</button>
-<button onclick="window.history.back()">Abbruch</button>
+<script type="module">
+import "./firebase.js";
 
-<br><br>
+let all=[];
 
-<select id="results" size="10" style="width:400px;"></select>
+onValue(ref(db,"daten"), snap=>{
+    all = Object.values(snap.val()||{});
+});
 
-<div id="output"></div>
-
-<script>
-
-const daten = [
-    "Tauchpumpe - HLF Crimmitschau",
-    "Tauchpumpe - LF Frankenhausen",
-    "Trennschleifer - Gerätehaus Gablenz",
-    "Tauwerk - HLF Mannichswalde"
-];
-
-function liveSearch(){
-    const value = document.getElementById("search").value.toLowerCase();
-    const list = document.getElementById("results");
-    list.innerHTML = "";
-
-    daten.forEach(d => {
-        if(d.toLowerCase().includes(value)){
-            let option = document.createElement("option");
-            option.text = d;
-            option.onclick = () => show(d);
-            list.add(option);
+window.search=function(){
+    list.innerHTML="";
+    all.forEach(d=>{
+        if(d.geraete?.toLowerCase().includes(s.value.toLowerCase())){
+            let o=new Option(d.geraete+" - "+d.ort);
+            o.onclick=()=>out.innerHTML+=d.geraete+"<br>";
+            list.add(o);
         }
     });
 }
-
-function show(text){
-    document.getElementById("output").innerHTML += "<p>"+text+"</p>";
-}
-
 </script>
 
 </body>
