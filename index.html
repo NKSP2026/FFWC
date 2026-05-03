@@ -2,27 +2,36 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Fahrzeug Status System</title>
+<title>Landfunkstelle Crimmitschau</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>🚒 Fahrzeug Status</h1>
+<div class="container">
 
-<div id="fahrzeuge"></div>
+    <!-- Hintergrund -->
+    <div class="background"></div>
 
-<h2>📋 Protokoll</h2>
-<table id="log">
-    <thead>
-        <tr>
-            <th>Fahrzeug</th>
-            <th>Status</th>
-            <th>Zeit</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+    <!-- Titel -->
+    <h1 class="title">
+        Ortsfeste Landfunkstelle<br>
+        Crimmitschau
+    </h1>
 
-<script src="app.js"></script>
+    <!-- Wappen -->
+    <img src="wappen.png" class="wappen">
+
+    <!-- Menü -->
+    <div class="menu">
+        <button>Löschen</button>
+        <button>Neu Anlegen</button>
+        <button>Einsatz-/ Sondergerät Suche</button>
+        <button>Fahrzeug Suche</button>
+        <button>Protokolle öffnen</button>
+        <button>Datenbank öffnen</button>
+    </div>
+
+</div>
+
 </body>
 </html>
