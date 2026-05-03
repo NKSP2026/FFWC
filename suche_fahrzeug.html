@@ -1,58 +1,31 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-<meta charset="UTF-8">
-<title>Fahrzeug Suche</title>
-</head>
+<head><meta charset="UTF-8"></head>
 <body>
 
-<h2>Fahrzeug Suche</h2>
+<input id="s" oninput="search()">
+<select id="list" size="10"></select>
+<div id="out"></div>
 
-<input id="search" placeholder="z.B. HLF oder Hilfeleistung..." oninput="search()">
-<button>Suchen</button>
-<button onclick="window.history.back()">Abbruch</button>
+<script type="module">
+import "./firebase.js";
 
-<br><br>
+let all=[];
 
-<select id="results" size="10" style="width:400px;"></select>
+onValue(ref(db,"daten"), snap=>{
+    all = Object.values(snap.val()||{});
+});
 
-<div id="output"></div>
-
-<script>
-
-const fahrzeuge = [
-    {name:"Hilfeleistungslöschgruppenfahrzeug 20", kurz:"HLF", ort:"Crimmitschau"},
-    {name:"Löschgruppenfahrzeug 10", kurz:"LF", ort:"Frankenhausen"},
-    {name:"Kleinlöschfahrzeug", kurz:"KLF", ort:"Gablenz"}
-];
-
-function search(){
-    const value = document.getElementById("search").value.toLowerCase();
-    const list = document.getElementById("results");
-    list.innerHTML = "";
-
-    fahrzeuge.forEach(f => {
-        if(
-            f.name.toLowerCase().includes(value) ||
-            f.kurz.toLowerCase().includes(value)
-        ){
-            let option = document.createElement("option");
-            option.text = f.name + " ("+f.kurz+") - " + f.ort;
-            option.onclick = () => show(f);
-            list.add(option);
+window.search=function(){
+    list.innerHTML="";
+    all.forEach(d=>{
+        if(d.fahrzeug?.toLowerCase().includes(s.value.toLowerCase())){
+            let o=new Option(d.fahrzeug+" - "+d.ort);
+            o.onclick=()=>out.innerHTML+=d.fahrzeug+"<br>";
+            list.add(o);
         }
     });
 }
-
-function show(f){
-    document.getElementById("output").innerHTML += `
-        <p>
-        Ort: ${f.ort}<br>
-        Fahrzeug: ${f.name}<br>
-        </p>
-    `;
-}
-
 </script>
 
 </body>
