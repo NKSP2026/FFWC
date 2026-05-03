@@ -1,0 +1,42 @@
+body {
+    font-family: Arial;
+    background: #111;
+    color: white;
+    text-align: center;
+}
+
+#fahrzeuge {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.button {
+    width: 120px;
+    height: 60px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Status Farben */
+.status1 { background: lightgreen; }
+.status2 { background: green; }
+.status3 { background: yellow; color:black; }
+.status4 { background: red; }
+.status5 { background: gray; }
+.status7 { background: orange; }
+.status8 { background: pink; color:black; }
+
+table {
+    margin: auto;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid white;
+    padding: 5px 10px;
+}
