@@ -16,8 +16,9 @@ body {
 /* Container */
 .container {
     position: relative;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
+    overflow: hidden;
 }
 
 /* Hintergrund */
@@ -26,43 +27,43 @@ body {
     width: 100%;
     height: 100%;
     background: url("bg.jpg") no-repeat center;
-    background-size: 80%;
+    background-size: contain;
 }
 
-/* Titel (weiter nach rechts ins Bild) */
+/* Titel (RESPONSIV nach rechts ins Bild) */
 .title {
     position: absolute;
-    top: 80px;
-    left: 180px;   /* 🔥 weiter ins Bild */
-    font-size: 60px;
+    top: 8%;
+    left: 12%;   /* 🔥 weiter ins Bild */
+    font-size: clamp(28px, 4vw, 60px);
     font-weight: bold;
     color: #ff6b6b;
     text-shadow: 4px 4px 12px black;
 }
 
-/* Wappen (+20% größer) */
+/* Wappen (RESPONSIV + größer) */
 .wappen {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 420px;   /* 🔥 größer */
+    top: 3%;
+    right: 2%;
+    width: clamp(200px, 22vw, 420px);  /* 🔥 automatisch größer */
 }
 
 /* Menü (weiter runter + nach links) */
 .menu {
     position: absolute;
-    top: 340px;   /* 🔥 weiter runter */
-    right: 140px; /* 🔥 weiter nach links */
+    top: 40%;        /* 🔥 weiter runter */
+    right: 10%;      /* 🔥 weiter nach links */
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 18px;
 }
 
-/* Buttons (ECHTER 3D LOOK) */
+/* Buttons */
 .menu button {
-    width: 360px;
-    padding: 18px;
-    font-size: 22px;
+    width: clamp(220px, 20vw, 360px);
+    padding: clamp(10px, 1.5vw, 18px);
+    font-size: clamp(14px, 1.2vw, 22px);
     font-weight: bold;
     color: black;
 
@@ -71,7 +72,7 @@ body {
 
     background: linear-gradient(to bottom, #7fa6bd, #4a6a7d);
 
-    /* 🔥 echter 3D Effekt */
+    /* 3D Effekt */
     box-shadow:
         inset 0 2px 0 rgba(255,255,255,0.6),
         0 8px 0 #2c3e50,
@@ -86,24 +87,45 @@ body {
     transform: translateY(-3px);
 }
 
-/* Klick (drücken Effekt) */
+/* Klick */
 .menu button:active {
     transform: translateY(6px);
-
     box-shadow:
         inset 0 4px 10px rgba(0,0,0,0.7),
         0 2px 0 #2c3e50,
         0 4px 6px rgba(0,0,0,0.7);
 }
 
-/* Löschen Button */
+/* Löschen */
 .delete {
     background: linear-gradient(to bottom, #ff4d4d, #b30000) !important;
-
     box-shadow:
         inset 0 2px 0 rgba(255,255,255,0.4),
         0 8px 0 #660000,
         0 12px 15px rgba(0,0,0,0.9);
+}
+
+/* 📱 Mobile Anpassung */
+@media (max-width: 768px) {
+
+    .title {
+        left: 5%;
+        font-size: 28px;
+    }
+
+    .wappen {
+        width: 180px;
+    }
+
+    .menu {
+        top: 55%;
+        right: 5%;
+    }
+
+    .menu button {
+        width: 220px;
+        font-size: 14px;
+    }
 }
 
 </style>
