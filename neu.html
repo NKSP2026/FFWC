@@ -2,59 +2,37 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Neu Anlegen</title>
+<title>Neu</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>Neu Anlegen</h1>
+<h2>Neu Anlegen</h2>
 
-<div class="form-grid">
+<input id="ort" placeholder="Ort"><br>
+<input id="fahrzeug" placeholder="Fahrzeug"><br>
+<input id="funk" placeholder="Funkkenner"><br>
+<input id="geraete" placeholder="Geräte"><br>
+<textarea id="bemerkung" placeholder="Bemerkung"></textarea><br>
 
-    <div>
-        <label>Ort / Ortsteil</label>
-        <input id="ort">
-    </div>
+<button onclick="save()">Speichern</button>
 
-    <div>
-        <label>Fahrzeug</label>
-        <input id="fahrzeug">
-    </div>
+<script type="module">
+import "./firebase.js";
 
-    <div>
-        <label>Funkkenner</label>
-        <input id="funk">
-    </div>
+window.save = function(){
+    const data = {
+        ort: ort.value,
+        fahrzeug: fahrzeug.value,
+        funk: funk.value,
+        geraete: geraete.value,
+        bemerkung: bemerkung.value
+    };
 
-    <div>
-        <label>Stärke</label>
-        <input id="staerke">
-    </div>
-
-    <div>
-        <label>Einsatzgeräte</label>
-        <input id="geraete">
-    </div>
-
-    <div>
-        <label>Sondergeräte</label>
-        <input id="sonder">
-    </div>
-
-</div>
-
-<label>Bemerkung / Adresse</label>
-<textarea id="bemerkung"></textarea>
-
-<br><br>
-
-<label><input type="checkbox"> Einsatz-/Sondergeräte</label><br>
-<label><input type="checkbox"> Fahrzeuge/ Anhänger</label>
-
-<br><br>
-
-<button>Speichern</button>
-<button onclick="window.history.back()">Abbrechen</button>
+    push(ref(db,"daten"), data);
+    alert("Gespeichert");
+}
+</script>
 
 </body>
 </html>
