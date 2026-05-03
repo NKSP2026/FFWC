@@ -23,15 +23,19 @@
 
     <!-- Menü -->
     <div class="menu">
-        <button>Löschen</button>
-        <button>Neu Anlegen</button>
-        <button>Einsatz-/ Sondergerät Suche</button>
-        <button>Fahrzeug Suche</button>
-        <button>Protokolle öffnen</button>
-        <button>Datenbank öffnen</button>
-    </div>
-
+    <button class="delete">Löschen</button>
+    <button onclick="openPage('neu.html')">Neu Anlegen</button>
+    <button onclick="openPage('suche_geraete.html')">Einsatz-/ Sondergerät Suche</button>
+    <button onclick="openPage('suche_fahrzeug.html')">Fahrzeug Suche</button>
+    <button onclick="openPage('protokolle.html')">Protokolle öffnen</button>
+    <button onclick="openPage('datenbank.html')">Datenbank öffnen</button>
 </div>
+
+<script>
+function openPage(page){
+    window.location.href = page;
+}
+</script>
 
 </body>
 </html>
