@@ -2,39 +2,33 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Landfunkstelle Crimmitschau</title>
+<title>Landfunkstelle</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-
-    <!-- Hintergrund -->
     <div class="background"></div>
 
-    <!-- Titel -->
     <h1 class="title">
         Ortsfeste Landfunkstelle<br>
         Crimmitschau
     </h1>
 
-    <!-- Wappen -->
     <img src="wappen.png" class="wappen">
 
-    <!-- Menü -->
     <div class="menu">
-    <button class="delete">Löschen</button>
-    <button onclick="openPage('neu.html')">Neu Anlegen</button>
-    <button onclick="openPage('suche_geraete.html')">Einsatz-/ Sondergerät Suche</button>
-    <button onclick="openPage('suche_fahrzeug.html')">Fahrzeug Suche</button>
-    <button onclick="openPage('protokolle.html')">Protokolle öffnen</button>
-    <button onclick="openPage('datenbank.html')">Datenbank öffnen</button>
+        <button class="delete">Löschen</button>
+        <button onclick="go('neu.html')">Neu Anlegen</button>
+        <button onclick="go('suche_geraete.html')">Einsatz-/ Sondergerät Suche</button>
+        <button onclick="go('suche_fahrzeug.html')">Fahrzeug Suche</button>
+        <button onclick="go('protokolle.html')">Protokolle öffnen</button>
+        <button onclick="go('datenbank.html')">Datenbank öffnen</button>
+    </div>
 </div>
 
 <script>
-function openPage(page){
-    window.location.href = page;
-}
+function go(x){ window.location.href = x; }
 </script>
 
 </body>
