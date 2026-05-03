@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Datenbank</title>
+</head>
+<body>
+
+<h2>Datenbank öffnen</h2>
+
+<input type="password" id="pw">
+<button onclick="openDB()">Öffnen</button>
+
+<div id="menu" style="display:none;">
+    <button onclick="showFahrzeuge()">Fahrzeuge</button>
+</div>
+
+<div id="content"></div>
+
+<script>
+
+function openDB(){
+    if(document.getElementById("pw").value === "1234"){
+        document.getElementById("menu").style.display = "block";
+    }
+}
+
+function showFahrzeuge(){
+    document.getElementById("content").innerHTML = `
+        <h3>Fahrzeuge</h3>
+        <p>HLF Crimmitschau</p>
+        <p>LF Frankenhausen</p>
+        <p>KLF Gablenz</p>
+    `;
+}
+
+</script>
+
+</body>
+</html>
