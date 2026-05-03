@@ -1,6 +1,8 @@
+/* Grundlayout */
 body {
     margin: 0;
-    font-family: Arial;
+    font-family: "Segoe UI", Arial;
+    background: #1e1e1e;
 }
 
 /* Container */
@@ -8,17 +10,17 @@ body {
     position: relative;
     width: 100vw;
     height: 100vh;
-    overflow: hidden;
 }
 
-/* Hintergrundbild (komplett sichtbar) */
+/* Hintergrund */
 .background {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url("bg.jpg") no-repeat center;
-    background-size: contain;   /* WICHTIG: ganzes Bild sichtbar */
-    background-color: black;    /* füllt Ränder */
+    background: url("bg.jpg") center no-repeat;
+    background-size: contain;
+    background-color: #000;
+    opacity: 0.9;
 }
 
 /* Titel */
@@ -26,51 +28,95 @@ body {
     position: absolute;
     top: 60px;
     left: 80px;
-    font-size: 50px;
+    font-size: 52px;
+    font-weight: bold;
     color: #ff6b6b;
-    text-shadow: 2px 2px 5px black;
+    text-shadow: 2px 2px 8px black;
 }
 
 /* Wappen */
 .wappen {
     position: absolute;
     top: 20px;
-    right: 20px;
-    width: 260px;   /* größer */
+    right: 30px;
+    width: 280px;
+    filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.8));
 }
 
-/* Menü rechts unter Wappen */
+/* Panel (wie Fenster) */
 .menu {
     position: absolute;
-    top: 200px;   /* unter Wappen */
-    right: 20px;
+    top: 220px;
+    right: 30px;
+    padding: 20px;
+    border-radius: 12px;
+
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+
+    box-shadow: 
+        0 8px 20px rgba(0,0,0,0.6),
+        inset 0 0 5px rgba(255,255,255,0.1);
+
     display: flex;
     flex-direction: column;
     gap: 15px;
-    align-items: flex-end;
 }
 
-/* Buttons */
+/* Buttons – Windows Style */
 .menu button {
-    width: 300px;              /* größer */
+    width: 280px;
     padding: 14px;
-    font-size: 18px;
-    font-weight: bold;         /* fette Schrift */
-    border: none;
-    border-radius: 10px;
-    background: #4a6a7d;
-    color: black;              /* schwarze Schrift */
+
+    font-size: 17px;
+    font-weight: 600;
+    color: black;
+
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.4);
+
+    background: linear-gradient(
+        to bottom,
+        #6f8fa1 0%,
+        #4a6a7d 100%
+    );
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.5),
+        0 4px 6px rgba(0,0,0,0.6);
+
     cursor: pointer;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+    transition: all 0.15s ease;
 }
 
 /* Hover */
 .menu button:hover {
-    background: #5f859c;
+    background: linear-gradient(
+        to bottom,
+        #7fa6bd 0%,
+        #567d95 100%
+    );
+    transform: translateY(-2px);
+}
+
+/* Klick Effekt */
+.menu button:active {
+    transform: translateY(1px);
+    box-shadow:
+        inset 0 3px 6px rgba(0,0,0,0.6);
 }
 
 /* Löschen Button */
 .delete {
-    background: red !important;
+    background: linear-gradient(
+        to bottom,
+        #ff6b6b,
+        #b30000
+    ) !important;
+
     color: black !important;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.4),
+        0 4px 6px rgba(0,0,0,0.8);
 }
