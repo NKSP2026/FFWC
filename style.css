@@ -1,42 +1,66 @@
 body {
+    margin: 0;
     font-family: Arial;
-    background: #111;
-    color: white;
-    text-align: center;
 }
 
-#fahrzeuge {
+.container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Hintergrundbild */
+.background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url("bg.jpg") no-repeat center;
+    background-size: cover;
+    filter: brightness(0.8);
+}
+
+/* Titel */
+.title {
+    position: absolute;
+    top: 60px;
+    left: 80px;
+    font-size: 50px;
+    color: #ff6b6b;
+    text-shadow: 2px 2px 5px black;
+}
+
+/* Wappen */
+.wappen {
+    position: absolute;
+    top: 80px;
+    right: 250px;
+    width: 220px;
+}
+
+/* Menü rechts */
+.menu {
+    position: absolute;
+    top: 200px;
+    right: 80px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.button {
-    width: 120px;
-    height: 60px;
+/* Buttons */
+.menu button {
+    width: 260px;
+    padding: 12px;
+    font-size: 16px;
     border: none;
+    border-radius: 8px;
+    background: #4a6a7d;
     color: white;
-    font-weight: bold;
     cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
 }
 
-/* Status Farben */
-.status1 { background: lightgreen; }
-.status2 { background: green; }
-.status3 { background: yellow; color:black; }
-.status4 { background: red; }
-.status5 { background: gray; }
-.status7 { background: orange; }
-.status8 { background: pink; color:black; }
-
-table {
-    margin: auto;
-    margin-top: 20px;
-    border-collapse: collapse;
-}
-
-td, th {
-    border: 1px solid white;
-    padding: 5px 10px;
+.menu button:hover {
+    background: #5f859c;
 }
