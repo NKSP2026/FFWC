@@ -37,6 +37,10 @@ body {
     right: 250px;
     width: 220px;
 }
+.delete {
+    background: red !important;
+    color: black !important;
+}
 
 /* Menü rechts */
 .menu {
