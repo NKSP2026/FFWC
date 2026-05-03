@@ -30,30 +30,31 @@ body {
     background-size: contain;
 }
 
-/* Titel (RESPONSIV nach rechts ins Bild) */
+/* Titel (20% weiter nach rechts) */
 .title {
     position: absolute;
     top: 8%;
-    left: 12%;   /* 🔥 weiter ins Bild */
+    left: 32%; /* vorher ~12% → +20% nach rechts */
     font-size: clamp(28px, 4vw, 60px);
     font-weight: bold;
     color: #ff6b6b;
     text-shadow: 4px 4px 12px black;
 }
 
-/* Wappen (RESPONSIV + größer) */
+/* Wappen (+30% größer) */
 .wappen {
     position: absolute;
     top: 3%;
     right: 2%;
-    width: clamp(200px, 22vw, 420px);  /* 🔥 automatisch größer */
+    width: clamp(260px, 30vw, 550px); /* größer */
 }
 
-/* Menü (weiter runter + nach links) */
+/* Menü (10% runter + 20% nach links) */
 .menu {
     position: absolute;
-    top: 40%;        /* 🔥 weiter runter */
-    right: 10%;      /* 🔥 weiter nach links */
+    top: 50%;   /* war ~40% → +10% runter */
+    right: 24%; /* war ~10% → +20% nach links */
+    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     gap: 18px;
@@ -105,21 +106,22 @@ body {
         0 12px 15px rgba(0,0,0,0.9);
 }
 
-/* 📱 Mobile Anpassung */
+/* Mobile */
 @media (max-width: 768px) {
 
     .title {
-        left: 5%;
+        left: 10%;
         font-size: 28px;
     }
 
     .wappen {
-        width: 180px;
+        width: 200px;
     }
 
     .menu {
-        top: 55%;
-        right: 5%;
+        top: 60%;
+        right: 10%;
+        transform: none;
     }
 
     .menu button {
