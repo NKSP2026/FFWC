@@ -29,70 +29,71 @@ body {
     background-size: 80%;
 }
 
-/* Titel */
+/* Titel (weiter nach rechts ins Bild) */
 .title {
     position: absolute;
-    top: 60px;
-    left: 80px;
+    top: 80px;
+    left: 180px;   /* 🔥 weiter ins Bild */
     font-size: 60px;
     font-weight: bold;
     color: #ff6b6b;
-    text-shadow: 3px 3px 10px black;
+    text-shadow: 4px 4px 12px black;
 }
 
-/* Wappen */
+/* Wappen (+20% größer) */
 .wappen {
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 385px; /* +10% größer */
+    width: 420px;   /* 🔥 größer */
 }
 
-/* Menü */
+/* Menü (weiter runter + nach links) */
 .menu {
     position: absolute;
-    top: 260px;   /* weiter runter */
-    right: 80px;  /* weiter links */
+    top: 340px;   /* 🔥 weiter runter */
+    right: 140px; /* 🔥 weiter nach links */
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px;
 }
 
-/* Buttons */
+/* Buttons (ECHTER 3D LOOK) */
 .menu button {
-    width: 350px;
+    width: 360px;
     padding: 18px;
     font-size: 22px;
     font-weight: bold;
     color: black;
 
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid #2c3e50;
 
-    background: linear-gradient(to bottom, #6f8fa1, #4a6a7d);
+    background: linear-gradient(to bottom, #7fa6bd, #4a6a7d);
 
+    /* 🔥 echter 3D Effekt */
     box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.4),
-        0 6px 0 #2c3e50,
-        0 8px 10px rgba(0,0,0,0.6);
+        inset 0 2px 0 rgba(255,255,255,0.6),
+        0 8px 0 #2c3e50,
+        0 12px 15px rgba(0,0,0,0.8);
 
     cursor: pointer;
-    transition: all 0.1s ease;
+    transition: all 0.15s ease;
 }
 
 /* Hover */
 .menu button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
-/* Klick Effekt */
+/* Klick (drücken Effekt) */
 .menu button:active {
-    transform: translateY(4px);
+    transform: translateY(6px);
 
     box-shadow:
-        inset 0 2px 6px rgba(0,0,0,0.6),
+        inset 0 4px 10px rgba(0,0,0,0.7),
         0 2px 0 #2c3e50,
-        0 4px 6px rgba(0,0,0,0.6);
+        0 4px 6px rgba(0,0,0,0.7);
 }
 
 /* Löschen Button */
@@ -100,9 +101,9 @@ body {
     background: linear-gradient(to bottom, #ff4d4d, #b30000) !important;
 
     box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.3),
-        0 6px 0 #660000,
-        0 8px 10px rgba(0,0,0,0.8);
+        inset 0 2px 0 rgba(255,255,255,0.4),
+        0 8px 0 #660000,
+        0 12px 15px rgba(0,0,0,0.9);
 }
 
 </style>
