@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Protokolle</title>
+</head>
+<body>
+
+<h2>Protokolle</h2>
+
+<input type="password" id="pw" placeholder="Passwort">
+<button onclick="check()">Öffnen</button>
+
+<div id="bereich" style="display:none;">
+    <a href="test.pdf" download>PDF herunterladen</a><br><br>
+
+    <button onclick="mail()">Mail senden</button>
+</div>
+
+<script>
+
+function check(){
+    if(document.getElementById("pw").value === "1234"){
+        document.getElementById("bereich").style.display = "block";
+    } else {
+        alert("Falsches Passwort");
+    }
+}
+
+function mail(){
+    window.location.href = "mailto:test@mail.de?subject=Anfrage&body=Hallo ich benötige...";
+}
+
+</script>
+
+</body>
+</html>
