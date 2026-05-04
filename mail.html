@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -56,11 +56,10 @@ button {
 
 <input id="mail_to" placeholder="Empfänger">
 
-<!-- 🔥 NEU: Betreff -->
 <input id="mail_subject" placeholder="Betreff wird automatisch erstellt">
 
-<input id="einsatz_art" placeholder="Einsatzart" oninput="updateSubject()">
-<input id="einsatz_ort" placeholder="Ort" oninput="updateSubject()">
+<input id="einsatz_art" placeholder="Einsatzart">
+<input id="einsatz_ort" placeholder="Ort">
 <input id="einsatz_adresse" placeholder="Adresse">
 
 <textarea id="einsatz_info" placeholder="Infos"></textarea>
@@ -76,6 +75,7 @@ button {
 
 <script type="module">
 
+/* 🔒 LOGIN */
 if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
@@ -90,9 +90,9 @@ const app = initializeApp({
 
 const db = getDatabase(app);
 
-let fahrzeugeData=[];
+let fahrzeugeData = [];
 
-/* Fahrzeuge laden */
+/* 🔥 Fahrzeuge laden */
 onValue(ref(db,"fahrzeuge"), snap=>{
 
     fahrzeuge.innerHTML="";
@@ -112,7 +112,7 @@ onValue(ref(db,"fahrzeuge"), snap=>{
     });
 });
 
-/* Fahrzeuge Liste */
+/* Fahrzeuge auswählen */
 function getF(){
 
     let c=document.querySelectorAll("#fahrzeuge input:checked");
@@ -120,16 +120,15 @@ function getF(){
 
     c.forEach(e=>{
         let f=fahrzeugeData[e.value];
-        list.push(`${f.fahrzeug} (${f.funk})`);
+        list.push(`${f.fahrzeug} (${f.funk||"-"})`);
     });
 
     return list;
 }
 
 /* 🔥 AUTO BETREFF */
-window.updateSubject = function(){
+function updateSubject(){
 
-    // wenn Benutzer selbst was eingegeben hat → nichts überschreiben
     if(mail_subject.dataset.manual === "true") return;
 
     let now=new Date();
@@ -138,25 +137,27 @@ window.updateSubject = function(){
     let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
 
     mail_subject.value = `${einsatz_art.value || "Einsatz"} - ${einsatz_ort.value || "-"} - ${datum} ${uhrzeit}`;
-};
+}
 
-/* merken ob manuell geändert */
+/* 🔥 MANUELL ÄNDERBAR */
 mail_subject.addEventListener("input", ()=>{
     mail_subject.dataset.manual = "true";
 });
 
-/* MAIL */
+/* Events */
+einsatz_art.addEventListener("input", updateSubject);
+einsatz_ort.addEventListener("input", updateSubject);
+
+/* 🔥 MAIL */
 window.sendMail=function(){
 
     let now=new Date();
-
     let datum=now.toLocaleDateString("de-DE");
     let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
 
-    let betreff = mail_subject.value || `${einsatz_art.value} - ${einsatz_ort.value} - ${datum} ${uhrzeit}`;
+    let betreff = mail_subject.value;
 
-    let body=`
-Einsatzbericht
+    let body=`Einsatzbericht
 
 Art: ${einsatz_art.value}
 Ort: ${einsatz_ort.value}
@@ -168,20 +169,27 @@ ${getF().join("\n")}
 Info:
 ${einsatz_info.value}
 
-Zeit: ${datum} ${uhrzeit}
-`;
+Zeit: ${datum} ${uhrzeit}`;
 
     location.href=`mailto:${mail_to.value}?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(body)}`;
 };
 
-/* PDF */
+/* 🔥 PDF */
 window.createPDF=function(){
 
     const { jsPDF } = window.jspdf;
     const doc=new jsPDF();
 
     let y=10;
-    function l(t){doc.text(t,10,y);y+=8;}
+
+    function l(t){
+        if(y > 270){
+            doc.addPage();
+            y = 10;
+        }
+        doc.text(t,10,y);
+        y+=8;
+    }
 
     let now=new Date();
     let datum=now.toLocaleDateString("de-DE");
@@ -195,11 +203,13 @@ window.createPDF=function(){
 
     l("");
     l("Fahrzeuge:");
+
     getF().forEach(f=>l("- "+f));
 
     l("");
     l("Info:");
-    l(einsatz_info.value);
+
+    einsatz_info.value.split("\n").forEach(line=>l(line));
 
     l("");
     l("Zeit: "+datum+" "+uhrzeit);
@@ -211,10 +221,10 @@ window.createPDF=function(){
     doc.save(`Einsatz_${safeOrt}_${safeDatum}_${safeUhrzeit}.pdf`);
 };
 
-/* zurück */
+/* 🔙 */
 window.back=()=>location.href="index.html";
 
-/* initial setzen */
+/* initial */
 updateSubject();
 
 </script>
