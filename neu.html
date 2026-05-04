@@ -4,111 +4,134 @@
 <meta charset="UTF-8">
 <title>Neu Anlegen</title>
 
-<link rel="stylesheet" href="style.css">
-
 <style>
 
-/* Fenster Style */
-.window {
-    width: 800px;
+/* Hintergrund */
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial;
+    background: #0f1117;
+    color: white;
+}
+
+/* Fenster */
+.container {
+    max-width: 900px;
     margin: 40px auto;
-    background: #dcdcdc;
-    padding: 20px;
-    border-radius: 8px;
+    background: #1c1f26;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* Titel */
+h2 {
+    margin-bottom: 20px;
 }
 
 /* Grid */
-.form-grid {
+.grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
 /* Felder */
-label {
-    font-weight: bold;
-}
-
 input, textarea {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background: #111318;
+    color: white;
 }
 
-/* Textarea breit */
+/* Fokus */
+input:focus, textarea:focus {
+    outline: 2px solid #3b82f6;
+}
+
+/* volle Breite */
 .full {
     grid-column: span 2;
+}
+
+/* Checkbox */
+.checkbox {
+    margin-top: 10px;
 }
 
 /* Buttons */
 .buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
-button {
-    padding: 10px 20px;
+.btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
     font-weight: bold;
+    cursor: pointer;
+}
+
+.save {
+    background: #3b82f6;
+    color: white;
+}
+
+.cancel {
+    background: #ef4444;
+    color: white;
+}
+
+/* Bild Vorschau */
+.preview {
+    margin-top: 10px;
+    max-height: 120px;
+    border-radius: 8px;
 }
 
 </style>
-
 </head>
 <body>
 
-<div class="window">
+<div class="container">
 
-    <h2>Neu Anlegen</h2>
+<h2>Neu Anlegen</h2>
 
-    <div class="form-grid">
+<div class="grid">
 
-        <div>
-            <label>Ort / Ortsteil</label>
-            <input id="ort">
-        </div>
+<input id="ort" placeholder="Ort / Ortsteil">
+<input id="fahrzeug" placeholder="Fahrzeug">
 
-        <div>
-            <label>Fahrzeug</label>
-            <input id="fahrzeug">
-        </div>
+<input id="funk" placeholder="Funkkenner">
+<input id="staerke" placeholder="Stärke">
 
-        <div>
-            <label>Funkkenner</label>
-            <input id="funk">
-        </div>
+<input id="geraete" placeholder="Einsatzgeräte">
+<input id="sonder" placeholder="Sondergeräte">
 
-        <div>
-            <label>Stärke</label>
-            <input id="staerke">
-        </div>
+<textarea id="bemerkung" class="full" placeholder="Bemerkung / Adresse"></textarea>
 
-        <div>
-            <label>Einsatzgeräte</label>
-            <input id="geraete">
-        </div>
+<!-- Bild -->
+<div class="full">
+    <input type="file" id="bild">
+    <img id="preview" class="preview">
+</div>
 
-        <div>
-            <label>Sondergeräte</label>
-            <input id="sonder">
-        </div>
+<!-- Checkbox -->
+<div class="full checkbox">
+    <label><input type="checkbox" id="einsatz"> Einsatz-/Sondergeräte</label><br>
+    <label><input type="checkbox" id="fahrzeuge"> Fahrzeuge/Anhänger</label>
+</div>
 
-        <div class="full">
-            <label>Bemerkung / Adresse</label>
-            <textarea id="bemerkung"></textarea>
-        </div>
+</div>
 
-        <div class="full">
-            <label><input type="checkbox" id="einsatz"> Einsatz-/Sondergeräte</label><br>
-            <label><input type="checkbox" id="fahrzeuge"> Fahrzeuge/Anhänger</label>
-        </div>
-
-    </div>
-
-    <div class="buttons">
-        <button onclick="save()">Speichern</button>
-        <button onclick="back()">Abbrechen</button>
-    </div>
+<div class="buttons">
+    <button class="btn save" onclick="save()">Speichern</button>
+    <button class="btn cancel" onclick="back()">Abbrechen</button>
+</div>
 
 </div>
 
@@ -117,44 +140,67 @@ button {
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
+  apiKey: "AIzaSy...",
   authDomain: "ffwc-d3994.firebaseapp.com",
   databaseURL: "https://ffwc-d3994-default-rtdb.firebaseio.com/",
   projectId: "ffwc-d3994",
-  storageBucket: "ffwc-d3994.firebasestorage.app",
+  storageBucket: "ffwc-d3994.appspot.com",
   messagingSenderId: "591233232022",
   appId: "1:591233232022:web:66ce4e0349d426e94ae6b7"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const storage = getStorage(app);
 
-window.save = function(){
+/* Bild Vorschau */
+document.getElementById("bild").addEventListener("change", e => {
+    const file = e.target.files[0];
+    if(file){
+        document.getElementById("preview").src = URL.createObjectURL(file);
+    }
+});
+
+/* Speichern */
+window.save = async function(){
+
+    let file = document.getElementById("bild").files[0];
+    let imageUrl = "";
+
+    /* Bild hochladen (optional) */
+    if(file){
+        let storageRef = sRef(storage, "bilder/" + Date.now());
+        await uploadBytes(storageRef, file);
+        imageUrl = await getDownloadURL(storageRef);
+    }
 
     let data = {
-        ort: document.getElementById("ort").value,
-        fahrzeug: document.getElementById("fahrzeug").value,
-        funk: document.getElementById("funk").value,
-        staerke: document.getElementById("staerke").value,
-        geraete: document.getElementById("geraete").value,
-        sonder: document.getElementById("sonder").value,
-        bemerkung: document.getElementById("bemerkung").value,
+        ort: ort.value,
+        fahrzeug: fahrzeug.value,
+        funk: funk.value,
+        staerke: staerke.value,
+        geraete: geraete.value,
+        sonder: sonder.value,
+        bemerkung: bemerkung.value,
+        bild: imageUrl,
         zeit: new Date().toLocaleString()
     };
 
-    if(document.getElementById("einsatz").checked){
+    if(einsatz.checked){
         push(ref(db, "geraete"), data);
     }
 
-    if(document.getElementById("fahrzeuge").checked){
+    if(fahrzeuge.checked){
         push(ref(db, "fahrzeuge"), data);
     }
 
     alert("Gespeichert!");
 }
 
+/* Zurück */
 window.back = function(){
     window.location.href = "index.html";
 }
