@@ -7,7 +7,7 @@
 <style>
 body {
     margin: 0;
-    font-family: "Segoe UI", Arial;
+    font-family: "Segoe UI";
     background: #0f1117;
     color: white;
 }
@@ -16,7 +16,7 @@ body {
     max-width: 900px;
     margin: 40px auto;
     background: #1c1f26;
-    padding: 40px;
+    padding: 30px;
     border-radius: 15px;
 }
 
@@ -27,8 +27,7 @@ body {
 }
 
 input, textarea {
-    width: 100%;
-    padding: 14px;
+    padding: 12px;
     border-radius: 10px;
     border: none;
     background: #111318;
@@ -39,22 +38,22 @@ input, textarea {
     grid-column: span 2;
 }
 
-.bottom {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 30px;
-}
-
-.btn {
-    padding: 12px 20px;
+button {
+    padding: 12px;
     border-radius: 10px;
     border: none;
     font-weight: bold;
     cursor: pointer;
 }
 
-.save { background: #3b82f6; }
-.cancel { background: #ef4444; }
+.save { background:#3b82f6; }
+.cancel { background:#ef4444; }
+
+.bottom {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
 </style>
 </head>
 
@@ -69,17 +68,19 @@ input, textarea {
 <input id="ort" placeholder="Ort">
 <input id="adresse" placeholder="Adresse">
 
-<input id="fahrzeug" placeholder="Fahrzeug (z.B. HLF 20)">
-<input id="lagerort" placeholder="Lagerort (z.B. G3, Regal A, Halle A)">
+<input id="telefon" placeholder="Telefon">
+<input id="fahrzeug" placeholder="Fahrzeug">
 
-<input id="geraete" placeholder="Einsatzgerät">
-<input id="beladung" placeholder="Beladung (z.B. Spreizer, Schneidgerät...)">
-<input id="sonder" placeholder="Sondergerät">
-
-<input id="telefon" placeholder="Telefonnummer">
 <input id="funk" placeholder="Funkkenner">
+<input id="staerke" placeholder="Stärke">
 
-<textarea id="bemerkung" class="full" placeholder="Bemerkung"></textarea>
+<input id="geraete" placeholder="Gerät">
+<input id="lagerort" placeholder="Lagerort (z.B. HLF G3 / Regal A)">
+
+<textarea id="beladung" class="full" placeholder="Beladung (wichtig für Suche!)"></textarea>
+
+<input type="file" id="bild" class="full">
+<img id="preview" style="max-height:120px">
 
 </div>
 
@@ -91,8 +92,10 @@ input, textarea {
 </div>
 
 <div>
-<button class="btn save" onclick="save()">Speichern</button>
-<button class="btn cancel" onclick="back()">Abbrechen</button>
+<button class="save" onclick="save()">Speichern</button>
+<button class="cancel" onclick="back()">Abbrechen</button>
+</div>
+
 </div>
 
 </div>
@@ -101,45 +104,54 @@ input, textarea {
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSy...",
-  authDomain: "ffwc-d3994.firebaseapp.com",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "ffwc-d3994",
+  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
+});
+
+const db = getDatabase(app);
+const storage = getStorage(app);
+
+bild.onchange = e=>{
+    preview.src = URL.createObjectURL(e.target.files[0]);
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+window.save = async function(){
 
-window.save = function(){
+    let img="";
+    if(bild.files[0]){
+        let r = sRef(storage,"bilder/"+Date.now());
+        await uploadBytes(r,bild.files[0]);
+        img = await getDownloadURL(r);
+    }
 
     let data = {
         ort: ort.value,
         adresse: adresse.value,
-        fahrzeug: fahrzeug.value,
-        lagerort: lagerort.value,
-        geraete: geraete.value,
-        sonder: sonder.value,
         telefon: telefon.value,
+        fahrzeug: fahrzeug.value,
         funk: funk.value,
-        bemerkung: bemerkung.value
+        staerke: staerke.value,
+        geraete: geraete.value,
+        lagerort: lagerort.value,
+        beladung: beladung.value,
+        bild: img
     };
 
     if(einsatz.checked){
-        push(ref(db, "geraete"), data);
+        push(ref(db,"geraete"), data);
     }
 
     if(fahrzeuge.checked){
-        push(ref(db, "fahrzeuge"), data);
+        push(ref(db,"fahrzeuge"), data);
     }
 
-    alert("Gespeichert");
+    alert("Gespeichert!");
 };
 
-window.back = function(){
-    window.location.href = "index.html";
-};
+window.back = ()=> location.href="index.html";
 
 </script>
 
