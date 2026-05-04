@@ -45,7 +45,6 @@ input, textarea {
     border: none;
     background: #111318;
     color: white;
-    font-size: 14px;
 }
 
 /* Fokus */
@@ -65,11 +64,10 @@ input:focus, textarea:focus {
     border-radius: 8px;
 }
 
-/* ===== UNTERER BEREICH ===== */
+/* ===== UNTEN ===== */
 .bottom-area {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
     margin-top: 40px;
 }
 
@@ -80,19 +78,11 @@ input:focus, textarea:focus {
     gap: 20px;
 }
 
-/* Checkbox Zeile */
+/* Checkbox */
 .checkline {
     display: flex;
-    align-items: center;
     justify-content: space-between;
     width: 300px;
-    font-size: 16px;
-}
-
-/* Checkbox */
-.checkline input {
-    transform: scale(1.3);
-    cursor: pointer;
 }
 
 /* RECHTS */
@@ -104,25 +94,16 @@ input:focus, textarea:focus {
 
 /* Buttons */
 .btn {
-    padding: 14px 20px;
+    padding: 14px;
     border-radius: 12px;
     border: none;
     font-weight: bold;
     cursor: pointer;
-    font-size: 14px;
     width: 160px;
 }
 
-/* Farben */
-.save {
-    background: #3b82f6;
-    color: white;
-}
-
-.cancel {
-    background: #ef4444;
-    color: white;
-}
+.save { background: #3b82f6; }
+.cancel { background: #ef4444; }
 
 </style>
 </head>
@@ -143,9 +124,12 @@ input:focus, textarea:focus {
 <input id="geraete" placeholder="Einsatzgeräte">
 <input id="sonder" placeholder="Sondergeräte">
 
+<!-- NEU -->
+<input id="telefon" placeholder="Telefonnummer">
+<input id="lagerort" placeholder="Standort / Verlastung (z.B. HLF G3 / Regal A / Anhänger)">
+
 <textarea id="bemerkung" class="full" placeholder="Bemerkung / Adresse"></textarea>
 
-<!-- Bild -->
 <div class="full">
     <input type="file" id="bild">
     <img id="preview" class="preview">
@@ -153,29 +137,24 @@ input:focus, textarea:focus {
 
 </div>
 
-<!-- ===== UNTEN ===== -->
 <div class="bottom-area">
 
-    <!-- LINKS -->
-    <div class="left-side">
+<div class="left-side">
+    <label class="checkline">
+        <span>Einsatz-/Sondergeräte</span>
+        <input type="checkbox" id="einsatz">
+    </label>
 
-        <label class="checkline">
-            <span>Einsatz-/Sondergeräte</span>
-            <input type="checkbox" id="einsatz">
-        </label>
+    <label class="checkline">
+        <span>Fahrzeuge/Anhänger</span>
+        <input type="checkbox" id="fahrzeuge">
+    </label>
+</div>
 
-        <label class="checkline">
-            <span>Fahrzeuge/Anhänger</span>
-            <input type="checkbox" id="fahrzeuge">
-        </label>
-
-    </div>
-
-    <!-- RECHTS -->
-    <div class="right-side">
-        <button class="btn save" onclick="save()">Speichern</button>
-        <button class="btn cancel" onclick="back()">Abbrechen</button>
-    </div>
+<div class="right-side">
+    <button class="btn save" onclick="save()">Speichern</button>
+    <button class="btn cancel" onclick="back()">Abbrechen</button>
+</div>
 
 </div>
 
@@ -199,15 +178,13 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const storage = getStorage(app);
 
-/* Bild Vorschau */
-bild.addEventListener("change", e => {
+bild.onchange = e => {
     const file = e.target.files[0];
     if(file){
         preview.src = URL.createObjectURL(file);
     }
-});
+};
 
-/* Speichern */
 window.save = async function(){
 
     let file = bild.files[0];
@@ -226,6 +203,8 @@ window.save = async function(){
         staerke: staerke.value,
         geraete: geraete.value,
         sonder: sonder.value,
+        telefon: telefon.value,
+        lagerort: lagerort.value,
         bemerkung: bemerkung.value,
         bild: imageUrl,
         zeit: new Date().toLocaleString()
@@ -240,12 +219,9 @@ window.save = async function(){
     }
 
     alert("Gespeichert!");
-}
+};
 
-/* Zurück */
-window.back = function(){
-    window.location.href = "index.html";
-}
+window.back = () => window.location.href = "index.html";
 
 </script>
 
