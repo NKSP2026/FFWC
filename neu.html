@@ -19,7 +19,7 @@ body {
     max-width: 900px;
     margin: 40px auto;
     background: #1c1f26;
-    padding: 40px; /* 👉 mehr Rand */
+    padding: 40px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
@@ -65,51 +65,60 @@ input:focus, textarea:focus {
     border-radius: 8px;
 }
 
-/* Checkbox Bereich */
-.checkbox-wrapper {
-    grid-column: span 2;
-    margin-top: 30px;
+/* ===== UNTERER BEREICH ===== */
+.bottom-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 40px;
+}
+
+/* LINKS */
+.left-side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 /* Checkbox Zeile */
 .checkline {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 15px;
+    justify-content: space-between;
+    width: 300px;
     font-size: 16px;
 }
 
 /* Checkbox */
 .checkline input {
     transform: scale(1.3);
-    margin: 0;
     cursor: pointer;
 }
 
-/* Buttons */
-.buttons {
+/* RECHTS */
+.right-side {
     display: flex;
-    justify-content: space-between;
-    margin-top: 30px;
+    flex-direction: column;
+    gap: 15px;
 }
 
+/* Buttons */
 .btn {
-    padding: 14px 25px;
+    padding: 14px 20px;
     border-radius: 12px;
     border: none;
     font-weight: bold;
     cursor: pointer;
     font-size: 14px;
+    width: 160px;
 }
 
-/* Speichern */
+/* Farben */
 .save {
     background: #3b82f6;
     color: white;
 }
 
-/* Abbrechen */
 .cancel {
     background: #ef4444;
     color: white;
@@ -142,25 +151,31 @@ input:focus, textarea:focus {
     <img id="preview" class="preview">
 </div>
 
-<!-- Checkbox -->
-<div class="checkbox-wrapper">
-
-    <label class="checkline">
-        <input type="checkbox" id="einsatz">
-        Einsatz-/Sondergeräte
-    </label>
-
-    <label class="checkline">
-        <input type="checkbox" id="fahrzeuge">
-        Fahrzeuge/Anhänger
-    </label>
-
 </div>
 
-<div class="buttons">
-    <button class="btn save" onclick="save()">Speichern</button>
-    <button class="btn cancel" onclick="back()">Abbrechen</button>
-</div>
+<!-- ===== UNTEN ===== -->
+<div class="bottom-area">
+
+    <!-- LINKS -->
+    <div class="left-side">
+
+        <label class="checkline">
+            <span>Einsatz-/Sondergeräte</span>
+            <input type="checkbox" id="einsatz">
+        </label>
+
+        <label class="checkline">
+            <span>Fahrzeuge/Anhänger</span>
+            <input type="checkbox" id="fahrzeuge">
+        </label>
+
+    </div>
+
+    <!-- RECHTS -->
+    <div class="right-side">
+        <button class="btn save" onclick="save()">Speichern</button>
+        <button class="btn cancel" onclick="back()">Abbrechen</button>
+    </div>
 
 </div>
 
