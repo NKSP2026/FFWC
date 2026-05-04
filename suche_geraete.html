@@ -35,6 +35,31 @@ input {
     border:none;
 }
 
+/* Buttons */
+.buttons {
+    margin-top:10px;
+    display:flex;
+    gap:10px;
+}
+
+button {
+    padding:10px 16px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.search-btn {
+    background:#3b82f6;
+    color:white;
+}
+
+.cancel-btn {
+    background:#ef4444;
+    color:white;
+}
+
 /* Vorschläge */
 #suggestions {
     background:#111318;
@@ -81,6 +106,11 @@ input {
     <!-- LINKS -->
     <div>
         <input id="s" placeholder="Gerät suchen..." oninput="suggest()">
+
+        <div class="buttons">
+            <button class="search-btn" onclick="doSearch()">Suchen</button>
+            <button class="cancel-btn" onclick="back()">Abbrechen</button>
+        </div>
     </div>
 
     <!-- RECHTS -->
@@ -117,7 +147,7 @@ onValue(ref(db,"fahrzeuge"), s=>{
 });
 
 
-// 🔥 Vorschläge
+/* 🔥 Vorschläge */
 window.suggest = function(){
 
     let q = s.value.toLowerCase();
@@ -150,13 +180,12 @@ window.suggest = function(){
         }
     });
 
-    /* anzeigen */
+    /* Anzeigen */
     found.forEach(name=>{
         let div = document.createElement("div");
         div.className="suggest-item";
         div.innerText = name;
 
-        /* 🔥 Doppelklick */
         div.ondblclick = ()=>{
             s.value = name;
             doSearch();
@@ -167,7 +196,7 @@ window.suggest = function(){
 };
 
 
-// 🔎 Suche
+/* 🔎 Suche */
 window.doSearch = function(){
 
     let q = s.value.toLowerCase();
@@ -222,6 +251,12 @@ function showCard(d,type){
 
     results.appendChild(c);
 }
+
+
+/* Zurück */
+window.back = function(){
+    window.location.href = "index.html";
+};
 
 </script>
 
