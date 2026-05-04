@@ -157,9 +157,7 @@ window.sendMail = function(){
         minute: "2-digit"
     });
 
-    /* 🔥 automatischer Betreff */
     let autoBetreff = `${einsatz_art.value || "Einsatz"} - ${einsatz_ort.value || "-"} - ${datum} ${uhrzeit}`;
-
     let betreff = mail_subject.value || autoBetreff;
 
     let fahrzeugeListe = getSelectedFahrzeuge().join("\n");
@@ -199,6 +197,7 @@ window.createPDF = function(){
     }
 
     let now = new Date();
+
     let datum = now.toLocaleDateString("de-DE");
     let uhrzeit = now.toLocaleTimeString("de-DE", {
         hour: "2-digit",
@@ -226,7 +225,12 @@ window.createPDF = function(){
     line("");
     line("Zeit: " + datum + " " + uhrzeit);
 
-    doc.save(`Einsatz_${einsatz_ort.value}_${datum}.pdf`);
+    /* 🔥 saubere Dateinamen */
+    let safeOrt = (einsatz_ort.value || "Unbekannt").replace(/\s+/g, "_");
+    let safeDatum = datum.replace(/\./g, "-");
+    let safeUhrzeit = uhrzeit.replace(":", "-");
+
+    doc.save(`Einsatz_${safeOrt}_${safeDatum}_${safeUhrzeit}.pdf`);
 };
 
 /* Zurück */
