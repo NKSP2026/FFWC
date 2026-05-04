@@ -24,7 +24,6 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* Suche */
 .search-area {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -40,7 +39,6 @@ input {
     color: white;
 }
 
-/* Vorschläge */
 #suggestions {
     height: 260px;
     background: #111318;
@@ -59,7 +57,6 @@ input {
     background: #2a2f3a;
 }
 
-/* Buttons */
 .buttons {
     display: flex;
     gap: 10px;
@@ -77,7 +74,6 @@ button {
 .search-btn { background: #3b82f6; }
 .cancel-btn { background: #ef4444; }
 
-/* Ergebnisse */
 .results {
     margin-top: 30px;
     display: grid;
@@ -85,20 +81,13 @@ button {
     gap: 20px;
 }
 
-/* Karte */
 .card {
     background: #111318;
     border-radius: 12px;
     padding: 15px;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-.card:hover {
-    transform: scale(1.02);
-}
-
-/* Bild */
 .card img {
     width: 100%;
     height: 160px;
@@ -107,7 +96,6 @@ button {
     margin-bottom: 10px;
 }
 
-/* Detail */
 .detail {
     margin-top: 10px;
     padding: 10px;
@@ -144,6 +132,7 @@ button {
 
 <script type="module">
 
+/* 🔒 LOGIN */
 if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
@@ -151,25 +140,21 @@ if(localStorage.getItem("login") !== "ok"){
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-/* Firebase */
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSy...",
-  authDomain: "ffwc-d3994.firebaseapp.com",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "ffwc-d3994"
-};
+  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let data = [];
 
-/* Daten laden */
+/* 🔥 Daten laden */
 onValue(ref(db, "fahrzeuge"), snap => {
     data = Object.values(snap.val() || {});
 });
 
-/* 🔎 Vorschläge mit Abkürzungen */
+/* 🔎 Vorschläge (verbessert) */
 window.suggest = function(){
 
     let s = search.value.toLowerCase();
@@ -181,23 +166,27 @@ window.suggest = function(){
 
     data.forEach(d => {
 
-        let name = d.fahrzeug || "";
+        let name = (d.fahrzeug || "").toLowerCase();
         let beladung = (d.beladung || "").toLowerCase();
 
-        /* normale Suche */
-        if(name.toLowerCase().includes(s)) found.add(name);
+        /* 🔥 Teilwortsuche */
+        if(name.includes(s)) found.add(d.fahrzeug);
 
-        /* 🔥 Abkürzungen */
-        if(s === "hlf" && name.toLowerCase().includes("hilfeleistung")) found.add(name);
-        if(s === "dl" && name.toLowerCase().includes("drehleiter")) found.add(name);
-        if(s === "rtb" && name.toLowerCase().includes("rettungsboot")) found.add(name);
+        /* 🔥 Beladung */
+        if(beladung.includes(s)) found.add(d.fahrzeug);
 
-        /* 🔥 Beladung durchsuchen */
-        if(beladung.includes(s)) found.add(name);
+        /* 🔥 Abkürzungen erweitert */
+        if(name.includes("hilfeleistung") && s.includes("hlf")) found.add(d.fahrzeug);
+        if(name.includes("drehleiter") && s.includes("dl")) found.add(d.fahrzeug);
+        if(name.includes("rettungsboot") && s.includes("rtb")) found.add(d.fahrzeug);
 
     });
 
+    let count = 0;
+
     found.forEach(name => {
+
+        if(count > 15) return; // max 15 Vorschläge
 
         let div = document.createElement("div");
         div.className = "suggest-item";
@@ -209,6 +198,7 @@ window.suggest = function(){
         };
 
         suggestions.appendChild(div);
+        count++;
     });
 };
 
@@ -220,27 +210,32 @@ window.doSearch = function(){
 
     data.forEach(d => {
 
-        let name = d.fahrzeug || "";
+        let name = (d.fahrzeug || "").toLowerCase();
         let beladung = (d.beladung || "").toLowerCase();
 
-        if(name.toLowerCase().includes(s) || beladung.includes(s)){
+        if(name.includes(s) || beladung.includes(s)){
 
             let card = document.createElement("div");
             card.className = "card";
 
             card.innerHTML = `
                 ${d.bild ? `<img src="${d.bild}">` : ""}
-
-                <b>${name}</b><br><br>
-
+                <b>${d.fahrzeug}</b><br><br>
                 <b>Ort:</b> ${d.ort || "-"}<br>
                 <b>Adresse:</b> ${d.adresse || "-"}<br>
-                <b>Funkkenner:</b> ${d.funk || "-"}<br>
+                <b>Funk:</b> ${d.funk || "-"}<br>
                 <b>Stärke:</b> ${d.staerke || "-"}
             `;
 
-            /* Klick → Details */
+            /* 🔥 Toggle Details */
             card.onclick = () => {
+
+                let existing = card.querySelector(".detail");
+
+                if(existing){
+                    existing.remove();
+                    return;
+                }
 
                 let detail = document.createElement("div");
                 detail.className = "detail";
@@ -251,7 +246,6 @@ window.doSearch = function(){
                 `;
 
                 card.appendChild(detail);
-                card.onclick = null;
             };
 
             results.appendChild(card);
@@ -259,10 +253,8 @@ window.doSearch = function(){
     });
 };
 
-/* Zurück */
-window.back = function(){
-    window.location.href = "index.html";
-};
+/* 🔙 */
+window.back = () => location.href = "index.html";
 
 </script>
 
