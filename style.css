@@ -1,11 +1,12 @@
-/* RESET */
+/* ===== BASIS ===== */
 body {
     margin: 0;
     font-family: "Segoe UI", Arial;
-    background: black;
+    background: #0f1117;
+    color: white;
 }
 
-/* CONTAINER */
+/* ===== CONTAINER ===== */
 .container {
     position: relative;
     width: 100%;
@@ -13,100 +14,102 @@ body {
     overflow: hidden;
 }
 
-/* HINTERGRUND */
+/* ===== HINTERGRUND ===== */
 .background {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: url("bg.jpg") no-repeat center;
-    background-size: cover; /* 🔥 WICHTIG */
+    background: url("feuerwehr.jpg") center/cover no-repeat;
+    filter: brightness(0.6);
 }
 
-/* TITEL */
+/* ===== TITEL ===== */
 .title {
     position: absolute;
-    top: 8%;
-    left: 5%;
-    font-size: clamp(24px, 4vw, 60px); /* 🔥 flexibel */
-    font-weight: bold;
+    top: 80px;
+    left: 60px;
+    font-size: 48px;
     color: #ff6b6b;
-    text-shadow: 4px 4px 12px black;
-    max-width: 60%;
+    text-shadow: 0 5px 20px rgba(0,0,0,0.7);
 }
 
-/* WAPPEN */
+/* ===== WAPPEN ===== */
 .wappen {
     position: absolute;
-    top: 5%;
-    right: 5%;
-    width: clamp(120px, 20vw, 400px);
+    top: 80px;
+    right: 60px;
+    width: 140px;
 }
 
-/* MENU */
+/* ===== MENÜ ===== */
 .menu {
     position: absolute;
-    top: 50%;
-    right: 5%;
-    transform: translateY(-50%);
+    right: 60px;
+    top: 250px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    width: 260px;
 }
 
-/* BUTTONS */
-.menu button {
-    width: clamp(200px, 18vw, 320px);
-    padding: clamp(10px, 1.2vw, 16px);
-    font-size: clamp(14px, 1.1vw, 20px);
-    font-weight: bold;
-    color: black;
-
+/* ===== BUTTONS ===== */
+button {
+    padding: 14px;
     border-radius: 12px;
-    border: 1px solid #2c3e50;
-
-    background: linear-gradient(to bottom, #7fa6bd, #4a6a7d);
-
-    box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.6),
-        0 6px 0 #2c3e50,
-        0 10px 15px rgba(0,0,0,0.8);
-
+    border: none;
+    font-weight: bold;
     cursor: pointer;
-    transition: all 0.15s ease;
+    font-size: 15px;
+    transition: 0.2s;
 }
 
-.menu button:hover {
-    transform: translateY(-2px);
+/* Hover Effekt */
+button:hover {
+    transform: scale(1.05);
 }
 
-.menu button:active {
-    transform: translateY(4px);
+/* Standard Buttons */
+.menu button {
+    background: linear-gradient(to bottom, #6b7280, #374151);
+    color: white;
 }
 
-/* LÖSCHEN BUTTON */
+/* Löschen Button */
 .delete {
-    background: linear-gradient(to bottom, #ff4d4d, #b30000) !important;
+    background: linear-gradient(to bottom, #ef4444, #991b1b);
 }
 
-/* 📱 MOBILE */
-@media (max-width: 768px) {
+/* Logout */
+.logout {
+    margin-top: 20px;
+    background: linear-gradient(to bottom, #9ca3af, #4b5563);
+}
+
+/* ===== RESPONSIVE (WICHTIG!) ===== */
+@media (max-width: 900px){
 
     .title {
-        font-size: 24px;
-        max-width: 90%;
-    }
-
-    .menu {
-        right: 50%;
-        transform: translate(50%, -50%);
-        align-items: center;
-    }
-
-    .menu button {
-        width: 260px;
+        font-size: 30px;
+        left: 20px;
+        top: 40px;
     }
 
     .wappen {
-        display: none; /* optional */
+        width: 90px;
+        top: 20px;
+        right: 20px;
+    }
+
+    .menu {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin: 200px auto 0 auto;
+        width: 90%;
+    }
+
+    .container {
+        height: auto;
+        padding-bottom: 40px;
     }
 }
