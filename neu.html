@@ -5,8 +5,6 @@
 <title>Neu Anlegen</title>
 
 <style>
-
-/* Hintergrund */
 body {
     margin: 0;
     font-family: "Segoe UI", Arial;
@@ -14,22 +12,18 @@ body {
     color: white;
 }
 
-/* Fenster */
 .container {
     max-width: 900px;
     margin: 40px auto;
     background: #1c1f26;
     padding: 40px;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
-/* Titel */
 h2 {
     margin-bottom: 25px;
 }
 
-/* Grid */
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -37,7 +31,6 @@ h2 {
     row-gap: 20px;
 }
 
-/* Felder */
 input, textarea {
     width: 100%;
     padding: 14px;
@@ -47,66 +40,53 @@ input, textarea {
     color: white;
 }
 
-/* Fokus */
-input:focus, textarea:focus {
-    outline: 2px solid #3b82f6;
-}
-
-/* volle Breite */
 .full {
     grid-column: span 2;
 }
 
-/* Bild */
-.preview {
-    margin-top: 10px;
-    max-height: 120px;
-    border-radius: 8px;
-}
-
-/* ===== UNTEN ===== */
+/* Layout unten */
 .bottom-area {
     display: flex;
     justify-content: space-between;
     margin-top: 40px;
 }
 
-/* LINKS */
 .left-side {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* Checkbox */
-.checkline {
-    display: flex;
-    justify-content: space-between;
-    width: 300px;
-}
-
-/* RECHTS */
-.right-side {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-/* Buttons */
+.checkline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.right-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .btn {
     padding: 14px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: none;
     font-weight: bold;
     cursor: pointer;
-    width: 160px;
 }
 
 .save { background: #3b82f6; }
 .cancel { background: #ef4444; }
 
+.preview {
+    margin-top: 10px;
+    max-height: 120px;
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -116,17 +96,17 @@ input:focus, textarea:focus {
 <div class="grid">
 
 <input id="ort" placeholder="Ort / Ortsteil">
-<input id="fahrzeug" placeholder="Fahrzeug">
+<input id="fahrzeug" placeholder="Fahrzeug (z.B. HLF 20)">
 
 <input id="funk" placeholder="Funkkenner">
 <input id="staerke" placeholder="Stärke">
 
-<input id="geraete" placeholder="Einsatzgeräte">
-<input id="sonder" placeholder="Sondergeräte">
+<input id="geraete" placeholder="Einsatzgerät">
+<input id="sonder" placeholder="Sondergerät">
 
-<!-- NEU -->
+<!-- 🔥 NEU -->
 <input id="telefon" placeholder="Telefonnummer">
-<input id="lagerort" placeholder="Standort / Verlastung (z.B. HLF G3 / Regal A / Anhänger)">
+<input id="lagerort" placeholder="Lagerort (z.B. Regal A / HLF G3 / Fahrzeughalle A)">
 
 <textarea id="bemerkung" class="full" placeholder="Bemerkung / Adresse"></textarea>
 
@@ -140,20 +120,22 @@ input:focus, textarea:focus {
 <div class="bottom-area">
 
 <div class="left-side">
-    <label class="checkline">
-        <span>Einsatz-/Sondergeräte</span>
-        <input type="checkbox" id="einsatz">
-    </label>
 
-    <label class="checkline">
-        <span>Fahrzeuge/Anhänger</span>
-        <input type="checkbox" id="fahrzeuge">
-    </label>
+<label class="checkline">
+    <input type="checkbox" id="einsatz">
+    Einsatz-/Sondergeräte
+</label>
+
+<label class="checkline">
+    <input type="checkbox" id="fahrzeuge">
+    Fahrzeuge/Anhänger
+</label>
+
 </div>
 
 <div class="right-side">
-    <button class="btn save" onclick="save()">Speichern</button>
-    <button class="btn cancel" onclick="back()">Abbrechen</button>
+<button class="btn save" onclick="save()">Speichern</button>
+<button class="btn cancel" onclick="back()">Abbrechen</button>
 </div>
 
 </div>
@@ -178,13 +160,15 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const storage = getStorage(app);
 
-bild.onchange = e => {
+/* Bild Vorschau */
+bild.addEventListener("change", e => {
     const file = e.target.files[0];
     if(file){
         preview.src = URL.createObjectURL(file);
     }
-};
+});
 
+/* Speichern */
 window.save = async function(){
 
     let file = bild.files[0];
@@ -203,8 +187,8 @@ window.save = async function(){
         staerke: staerke.value,
         geraete: geraete.value,
         sonder: sonder.value,
-        telefon: telefon.value,
-        lagerort: lagerort.value,
+        telefon: telefon.value,        // 🔥 NEU
+        lagerort: lagerort.value,      // 🔥 NEU
         bemerkung: bemerkung.value,
         bild: imageUrl,
         zeit: new Date().toLocaleString()
@@ -221,7 +205,10 @@ window.save = async function(){
     alert("Gespeichert!");
 };
 
-window.back = () => window.location.href = "index.html";
+/* Zurück */
+window.back = function(){
+    window.location.href = "index.html";
+};
 
 </script>
 
