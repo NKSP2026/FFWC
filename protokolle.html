@@ -2,53 +2,48 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Protokolle</title>
+<title>Einsatzsystem</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 body {
-    margin: 0;
-    font-family: Arial;
-    background: #0f1117;
-    color: white;
+    margin:0;
+    font-family:Arial;
+    background:#0f1117;
+    color:white;
 }
 
 .container {
-    max-width: 900px;
-    margin: 40px auto;
-    background: #1c1f26;
-    padding: 30px;
-    border-radius: 15px;
+    max-width:900px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:15px;
 }
 
 input, textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    margin-top: 5px;
-    background: #111318;
-    color: white;
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    margin-top:5px;
+    background:#111318;
+    color:white;
 }
 
 button {
-    margin-top: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
+    margin-top:10px;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
 }
 
 .open { background:#3b82f6; }
 .mail { background:#10b981; }
-.save { background:#3b82f6; }
-
-.file {
-    background:#111318;
-    padding:10px;
-    margin-top:10px;
-    border-radius:8px;
-}
+.pdf { background:#f59e0b; }
 </style>
 </head>
 
@@ -56,45 +51,28 @@ button {
 
 <div class="container">
 
-<h2>Protokolle</h2>
+<h2>Einsatzsystem</h2>
 
 <input type="password" id="pw" placeholder="Passwort">
 <button class="open" onclick="openP()">Öffnen</button>
 
 <div id="area" style="display:none">
 
-<h3>📄 PDF hochladen</h3>
-<input type="file" id="file">
-<button onclick="upload()">Hochladen</button>
+<h3>✉ Empfänger</h3>
+<input id="mail_to" placeholder="z.B. leitstelle@zwickau.de">
 
-<div id="list"></div>
+<h3>🚒 Einsatzdaten</h3>
 
-<hr>
-
-<h3>✉ Mail Einstellungen</h3>
-
-<label>Empfänger</label>
-<input id="mail_to">
-
-<label>Betreff</label>
-<input id="mail_subject">
-
-<label>Standard Nachricht</label>
-<textarea id="mail_body"></textarea>
-
-<button class="save" onclick="saveMail()">Speichern</button>
-
-<hr>
-
-<h3>🚒 Einsatz-Mail senden</h3>
-
-<input id="einsatz_art" placeholder="Einsatzart (z.B. Brand, TH)">
+<input id="einsatz_art" placeholder="Einsatzart">
 <input id="einsatz_ort" placeholder="Ort">
 <input id="einsatz_adresse" placeholder="Adresse">
+<textarea id="einsatz_info" placeholder="Infos"></textarea>
 
-<textarea id="einsatz_info" placeholder="Weitere Infos"></textarea>
+<h3>🚗 Fahrzeuge auswählen</h3>
+<div id="fahrzeuge"></div>
 
-<button class="mail" onclick="sendEinsatzMail()">Einsatz-Mail senden</button>
+<button class="mail" onclick="sendMail()">Einsatz-Mail</button>
+<button class="pdf" onclick="createPDF()">PDF erstellen</button>
 
 </div>
 
@@ -103,116 +81,120 @@ button {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const app = initializeApp({
-  apiKey: "AIzaSy...",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  storageBucket: "ffwc-d3994.appspot.com"
+  apiKey:"AIzaSy...",
+  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
 });
 
 const db = getDatabase(app);
-const storage = getStorage(app);
+
+let fahrzeugeData = [];
 
 /* Passwort */
 window.openP = function(){
-    if(pw.value === "1234"){
-        area.style.display = "block";
-        loadFiles();
-        loadMail();
+    if(pw.value==="1234"){
+        area.style.display="block";
+        loadFahrzeuge();
     }
 };
 
-/* Upload */
-window.upload = async function(){
+/* Fahrzeuge */
+function loadFahrzeuge(){
 
-    let f = file.files[0];
-    if(!f) return;
+    onValue(ref(db,"fahrzeuge"), snap=>{
 
-    let path = "pdfs/" + Date.now() + "_" + f.name;
+        fahrzeuge.innerHTML="";
+        fahrzeugeData = Object.values(snap.val()||{});
 
-    let storageRef = sRef(storage, path);
+        fahrzeugeData.forEach((f,i)=>{
 
-    await uploadBytes(storageRef, f);
-
-    let url = await getDownloadURL(storageRef);
-
-    await push(ref(db,"pdfs"), {
-        name: f.name,
-        url: url,
-        time: new Date().toLocaleString()
-    });
-
-    alert("Upload fertig");
-};
-
-/* PDF Liste */
-function loadFiles(){
-    onValue(ref(db,"pdfs"), snap=>{
-        list.innerHTML="";
-        let data = snap.val()||{};
-
-        Object.values(data).forEach(f=>{
             let div = document.createElement("div");
-            div.className="file";
+
             div.innerHTML = `
-                <b>${f.name}</b><br>
-                <a href="${f.url}" target="_blank">Öffnen</a><br>
-                <small>${f.time}</small>
+                <label>
+                    <input type="checkbox" value="${i}">
+                    ${f.fahrzeug} (${f.funk || "-"})
+                </label>
             `;
-            list.appendChild(div);
+
+            fahrzeuge.appendChild(div);
         });
     });
 }
 
-/* Mail speichern */
-window.saveMail = function(){
+/* Auswahl */
+function getSelectedFahrzeuge(){
 
-    set(ref(db,"mail"), {
-        to: mail_to.value,
-        subject: mail_subject.value,
-        body: mail_body.value
+    let checked = document.querySelectorAll("#fahrzeuge input:checked");
+    let list = [];
+
+    checked.forEach(c=>{
+        let f = fahrzeugeData[c.value];
+        list.push(f.fahrzeug + " (" + (f.funk||"-") + ")");
     });
 
-    alert("Gespeichert");
-};
-
-/* Mail laden */
-function loadMail(){
-
-    onValue(ref(db,"mail"), snap=>{
-        let m = snap.val();
-        if(!m) return;
-
-        mail_to.value = m.to || "";
-        mail_subject.value = m.subject || "";
-        mail_body.value = m.body || "";
-    });
+    return list.join(", ");
 }
 
-/* 🔥 Einsatz-Mail */
-window.sendEinsatzMail = function(){
+/* 🔥 Mail */
+window.sendMail = function(){
 
-    let to = encodeURIComponent(mail_to.value);
-    let subject = encodeURIComponent(mail_subject.value);
-
-    let now = new Date().toLocaleString();
+    let empfaenger = mail_to.value || ""; // frei eingeben
 
     let body = `
-${mail_body.value}
+Einsatzbericht
 
---- Einsatzmeldung ---
 Art: ${einsatz_art.value}
 Ort: ${einsatz_ort.value}
 Adresse: ${einsatz_adresse.value}
-Zeit: ${now}
+
+Fahrzeuge:
+${getSelectedFahrzeuge()}
 
 Info:
 ${einsatz_info.value}
+
+Zeit: ${new Date().toLocaleString()}
 `;
 
-    window.location.href = `mailto:${to}?subject=${subject}&body=${encodeURIComponent(body)}`;
+    window.location.href =
+    `mailto:${encodeURIComponent(empfaenger)}?subject=Einsatzbericht&body=${encodeURIComponent(body)}`;
+};
+
+/* PDF */
+window.createPDF = function(){
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 10;
+
+    function line(txt){
+        doc.text(txt, 10, y);
+        y += 8;
+    }
+
+    line("Einsatzbericht");
+    line("----------------");
+
+    line("Art: " + einsatz_art.value);
+    line("Ort: " + einsatz_ort.value);
+    line("Adresse: " + einsatz_adresse.value);
+
+    line("");
+    line("Fahrzeuge:");
+    line(getSelectedFahrzeuge());
+
+    line("");
+    line("Info:");
+    line(einsatz_info.value);
+
+    line("");
+    line("Zeit: " + new Date().toLocaleString());
+
+    doc.save("Einsatzbericht.pdf");
 };
 
 </script>
