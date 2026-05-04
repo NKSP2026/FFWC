@@ -28,19 +28,37 @@
         <button onclick="go('mail.html')">Mail</button>
         <button onclick="go('protokolle.html')">Protokolle</button>
         <button onclick="go('datenbank.html')">Datenbank öffnen</button>
+
+        <!-- 🔥 NEU: Logout -->
+        <button onclick="logout()" style="
+            margin-top:15px;
+            background: linear-gradient(to bottom, #6b7280, #374151);
+            color: white;
+        ">
+            Logout
+        </button>
     </div>
 
 </div>
 
 <script>
-  
+
+/* 🔐 Login Check */
 if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
 
+/* Navigation */
 function go(x){
     window.location.href = x;
 }
+
+/* 🔓 Logout */
+function logout(){
+    localStorage.removeItem("login");
+    window.location.href = "login.html";
+}
+
 </script>
 
 </body>
