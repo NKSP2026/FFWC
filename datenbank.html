@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -49,7 +49,6 @@ button {
 .save { background:#3b82f6; }
 .delete { background:#ef4444; }
 .back { background:#6b7280; }
-.open { background:#3b82f6; }
 
 h3 {
     margin-top:30px;
@@ -63,9 +62,6 @@ h3 {
 
 <h2>Datenbank</h2>
 
-<input type="password" id="pw" placeholder="Passwort">
-<button class="open" onclick="openDB()">Öffnen</button>
-
 <div id="content"></div>
 
 <button class="back" onclick="back()">Zurück</button>
@@ -74,6 +70,7 @@ h3 {
 
 <script type="module">
 
+/* 🔒 LOGIN CHECK */
 if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
@@ -88,92 +85,86 @@ const app = initializeApp({
 
 const db = getDatabase(app);
 
-/* Öffnen */
-window.openDB = function(){
+/* 🔥 DIREKT LADEN (kein Button mehr nötig) */
 
-    if(pw.value !== "1234") return;
+let html = "<h3>Geräte</h3>";
 
-    content.innerHTML = "<h3>Geräte</h3>";
+onValue(ref(db,"geraete"), snap=>{
 
-    /* Geräte */
-    onValue(ref(db,"geraete"), snap=>{
+    html = "<h3>Geräte</h3>";
 
-        let html = "<h3>Geräte</h3>";
+    Object.entries(snap.val()||{}).forEach(([key,d])=>{
 
-        Object.entries(snap.val()||{}).forEach(([key,d])=>{
+        html += `
+        <div class="entry">
 
-            html += `
-            <div class="entry">
+            <b>Gerät</b>
+            <input id="g_geraete_${key}" value="${d.geraete||""}">
 
-                <b>Gerät</b>
-                <input id="g_geraete_${key}" value="${d.geraete||""}">
+            <b>Ort</b>
+            <input id="g_ort_${key}" value="${d.ort||""}">
 
-                <b>Ort</b>
-                <input id="g_ort_${key}" value="${d.ort||""}">
+            <b>Adresse</b>
+            <input id="g_adresse_${key}" value="${d.adresse||""}">
 
-                <b>Adresse</b>
-                <input id="g_adresse_${key}" value="${d.adresse||""}">
+            <b>Lagerort</b>
+            <input id="g_lager_${key}" value="${d.lagerort||""}">
 
-                <b>Lagerort</b>
-                <input id="g_lager_${key}" value="${d.lagerort||""}">
+            <b>Telefon</b>
+            <input id="g_tel_${key}" value="${d.telefon||""}">
 
-                <b>Telefon</b>
-                <input id="g_tel_${key}" value="${d.telefon||""}">
+            <button class="save" onclick="saveG('${key}')">Speichern</button>
+            <button class="delete" onclick="del('geraete','${key}')">Löschen</button>
 
-                <button class="save" onclick="saveG('${key}')">Speichern</button>
-                <button class="delete" onclick="del('geraete','${key}')">Löschen</button>
-
-            </div>
-            `;
-        });
-
-        content.innerHTML = html;
-
+        </div>
+        `;
     });
 
-    /* Fahrzeuge */
-    onValue(ref(db,"fahrzeuge"), snap=>{
+    content.innerHTML = html;
 
-        let html = content.innerHTML + "<h3>Fahrzeuge</h3>";
+});
 
-        Object.entries(snap.val()||{}).forEach(([key,d])=>{
+/* Fahrzeuge */
+onValue(ref(db,"fahrzeuge"), snap=>{
 
-            html += `
-            <div class="entry">
+    let html2 = content.innerHTML + "<h3>Fahrzeuge</h3>";
 
-                <b>Fahrzeug</b>
-                <input id="f_name_${key}" value="${d.fahrzeug||""}">
+    Object.entries(snap.val()||{}).forEach(([key,d])=>{
 
-                <b>Ort</b>
-                <input id="f_ort_${key}" value="${d.ort||""}">
+        html2 += `
+        <div class="entry">
 
-                <b>Adresse</b>
-                <input id="f_adresse_${key}" value="${d.adresse||""}">
+            <b>Fahrzeug</b>
+            <input id="f_name_${key}" value="${d.fahrzeug||""}">
 
-                <b>Funk</b>
-                <input id="f_funk_${key}" value="${d.funk||""}">
+            <b>Ort</b>
+            <input id="f_ort_${key}" value="${d.ort||""}">
 
-                <b>Stärke</b>
-                <input id="f_staerke_${key}" value="${d.staerke||""}">
+            <b>Adresse</b>
+            <input id="f_adresse_${key}" value="${d.adresse||""}">
 
-                <b>Beladung</b>
-                <input id="f_beladung_${key}" value="${d.beladung||""}">
+            <b>Funk</b>
+            <input id="f_funk_${key}" value="${d.funk||""}">
 
-                <button class="save" onclick="saveF('${key}')">Speichern</button>
-                <button class="delete" onclick="del('fahrzeuge','${key}')">Löschen</button>
+            <b>Stärke</b>
+            <input id="f_staerke_${key}" value="${d.staerke||""}">
 
-            </div>
-            `;
-        });
+            <b>Beladung</b>
+            <input id="f_beladung_${key}" value="${d.beladung||""}">
 
-        content.innerHTML = html;
+            <button class="save" onclick="saveF('${key}')">Speichern</button>
+            <button class="delete" onclick="del('fahrzeuge','${key}')">Löschen</button>
 
+        </div>
+        `;
     });
-};
 
-/* Geräte speichern */
+    content.innerHTML = html2;
+
+});
+
+/* SAVE */
 window.saveG = function(key){
-
     update(ref(db,"geraete/"+key),{
         geraete: document.getElementById("g_geraete_"+key).value,
         ort: document.getElementById("g_ort_"+key).value,
@@ -181,13 +172,10 @@ window.saveG = function(key){
         lagerort: document.getElementById("g_lager_"+key).value,
         telefon: document.getElementById("g_tel_"+key).value
     });
-
     alert("Gespeichert");
 };
 
-/* Fahrzeuge speichern */
 window.saveF = function(key){
-
     update(ref(db,"fahrzeuge/"+key),{
         fahrzeug: document.getElementById("f_name_"+key).value,
         ort: document.getElementById("f_ort_"+key).value,
@@ -196,19 +184,17 @@ window.saveF = function(key){
         staerke: document.getElementById("f_staerke_"+key).value,
         beladung: document.getElementById("f_beladung_"+key).value
     });
-
     alert("Gespeichert");
 };
 
-/* Löschen */
+/* DELETE */
 window.del = function(type,key){
-
     if(confirm("Wirklich löschen?")){
         remove(ref(db,type+"/"+key));
     }
 };
 
-/* Zurück */
+/* BACK */
 window.back = function(){
     window.location.href = "index.html";
 };
