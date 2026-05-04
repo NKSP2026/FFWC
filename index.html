@@ -33,6 +33,11 @@
 </div>
 
 <script>
+  
+if(localStorage.getItem("login") !== "ok"){
+    window.location.href = "login.html";
+}
+
 function go(x){
     window.location.href = x;
 }
