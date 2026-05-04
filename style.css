@@ -55,7 +55,7 @@ body {
     width: 260px;
 }
 
-/* ===== BUTTON BASIS ===== */
+/* ===== BUTTON BASIS (3D!) ===== */
 button {
     padding: 14px;
     border-radius: 12px;
@@ -63,36 +63,43 @@ button {
     font-weight: bold;
     cursor: pointer;
     font-size: 15px;
-    transition: 0.2s;
+
+    /* 3D Effekt */
+    box-shadow: 0 6px 0 rgba(0,0,0,0.6);
+    transition: all 0.1s ease-in-out;
+}
+
+/* Klick Effekt */
+button:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.6);
+}
+
+/* ===== STANDARD BUTTONS ===== */
+.menu button:not(.delete):not(.logout) {
+    background: linear-gradient(to bottom, #9ca3af, #4b5563);
+    color: white;
 }
 
 /* Hover */
-button:hover {
-    transform: scale(1.05);
+.menu button:not(.delete):not(.logout):hover {
+    background: linear-gradient(to bottom, #b5bcc6, #6b7280);
 }
 
-/* ===== STANDARD BUTTONS (NICHT delete/logout!) ===== */
-.menu button:not(.delete):not(.logout) {
-    background: linear-gradient(to bottom, #6b7280, #374151);
-    color: white;
-}
-
-/* ===== LÖSCHEN BUTTON (ROT!) ===== */
+/* ===== LÖSCHEN (ROT 3D!) ===== */
 .delete {
-    background: linear-gradient(to bottom, #ef4444, #991b1b);
+    background: linear-gradient(to bottom, #ff4d4d, #991b1b);
     color: white;
 }
 
-/* Hover Effekt rot */
 .delete:hover {
-    box-shadow: 0 0 12px rgba(239,68,68,0.7);
+    background: linear-gradient(to bottom, #ff6666, #b91c1c);
 }
 
 /* ===== LOGOUT ===== */
 .logout {
     margin-top: 20px;
-    background: linear-gradient(to bottom, #9ca3af, #4b5563);
-    color: white;
+    background: linear-gradient(to bottom, #6b7280, #374151);
 }
 
 /* ===== RESPONSIVE ===== */
