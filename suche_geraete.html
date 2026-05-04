@@ -19,7 +19,6 @@ body {
     border-radius:15px;
 }
 
-/* Suchbereich */
 .search-area {
     display:grid;
     grid-template-columns:2fr 1fr;
@@ -35,7 +34,6 @@ input {
     border:none;
 }
 
-/* Buttons */
 .buttons {
     margin-top:10px;
     display:flex;
@@ -50,17 +48,9 @@ button {
     cursor:pointer;
 }
 
-.search-btn {
-    background:#3b82f6;
-    color:white;
-}
+.search-btn { background:#3b82f6; }
+.cancel-btn { background:#ef4444; }
 
-.cancel-btn {
-    background:#ef4444;
-    color:white;
-}
-
-/* Vorschläge */
 #suggestions {
     background:#111318;
     border-radius:12px;
@@ -79,7 +69,6 @@ button {
     background:#2a2f3a;
 }
 
-/* Ergebnisse */
 .results {
     margin-top:30px;
     display:grid;
@@ -103,18 +92,16 @@ button {
 
 <div class="search-area">
 
-    <!-- LINKS -->
-    <div>
-        <input id="s" placeholder="Gerät suchen..." oninput="suggest()">
+<div>
+<input id="s" placeholder="Gerät suchen..." oninput="suggest()">
 
-        <div class="buttons">
-            <button class="search-btn" onclick="doSearch()">Suchen</button>
-            <button class="cancel-btn" onclick="back()">Abbrechen</button>
-        </div>
-    </div>
+<div class="buttons">
+<button class="search-btn" onclick="doSearch()">Suchen</button>
+<button class="cancel-btn" onclick="back()">Abbrechen</button>
+</div>
+</div>
 
-    <!-- RECHTS -->
-    <div id="suggestions"></div>
+<div id="suggestions"></div>
 
 </div>
 
@@ -124,6 +111,7 @@ button {
 
 <script type="module">
 
+/* 🔒 LOGIN */
 if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
@@ -150,8 +138,7 @@ onValue(ref(db,"fahrzeuge"), s=>{
     fahrzeuge = Object.values(s.val()||{});
 });
 
-
-/* 🔥 Vorschläge */
+/* 🔥 VORSCHLÄGE */
 window.suggest = function(){
 
     let q = s.value.toLowerCase();
@@ -168,13 +155,11 @@ window.suggest = function(){
         }
     });
 
-    /* Fahrzeuge Beladung */
+    /* Fahrzeuge */
     fahrzeuge.forEach(d=>{
         if(d.beladung){
 
-            let teile = d.beladung.split(",");
-
-            teile.forEach(t=>{
+            d.beladung.split(",").forEach(t=>{
                 let name = t.trim();
 
                 if(name.toLowerCase().includes(q)){
@@ -184,8 +169,12 @@ window.suggest = function(){
         }
     });
 
-    /* Anzeigen */
+    let count = 0;
+
     found.forEach(name=>{
+
+        if(count > 15) return;
+
         let div = document.createElement("div");
         div.className="suggest-item";
         div.innerText = name;
@@ -196,20 +185,23 @@ window.suggest = function(){
         };
 
         suggestions.appendChild(div);
+        count++;
     });
 };
 
-
-/* 🔎 Suche */
+/* 🔎 SUCHE */
 window.doSearch = function(){
 
     let q = s.value.toLowerCase();
     results.innerHTML="";
 
+    let foundSomething = false;
+
     /* Geräte */
     geraete.forEach(d=>{
         if(d.geraete?.toLowerCase().includes(q)){
             showCard(d,"gerät");
+            foundSomething = true;
         }
     });
 
@@ -217,17 +209,21 @@ window.doSearch = function(){
     fahrzeuge.forEach(d=>{
         if(d.beladung?.toLowerCase().includes(q)){
             showCard(d,"fahrzeug");
+            foundSomething = true;
         }
     });
+
+    if(!foundSomething){
+        results.innerHTML = "❌ Kein Treffer gefunden";
+    }
 };
 
-
-/* ENTER Taste */
+/* ENTER */
 s.addEventListener("keypress", e=>{
     if(e.key==="Enter") doSearch();
 });
 
-
+/* 🔥 KARTE */
 function showCard(d,type){
 
     let c = document.createElement("div");
@@ -236,31 +232,37 @@ function showCard(d,type){
     if(type==="gerät"){
         c.innerHTML=`
         <b>${d.geraete}</b><br><br>
-        📍 liegt auf ${d.lagerort || "-"}<br><br>
+        📍 ${d.lagerort || "-"}<br><br>
         Ort: ${d.ort}<br>
         Adresse: ${d.adresse}<br>
-        Telefon: ${d.telefon || "-"}
+        ☎ ${d.telefon || "-"}
         `;
     }
 
     if(type==="fahrzeug"){
         c.innerHTML=`
         <b>${d.fahrzeug}</b><br><br>
-        📍 liegt auf Fahrzeug (${d.fahrzeug})<br><br>
+        🚒 Fahrzeug enthält:<br>
+        ${qHighlight(d.beladung)}
+        <br><br>
         Ort: ${d.ort}<br>
-        Adresse: ${d.adresse}<br>
-        🔧 enthält gesuchtes Gerät
+        Adresse: ${d.adresse}
         `;
     }
 
     results.appendChild(c);
 }
 
+/* 🔥 Highlight Treffer */
+function qHighlight(text){
+    let q = s.value;
+    if(!text) return "";
 
-/* Zurück */
-window.back = function(){
-    window.location.href = "index.html";
-};
+    return text.replace(new RegExp(q,"gi"), m=>`<span style="color:#3b82f6">${m}</span>`);
+}
+
+/* zurück */
+window.back = ()=> location.href="index.html";
 
 </script>
 
