@@ -154,6 +154,7 @@ button {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSy...",
   authDomain: "ffwc-d3994.firebaseapp.com",
@@ -169,10 +170,52 @@ const db = getDatabase(app);
 
 let data = [];
 
+/* Daten laden */
 onValue(ref(db, "geraete"), snap => {
+    console.log("DATEN:", snap.val());
     data = Object.values(snap.val() || {});
 });
 
+
+/* =========================
+   🔎 VORSCHLÄGE (LIVE)
+========================= */
+window.suggest = function(){
+
+    let s = search.value.toLowerCase();
+    suggestions.innerHTML = "";
+
+    if(!s) return;
+
+    let found = [];
+
+    data.forEach(d=>{
+        if(d.geraete && d.geraete.toLowerCase().includes(s)){
+            if(!found.includes(d.geraete)){
+                found.push(d.geraete);
+            }
+        }
+    });
+
+    found.forEach(g=>{
+        let div = document.createElement("div");
+        div.className = "suggest-item";
+        div.innerText = g;
+
+        /* Doppelklick = direkt suchen */
+        div.ondblclick = ()=>{
+            search.value = g;
+            doSearch();
+        };
+
+        suggestions.appendChild(div);
+    });
+};
+
+
+/* =========================
+   🔥 PROFI-SUCHE
+========================= */
 window.doSearch = function(){
 
     let s = search.value.toLowerCase();
@@ -182,16 +225,58 @@ window.doSearch = function(){
 
         if(d.geraete && d.geraete.toLowerCase().includes(s)){
 
+            let ortText = "-";
+
+            let lager = (d.lagerort || "").toLowerCase();
+            let fahrzeug = (d.fahrzeug || "").toLowerCase();
+            let ort = d.ort || "";
+
+            /* 🔥 INTELLIGENTE ERKENNUNG */
+
+            if(lager.includes("hlf") || fahrzeug.includes("hlf")){
+                ortText = `liegt auf ${d.fahrzeug || d.lagerort}`;
+            }
+            else if(lager.includes("lf")){
+                ortText = `liegt auf ${d.lagerort}`;
+            }
+            else if(lager.includes("rtw") || lager.includes("nef")){
+                ortText = `liegt auf ${d.lagerort}`;
+            }
+            else if(lager.includes("anhänger") || lager.includes("anhaenger")){
+                ortText = `liegt auf ${d.lagerort}`;
+            }
+            else if(lager.includes("regal")){
+                ortText = `liegt im ${d.lagerort}`;
+            }
+            else if(lager.includes("halle")){
+                ortText = `liegt in ${d.lagerort}`;
+            }
+            else if(lager.includes("lager")){
+                ortText = `liegt im ${d.lagerort}`;
+            }
+            else if(ort){
+                ortText = `liegt bei Wache ${ort}`;
+            }
+
+            /* Karte */
             let card = document.createElement("div");
             card.className = "card";
 
             card.innerHTML = `
                 ${d.bild ? `<img src="${d.bild}">` : ""}
-                <b>Ort:</b> ${d.ort || "-"}<br>
-                <b>Einsatzgerät:</b> ${d.geraete || "-"}<br>
-                <b>Standort:</b> ${d.lagerort || "-"}<br>
-                <b>Telefon:</b> ${d.telefon || "-"}<br>
-                <b>Bemerkung:</b> ${d.bemerkung || "-"}
+
+                <div style="font-size:18px; font-weight:bold; margin-bottom:8px;">
+                    ${d.geraete || "-"}
+                </div>
+
+                <div style="color:#3b82f6; font-weight:bold; margin-bottom:10px;">
+                    📍 ${ortText}
+                </div>
+
+                <div><b>Ort:</b> ${d.ort || "-"}</div>
+                <div><b>Telefon:</b> ${d.telefon || "-"}</div>
+                <div><b>Fahrzeug:</b> ${d.fahrzeug || "-"}</div>
+                <div><b>Bemerkung:</b> ${d.bemerkung || "-"}</div>
             `;
 
             results.appendChild(card);
@@ -201,6 +286,10 @@ window.doSearch = function(){
 
 };
 
-window.back = () => window.location.href = "index.html";
+
+/* Zurück */
+window.back = function(){
+    window.location.href = "index.html";
+};
 
 </script>
