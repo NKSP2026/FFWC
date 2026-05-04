@@ -169,6 +169,7 @@ let data = [];
 
 /* Daten laden */
 onValue(ref(db, "geraete"), snap => {
+    console.log("GERAETE:", snap.val());
     data = Object.values(snap.val() || {});
 });
 
