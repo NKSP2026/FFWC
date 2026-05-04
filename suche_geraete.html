@@ -2,103 +2,43 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Einsatzgeräte Suche</title>
+<title>Geräte Suche</title>
 
 <style>
 body {
-    margin: 0;
-    font-family: "Segoe UI", Arial;
-    background: #0f1117;
-    color: white;
+    background:#0f1117;
+    color:white;
+    font-family:Segoe UI;
 }
 
 .container {
-    max-width: 1100px;
-    margin: 40px auto;
-    background: #1c1f26;
-    padding: 30px;
-    border-radius: 15px;
+    max-width:1100px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:15px;
 }
 
-h2 {
-    margin-bottom: 20px;
-}
-
-/* Suchbereich */
-.search-area {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 40px;
-}
-
-/* Input */
 input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: #111318;
-    color: white;
-    margin-bottom: 10px;
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    background:#111318;
+    color:white;
+    border:none;
 }
 
-/* Vorschläge */
-#suggestions {
-    height: 260px;
-    background: #111318;
-    border-radius: 12px;
-    padding: 12px;
-    overflow-y: auto;
-}
-
-.suggest-item {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 6px;
-}
-
-.suggest-item:hover {
-    background: #2a2f3a;
-}
-
-/* Buttons */
-.buttons {
-    display: flex;
-    gap: 10px;
-}
-
-button {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.search-btn { background: #3b82f6; }
-.cancel-btn { background: #ef4444; }
-
-/* Ergebnisse */
 .results {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
-    gap: 20px;
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:20px;
 }
 
-/* Karte */
 .card {
-    background: #111318;
-    border-radius: 12px;
-    padding: 15px;
-}
-
-.card img {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    background:#111318;
+    padding:15px;
+    border-radius:12px;
 }
 </style>
 </head>
@@ -107,22 +47,9 @@ button {
 
 <div class="container">
 
-<h2>Einsatzgeräte Suche</h2>
+<h2>Geräte Suche</h2>
 
-<div class="search-area">
-
-<div>
-<input id="search" placeholder="Gerät suchen..." oninput="suggest()">
-
-<div class="buttons">
-<button class="search-btn" onclick="doSearch()">Suchen</button>
-<button class="cancel-btn" onclick="back()">Abbrechen</button>
-</div>
-</div>
-
-<div id="suggestions"></div>
-
-</div>
+<input id="s" placeholder="Gerät suchen..." oninput="search()">
 
 <div id="results" class="results"></div>
 
@@ -133,380 +60,73 @@ button {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-/* Firebase */
-const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "ffwc-d3994.firebaseapp.com",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "ffwc-d3994",
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-let data = [];
-
-/* Daten laden */
-onValue(ref(db, "geraete"), snap => {
-    data = Object.values(snap.val() || {});
+const app = initializeApp({
+  apiKey:"AIzaSy...",
+  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
 });
 
-/* 🔎 Vorschläge */
-window.suggest = function(){
-
-    let s = search.value.toLowerCase();
-    suggestions.innerHTML = "";
-
-    if(!s) return;
-
-    let found = new Set();
-
-    data.forEach(d => {
-
-        let g1 = d.geraete || "";
-        let g2 = d.sonder || "";
-
-        if(g1.toLowerCase().includes(s)) found.add(g1);
-        if(g2.toLowerCase().includes(s)) found.add(g2);
-
-    });
-
-    found.forEach(name => {
-
-        let div = document.createElement("div");
-        div.className = "suggest-item";
-        div.innerText = name;
-
-        div.ondblclick = () => {
-            search.value = name;
-            doSearch();
-        };
-
-        suggestions.appendChild(div);
-    });
-};
-
-/* 📍 Standort Logik */
-function getOrtText(d){
-
-    let fahrzeug = d.fahrzeug || "";
-    let lager = (d.lagerort || "").toLowerCase();
-
-    // Fahrzeug + Fach
-    if(fahrzeug && lager){
-        return `liegt auf ${fahrzeug} (${d.lagerort})`;
-    }
-
-    // Regal
-    if(lager.includes("regal")){
-        return `liegt im ${d.lagerort}`;
-    }
-
-    // Halle
-    if(lager.includes("halle")){
-        return `liegt in ${d.lagerort}`;
-    }
-
-    // Anhänger
-    if(lager.includes("anhänger") || lager.includes("anhaenger")){
-        return `liegt auf ${d.lagerort}`;
-    }
-
-    // fallback
-    return `liegt bei Wache ${d.ort || "-"}`;
-}
-
-/* 🔥 Suche */
-window.doSearch = function(){
-
-    let s = search.value.toLowerCase();
-    results.innerHTML = "";
-
-    data.forEach(d => {
-
-        let g1 = d.geraete || "";
-        let g2 = d.sonder || "";
-
-        if(g1.toLowerCase().includes(s) || g2.toLowerCase().includes(s)){
-
-            let card = document.createElement("div");
-            card.className = "card";
-
-            card.innerHTML = `
-                <b>${g1 || g2}</b><br><br>
-
-                📍 ${getOrtText(d)}<br><br>
-
-                <b>Ort:</b> ${d.ort || "-"}<br>
-                <b>Adresse:</b> ${d.adresse || "-"}<br>
-                <b>Telefon:</b> ${d.telefon || "-"}<br>
-                <b>Bemerkung:</b> ${d.bemerkung || "-"}
-            `;
-
-            results.appendChild(card);
-        }
-    });
-};
-
-/* Zurück */
-window.back = function(){
-    window.location.href = "index.html";
-};
-
-</script>
-
-</body>
-</html>
-<style>
-body {
-    margin: 0;
-    font-family: "Segoe UI", Arial;
-    background: #0f1117;
-    color: white;
-}
-
-.container {
-    max-width: 1100px;
-    margin: 40px auto;
-    background: #1c1f26;
-    padding: 30px;
-    border-radius: 15px;
-}
-
-h2 { margin-bottom: 20px; }
-
-.search-area {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    column-gap: 40px;
-}
-
-input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: #111318;
-    color: white;
-    margin-bottom: 10px;
-}
-
-#suggestions {
-    height: 260px;
-    background: #111318;
-    border-radius: 12px;
-    padding: 12px;
-    overflow-y: auto;
-}
-
-.suggest-item {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 6px;
-}
-
-.suggest-item:hover {
-    background: #2a2f3a;
-}
-
-.buttons {
-    display: flex;
-    gap: 10px;
-}
-
-button {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.search-btn { background: #3b82f6; }
-.cancel-btn { background: #ef4444; }
-
-.results {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
-    gap: 20px;
-}
-
-.card {
-    background: #111318;
-    border-radius: 12px;
-    padding: 15px;
-}
-
-.card img {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>Einsatzgeräte Suche</h2>
-
-<div class="search-area">
-
-<div>
-<input id="search" placeholder="Gerät suchen..." oninput="suggest()">
-
-<div class="buttons">
-<button class="search-btn" onclick="doSearch()">Suchen</button>
-<button class="cancel-btn" onclick="back()">Abbrechen</button>
-</div>
-</div>
-
-<div id="suggestions"></div>
-
-</div>
-
-<div class="results" id="results"></div>
-
-</div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "ffwc-d3994.firebaseapp.com",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "ffwc-d3994",
-  storageBucket: "ffwc-d3994.appspot.com",
-  messagingSenderId: "591233232022",
-  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7"
-};
-
-const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-let data = [];
+let geraete = [];
+let fahrzeuge = [];
 
-/* Daten laden */
-onValue(ref(db, "geraete"), snap => {
-    data = Object.values(snap.val() || {});
+/* beide laden */
+onValue(ref(db,"geraete"), s=>{
+    geraete = Object.values(s.val()||{});
 });
 
-/* 🔎 Vorschläge FIX */
-window.suggest = function(){
+onValue(ref(db,"fahrzeuge"), s=>{
+    fahrzeuge = Object.values(s.val()||{});
+});
 
-    let s = search.value.toLowerCase();
-    suggestions.innerHTML = "";
+/* Suche */
+window.search = function(){
 
-    if(!s) return;
+    let q = s.value.toLowerCase();
+    results.innerHTML="";
 
-    let found = [];
-
-    data.forEach(d=>{
-
-        let g1 = d.geraete || "";
-        let g2 = d.sonder || "";
-
-        if(g1.toLowerCase().includes(s) || g2.toLowerCase().includes(s)){
-
-            let name = g1 || g2;
-
-            if(name && !found.includes(name)){
-                found.push(name);
-            }
+    /* normale Geräte */
+    geraete.forEach(d=>{
+        if(d.geraete?.toLowerCase().includes(q)){
+            showCard(d, "gerät");
         }
     });
 
-    found.forEach(g=>{
-        let div = document.createElement("div");
-        div.className = "suggest-item";
-        div.innerText = g;
-
-        div.ondblclick = ()=>{
-            search.value = g;
-            doSearch();
-        };
-
-        suggestions.appendChild(div);
+    /* 🔥 Fahrzeuge durchsuchen */
+    fahrzeuge.forEach(d=>{
+        if(d.beladung?.toLowerCase().includes(q)){
+            showCard(d, "fahrzeug");
+        }
     });
 };
 
+function showCard(d, type){
 
-/* 📍 Standort Logik */
-function getOrtText(d){
+    let c = document.createElement("div");
+    c.className="card";
 
-    let lager = (d.lagerort || "").toLowerCase();
-    let fahrzeug = d.fahrzeug || "";
-    let ort = d.ort || "";
-
-    if(lager.includes("hlf")){
-        let fach = lager.match(/g\d+/i);
-        return `liegt auf ${fahrzeug} ${fach ? "(" + fach[0].toUpperCase() + ")" : ""}`;
+    if(type==="gerät"){
+        c.innerHTML=`
+        <b>${d.geraete}</b><br><br>
+        📍 liegt auf ${d.lagerort || "-"}<br><br>
+        Ort: ${d.ort}<br>
+        Adresse: ${d.adresse}<br>
+        Telefon: ${d.telefon}
+        `;
     }
 
-    if(lager.includes("anhänger") || lager.includes("anhaenger")){
-        return `liegt auf ${d.lagerort}`;
+    if(type==="fahrzeug"){
+        c.innerHTML=`
+        <b>${d.fahrzeug}</b><br><br>
+        📍 liegt auf Fahrzeug (${d.fahrzeug})<br><br>
+        Ort: ${d.ort}<br>
+        Adresse: ${d.adresse}<br>
+        Beladung enthält gesuchtes Gerät
+        `;
     }
 
-    if(lager.includes("regal")){
-        return `liegt im ${d.lagerort}`;
-    }
-
-    if(lager.includes("halle")){
-        return `liegt in ${d.lagerort}`;
-    }
-
-    if(lager.includes("lager")){
-        return `liegt im ${d.lagerort}`;
-    }
-
-    if(ort){
-        return `liegt bei Wache ${ort}`;
-    }
-
-    return "-";
+    results.appendChild(c);
 }
-
-
-/* 🔥 Suche */
-window.doSearch = function(){
-
-    let s = search.value.toLowerCase();
-    results.innerHTML = "";
-
-    data.forEach(d=>{
-
-        let g1 = d.geraete || "";
-        let g2 = d.sonder || "";
-
-        if(g1.toLowerCase().includes(s) || g2.toLowerCase().includes(s)){
-
-            let card = document.createElement("div");
-            card.className = "card";
-
-            card.innerHTML = `
-                ${d.bild ? `<img src="${d.bild}">` : ""}
-                <b>${g1 || g2}</b><br><br>
-                📍 ${getOrtText(d)}<br><br>
-                Ort: ${d.ort || "-"}<br>
-                Telefon: ${d.telefon || "-"}<br>
-                Bemerkung: ${d.bemerkung || "-"}
-            `;
-
-            results.appendChild(card);
-        }
-    });
-};
-
-window.back = function(){
-    window.location.href = "index.html";
-};
 
 </script>
 
