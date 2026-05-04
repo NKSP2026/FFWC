@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Einsatz Mail</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#0f1117;
+    color:white;
+}
+
+.container {
+    max-width:900px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:15px;
+}
+
+input, textarea {
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    margin-top:5px;
+    background:#111318;
+    color:white;
+}
+
+button {
+    margin-top:10px;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.mail { background:#10b981; }
+.pdf { background:#f59e0b; }
+.back { background:#6b7280; }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>✉ Einsatz Mail</h2>
+
+<input id="mail_to" placeholder="Empfänger">
+
+<input id="einsatz_art" placeholder="Einsatzart">
+<input id="einsatz_ort" placeholder="Ort">
+<input id="einsatz_adresse" placeholder="Adresse">
+
+<textarea id="einsatz_info" placeholder="Infos"></textarea>
+
+<h3>🚗 Fahrzeuge</h3>
+<div id="fahrzeuge"></div>
+
+<button class="mail" onclick="sendMail()">Mail senden</button>
+<button class="pdf" onclick="createPDF()">PDF erstellen</button>
+<button class="back" onclick="back()">Zurück</button>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSy...",
+  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
+});
+
+const db = getDatabase(app);
+
+let fahrzeugeData=[];
+
+onValue(ref(db,"fahrzeuge"), snap=>{
+
+    fahrzeuge.innerHTML="";
+    fahrzeugeData = Object.values(snap.val()||{});
+
+    fahrzeugeData.forEach((f,i)=>{
+
+        let div=document.createElement("div");
+
+        div.innerHTML=`
+        <label>
+        <input type="checkbox" value="${i}">
+        ${f.fahrzeug} (${f.funk||"-"})
+        </label>`;
+
+        fahrzeuge.appendChild(div);
+    });
+});
+
+function getF(){
+
+    let c=document.querySelectorAll("#fahrzeuge input:checked");
+    let list=[];
+
+    c.forEach(e=>{
+        let f=fahrzeugeData[e.value];
+        list.push(`${f.fahrzeug} (${f.funk})`);
+    });
+
+    return list;
+}
+
+/* MAIL */
+window.sendMail=function(){
+
+    let now=new Date();
+
+    let datum=now.toLocaleDateString("de-DE");
+    let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+
+    let betreff=`${einsatz_art.value||"Einsatz"} - ${einsatz_ort.value||"-"} - ${datum} ${uhrzeit}`;
+
+    let body=`
+Einsatzbericht
+
+Art: ${einsatz_art.value}
+Ort: ${einsatz_ort.value}
+Adresse: ${einsatz_adresse.value}
+
+Fahrzeuge:
+${getF().join("\n")}
+
+Info:
+${einsatz_info.value}
+
+Zeit: ${datum} ${uhrzeit}
+`;
+
+    location.href=`mailto:${mail_to.value}?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(body)}`;
+};
+
+/* PDF */
+window.createPDF=function(){
+
+    const { jsPDF } = window.jspdf;
+    const doc=new jsPDF();
+
+    let y=10;
+
+    function l(t){doc.text(t,10,y);y+=8;}
+
+    let now=new Date();
+    let datum=now.toLocaleDateString("de-DE");
+    let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+
+    l("Einsatzbericht");
+    l("----------------");
+    l("Art: "+einsatz_art.value);
+    l("Ort: "+einsatz_ort.value);
+    l("Adresse: "+einsatz_adresse.value);
+
+    l("");
+    l("Fahrzeuge:");
+
+    getF().forEach(f=>l("- "+f));
+
+    l("");
+    l("Info:");
+    l(einsatz_info.value);
+
+    l("");
+    l("Zeit: "+datum+" "+uhrzeit);
+
+    let safeOrt=(einsatz_ort.value||"X").replace(/\s+/g,"_");
+    let safeDatum=datum.replace(/\./g,"-");
+    let safeUhrzeit=uhrzeit.replace(":","-");
+
+    doc.save(`Einsatz_${safeOrt}_${safeDatum}_${safeUhrzeit}.pdf`);
+};
+
+/* back */
+window.back=()=>location.href="index.html";
+
+</script>
+
+</body>
+</html>
