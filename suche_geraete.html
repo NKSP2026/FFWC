@@ -29,14 +29,15 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* Suchbereich */
+/* ===== SUCHBEREICH ===== */
 .search-area {
     display: grid;
-    grid-template-columns: 1fr 200px;
-    gap: 20px;
+    grid-template-columns: 2fr 1fr; /* 👉 rechts größer */
+    column-gap: 40px;              /* 👉 Abstand */
+    align-items: start;
 }
 
-/* Input */
+/* Eingabe */
 input {
     width: 100%;
     padding: 14px;
@@ -44,21 +45,23 @@ input {
     border: none;
     background: #111318;
     color: white;
+    margin-bottom: 10px;
 }
 
 /* Vorschläge */
 #suggestions {
-    height: 150px;
+    height: 220px;
     background: #111318;
-    border-radius: 10px;
+    border-radius: 12px;
+    padding: 12px;
     overflow-y: auto;
-    padding: 10px;
 }
 
 /* Vorschlag */
 .suggest-item {
     padding: 8px;
     cursor: pointer;
+    border-radius: 6px;
 }
 
 .suggest-item:hover {
@@ -67,7 +70,6 @@ input {
 
 /* Buttons */
 .buttons {
-    margin-top: 15px;
     display: flex;
     gap: 10px;
 }
@@ -90,7 +92,7 @@ button {
     color: white;
 }
 
-/* Ergebnisse */
+/* ===== ERGEBNISSE ===== */
 .results {
     margin-top: 30px;
     display: grid;
@@ -125,7 +127,7 @@ button {
 
 <div class="search-area">
 
-    <!-- Links -->
+    <!-- LINKS -->
     <div>
         <input id="search" placeholder="Gerät suchen..." oninput="suggest()">
 
@@ -135,7 +137,7 @@ button {
         </div>
     </div>
 
-    <!-- Rechts Vorschläge -->
+    <!-- RECHTS -->
     <div id="suggestions"></div>
 
 </div>
@@ -165,7 +167,7 @@ const db = getDatabase(app);
 
 let data = [];
 
-/* Daten laden (nur Geräte!) */
+/* Daten laden */
 onValue(ref(db, "geraete"), snap => {
     data = Object.values(snap.val() || {});
 });
