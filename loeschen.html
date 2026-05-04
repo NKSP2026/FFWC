@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -49,6 +49,7 @@ select, input {
     border-radius: 10px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 button {
@@ -78,7 +79,7 @@ button {
 <!-- Typ -->
 <div class="box">
     <label>Was löschen?</label>
-    <select id="typ" onchange="loadOrte()">
+    <select id="typ" onchange="loadData()">
         <option value="">Bitte wählen</option>
         <option value="geraete">Geräte</option>
         <option value="fahrzeuge">Fahrzeuge</option>
@@ -91,7 +92,7 @@ button {
     <select id="ort" onchange="nextStep()"></select>
 </div>
 
-<!-- Lagerort (nur Geräte) -->
+<!-- Lagerort -->
 <div class="box" id="lagerBox">
     <label>Lagerort</label>
     <select id="lager" onchange="loadItems()"></select>
@@ -112,6 +113,7 @@ button {
 
 <script type="module">
 
+/* 🔒 LOGIN CHECK */
 if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
@@ -136,8 +138,8 @@ const lagerSelect = document.getElementById("lager");
 const lagerBox = document.getElementById("lagerBox");
 const liste = document.getElementById("liste");
 
-/* Orte laden */
-window.loadOrte = function(){
+/* 🔥 DATEN LADEN */
+window.loadData = function(){
 
     let typ = typSelect.value;
     if(!typ) return;
@@ -152,7 +154,7 @@ window.loadOrte = function(){
             if(d.ort) orte.add(d.ort);
         });
 
-        ortSelect.innerHTML = "<option>Ort wählen</option>";
+        ortSelect.innerHTML = "<option value=''>Ort wählen</option>";
 
         orte.forEach(o=>{
             ortSelect.innerHTML += `<option>${o}</option>`;
@@ -163,26 +165,25 @@ window.loadOrte = function(){
     });
 };
 
-/* nächster Schritt */
+/* 🔥 SCHRITT LOGIK */
 window.nextStep = function(){
 
     let typ = typSelect.value;
 
     if(typ === "fahrzeuge"){
-        /* 🔥 Lagerort AUSBLENDEN */
         lagerBox.style.display = "none";
         loadItems();
     } else {
-        /* Geräte */
         lagerBox.style.display = "block";
         loadLagerorte();
     }
 };
 
-/* Lagerorte (nur Geräte) */
+/* 🔥 LAGERORTE */
 window.loadLagerorte = function(){
 
     let ort = ortSelect.value;
+
     let lagerSet = new Set();
 
     Object.values(rawData).forEach(d=>{
@@ -191,14 +192,14 @@ window.loadLagerorte = function(){
         }
     });
 
-    lagerSelect.innerHTML = "<option>Lagerort wählen</option>";
+    lagerSelect.innerHTML = "<option value=''>Lagerort wählen</option>";
 
     lagerSet.forEach(l=>{
         lagerSelect.innerHTML += `<option>${l}</option>`;
     });
 };
 
-/* Items laden */
+/* 🔥 ITEMS */
 window.loadItems = function(){
 
     let typ = typSelect.value;
@@ -223,7 +224,7 @@ window.loadItems = function(){
     renderList(currentItems);
 };
 
-/* Filter */
+/* 🔍 FILTER */
 window.filterList = function(){
 
     let s = search.value.toLowerCase();
@@ -237,7 +238,7 @@ window.filterList = function(){
     renderList(filtered);
 };
 
-/* Anzeige */
+/* 🔥 ANZEIGE */
 function renderList(items){
 
     liste.innerHTML = "";
@@ -258,7 +259,7 @@ function renderList(items){
     });
 }
 
-/* Löschen */
+/* 🔥 DELETE */
 window.del = function(key){
 
     let typ = typSelect.value;
@@ -268,7 +269,7 @@ window.del = function(key){
     }
 };
 
-/* Zurück */
+/* 🔙 BACK */
 window.back = function(){
     window.location.href = "index.html";
 };
