@@ -20,15 +20,10 @@ body {
     border-radius: 15px;
 }
 
-h2 {
-    margin-bottom: 25px;
-}
-
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 40px;
-    row-gap: 20px;
+    gap: 20px;
 }
 
 input, textarea {
@@ -44,33 +39,14 @@ input, textarea {
     grid-column: span 2;
 }
 
-/* Layout unten */
-.bottom-area {
+.bottom {
     display: flex;
     justify-content: space-between;
-    margin-top: 40px;
-}
-
-.left-side {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.checkline {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.right-side {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    margin-top: 30px;
 }
 
 .btn {
-    padding: 14px;
+    padding: 12px 20px;
     border-radius: 10px;
     border: none;
     font-weight: bold;
@@ -79,11 +55,6 @@ input, textarea {
 
 .save { background: #3b82f6; }
 .cancel { background: #ef4444; }
-
-.preview {
-    margin-top: 10px;
-    max-height: 120px;
-}
 </style>
 </head>
 
@@ -95,45 +66,30 @@ input, textarea {
 
 <div class="grid">
 
-<input id="ort" placeholder="Ort / Ortsteil">
-<input id="fahrzeug" placeholder="Fahrzeug (z.B. HLF 20)">
+<input id="ort" placeholder="Ort">
+<input id="adresse" placeholder="Adresse">
 
-<input id="funk" placeholder="Funkkenner">
-<input id="staerke" placeholder="Stärke">
+<input id="fahrzeug" placeholder="Fahrzeug (z.B. HLF 20)">
+<input id="lagerort" placeholder="Lagerort (z.B. G3, Regal A, Halle A)">
 
 <input id="geraete" placeholder="Einsatzgerät">
 <input id="sonder" placeholder="Sondergerät">
 
-<!-- 🔥 NEU -->
 <input id="telefon" placeholder="Telefonnummer">
-<input id="lagerort" placeholder="Lagerort (z.B. Regal A / HLF G3 / Fahrzeughalle A)">
+<input id="funk" placeholder="Funkkenner">
 
-<textarea id="bemerkung" class="full" placeholder="Bemerkung / Adresse"></textarea>
-
-<div class="full">
-    <input type="file" id="bild">
-    <img id="preview" class="preview">
-</div>
+<textarea id="bemerkung" class="full" placeholder="Bemerkung"></textarea>
 
 </div>
 
-<div class="bottom-area">
+<div class="bottom">
 
-<div class="left-side">
-
-<label class="checkline">
-    <input type="checkbox" id="einsatz">
-    Einsatz-/Sondergeräte
-</label>
-
-<label class="checkline">
-    <input type="checkbox" id="fahrzeuge">
-    Fahrzeuge/Anhänger
-</label>
-
+<div>
+<label><input type="checkbox" id="einsatz"> Geräte</label><br>
+<label><input type="checkbox" id="fahrzeuge"> Fahrzeuge</label>
 </div>
 
-<div class="right-side">
+<div>
 <button class="btn save" onclick="save()">Speichern</button>
 <button class="btn cancel" onclick="back()">Abbrechen</button>
 </div>
@@ -144,54 +100,29 @@ input, textarea {
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSy...",
   authDomain: "ffwc-d3994.firebaseapp.com",
   databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
   projectId: "ffwc-d3994",
-  storageBucket: "ffwc-d3994.appspot.com",
-  messagingSenderId: "591233232022",
-  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const storage = getStorage(app);
 
-/* Bild Vorschau */
-bild.addEventListener("change", e => {
-    const file = e.target.files[0];
-    if(file){
-        preview.src = URL.createObjectURL(file);
-    }
-});
-
-/* Speichern */
-window.save = async function(){
-
-    let file = bild.files[0];
-    let imageUrl = "";
-
-    if(file){
-        let storageRef = sRef(storage, "bilder/" + Date.now());
-        await uploadBytes(storageRef, file);
-        imageUrl = await getDownloadURL(storageRef);
-    }
+window.save = function(){
 
     let data = {
         ort: ort.value,
+        adresse: adresse.value,
         fahrzeug: fahrzeug.value,
-        funk: funk.value,
-        staerke: staerke.value,
+        lagerort: lagerort.value,
         geraete: geraete.value,
         sonder: sonder.value,
-        telefon: telefon.value,        // 🔥 NEU
-        lagerort: lagerort.value,      // 🔥 NEU
-        bemerkung: bemerkung.value,
-        bild: imageUrl,
-        zeit: new Date().toLocaleString()
+        telefon: telefon.value,
+        funk: funk.value,
+        bemerkung: bemerkung.value
     };
 
     if(einsatz.checked){
@@ -202,10 +133,9 @@ window.save = async function(){
         push(ref(db, "fahrzeuge"), data);
     }
 
-    alert("Gespeichert!");
+    alert("Gespeichert");
 };
 
-/* Zurück */
 window.back = function(){
     window.location.href = "index.html";
 };
