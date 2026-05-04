@@ -74,6 +74,10 @@ h3 {
 
 <script type="module">
 
+if(localStorage.getItem("login") !== "ok"){
+    window.location.href = "login.html";
+}
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
