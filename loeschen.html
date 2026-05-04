@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Löschen</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial;
+    background: #0f1117;
+    color: white;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #1c1f26;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+/* Schritte */
+.box {
+    margin-bottom: 25px;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background: #111318;
+    color: white;
+    border: none;
+}
+
+/* Liste */
+.list {
+    margin-top: 20px;
+    display: grid;
+    gap: 10px;
+}
+
+/* Eintrag */
+.item {
+    background: #111318;
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.delete {
+    background: #ef4444;
+}
+
+.back {
+    margin-top: 20px;
+    background: #3b82f6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Daten löschen</h2>
+
+<!-- Schritt 1 -->
+<div class="box">
+    <label>Was löschen?</label>
+    <select id="typ" onchange="loadOrte()">
+        <option value="">Bitte wählen</option>
+        <option value="geraete">Geräte</option>
+        <option value="fahrzeuge">Fahrzeuge</option>
+    </select>
+</div>
+
+<!-- Schritt 2 -->
+<div class="box">
+    <label>Ort</label>
+    <select id="ort" onchange="loadLagerorte()"></select>
+</div>
+
+<!-- Schritt 3 -->
+<div class="box">
+    <label>Lagerort</label>
+    <select id="lager" onchange="loadItems()"></select>
+</div>
+
+<!-- Ergebnis -->
+<div id="liste" class="list"></div>
+
+<button class="back" onclick="back()">Zurück</button>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "ffwc-d3994.firebaseapp.com",
+  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "ffwc-d3994",
+  storageBucket: "ffwc-d3994.appspot.com",
+  messagingSenderId: "591233232022",
+  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let rawData = {};
+
+/* Daten laden */
+function loadData(){
+    let typ = typSelect.value;
+    if(!typ) return;
+
+    onValue(ref(db, typ), snap => {
+        rawData = snap.val() || {};
+        loadOrte();
+    });
+}
+
+/* HTML refs */
+const typSelect = document.getElementById("typ");
+const ortSelect = document.getElementById("ort");
+const lagerSelect = document.getElementById("lager");
+const liste = document.getElementById("liste");
+
+/* Orte laden */
+window.loadOrte = function(){
+
+    let typ = typSelect.value;
+    if(!typ) return;
+
+    onValue(ref(db, typ), snap => {
+
+        rawData = snap.val() || {};
+
+        let orte = new Set();
+
+        Object.values(rawData).forEach(d=>{
+            if(d.ort) orte.add(d.ort);
+        });
+
+        ortSelect.innerHTML = "<option>Ort wählen</option>";
+
+        orte.forEach(o=>{
+            ortSelect.innerHTML += `<option>${o}</option>`;
+        });
+    });
+};
+
+/* Lagerorte laden */
+window.loadLagerorte = function(){
+
+    let ort = ortSelect.value;
+
+    let lagerSet = new Set();
+
+    Object.values(rawData).forEach(d=>{
+        if(d.ort === ort){
+            if(d.lagerort) lagerSet.add(d.lagerort);
+        }
+    });
+
+    lagerSelect.innerHTML = "<option>Lagerort wählen</option>";
+
+    lagerSet.forEach(l=>{
+        lagerSelect.innerHTML += `<option>${l}</option>`;
+    });
+};
+
+/* Items laden */
+window.loadItems = function(){
+
+    let ort = ortSelect.value;
+    let lager = lagerSelect.value;
+
+    liste.innerHTML = "";
+
+    Object.entries(rawData).forEach(([key, d])=>{
+
+        if(d.ort === ort && d.lagerort === lager){
+
+            let div = document.createElement("div");
+            div.className = "item";
+
+            div.innerHTML = `
+                <span>${d.geraete || d.fahrzeug || "-"}</span>
+                <button class="delete" onclick="del('${key}')">Löschen</button>
+            `;
+
+            liste.appendChild(div);
+        }
+    });
+};
+
+/* Löschen */
+window.del = function(key){
+
+    let typ = typSelect.value;
+
+    if(confirm("Wirklich löschen?")){
+        remove(ref(db, typ + "/" + key));
+    }
+};
+
+/* Zurück */
+window.back = function(){
+    window.location.href = "index.html";
+};
+
+</script>
+
+</body>
+</html>
