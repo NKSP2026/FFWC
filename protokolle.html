@@ -79,11 +79,22 @@ button {
 <label>Betreff</label>
 <input id="mail_subject">
 
-<label>Nachricht</label>
+<label>Standard Nachricht</label>
 <textarea id="mail_body"></textarea>
 
 <button class="save" onclick="saveMail()">Speichern</button>
-<button class="mail" onclick="sendMail()">Mail senden</button>
+
+<hr>
+
+<h3>🚒 Einsatz-Mail senden</h3>
+
+<input id="einsatz_art" placeholder="Einsatzart (z.B. Brand, TH)">
+<input id="einsatz_ort" placeholder="Ort">
+<input id="einsatz_adresse" placeholder="Adresse">
+
+<textarea id="einsatz_info" placeholder="Weitere Infos"></textarea>
+
+<button class="mail" onclick="sendEinsatzMail()">Einsatz-Mail senden</button>
 
 </div>
 
@@ -95,15 +106,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSy...",
-  authDomain: "ffwc-d3994.firebaseapp.com",
   databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "ffwc-d3994",
   storageBucket: "ffwc-d3994.appspot.com"
-};
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const storage = getStorage(app);
 
@@ -116,7 +124,7 @@ window.openP = function(){
     }
 };
 
-/* 🔥 Upload */
+/* Upload */
 window.upload = async function(){
 
     let f = file.files[0];
@@ -139,32 +147,26 @@ window.upload = async function(){
     alert("Upload fertig");
 };
 
-/* 🔥 Liste laden */
+/* PDF Liste */
 function loadFiles(){
-
     onValue(ref(db,"pdfs"), snap=>{
-
-        list.innerHTML = "";
-
-        let data = snap.val() || {};
+        list.innerHTML="";
+        let data = snap.val()||{};
 
         Object.values(data).forEach(f=>{
-
             let div = document.createElement("div");
-            div.className = "file";
-
+            div.className="file";
             div.innerHTML = `
                 <b>${f.name}</b><br>
-                <a href="${f.url}" target="_blank">Öffnen / Download</a><br>
+                <a href="${f.url}" target="_blank">Öffnen</a><br>
                 <small>${f.time}</small>
             `;
-
             list.appendChild(div);
         });
     });
 }
 
-/* 🔥 Mail speichern */
+/* Mail speichern */
 window.saveMail = function(){
 
     set(ref(db,"mail"), {
@@ -176,11 +178,10 @@ window.saveMail = function(){
     alert("Gespeichert");
 };
 
-/* 🔥 Mail laden */
+/* Mail laden */
 function loadMail(){
 
     onValue(ref(db,"mail"), snap=>{
-
         let m = snap.val();
         if(!m) return;
 
@@ -190,14 +191,28 @@ function loadMail(){
     });
 }
 
-/* 🔥 Mail senden */
-window.sendMail = function(){
+/* 🔥 Einsatz-Mail */
+window.sendEinsatzMail = function(){
 
     let to = encodeURIComponent(mail_to.value);
     let subject = encodeURIComponent(mail_subject.value);
-    let body = encodeURIComponent(mail_body.value);
 
-    window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    let now = new Date().toLocaleString();
+
+    let body = `
+${mail_body.value}
+
+--- Einsatzmeldung ---
+Art: ${einsatz_art.value}
+Ort: ${einsatz_ort.value}
+Adresse: ${einsatz_adresse.value}
+Zeit: ${now}
+
+Info:
+${einsatz_info.value}
+`;
+
+    window.location.href = `mailto:${to}?subject=${subject}&body=${encodeURIComponent(body)}`;
 };
 
 </script>
