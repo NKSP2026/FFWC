@@ -19,6 +19,13 @@ body {
     border-radius:15px;
 }
 
+/* Suchbereich */
+.search-area {
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:30px;
+}
+
 input {
     width:100%;
     padding:12px;
@@ -28,6 +35,26 @@ input {
     border:none;
 }
 
+/* Vorschläge */
+#suggestions {
+    background:#111318;
+    border-radius:12px;
+    padding:10px;
+    height:250px;
+    overflow-y:auto;
+}
+
+.suggest-item {
+    padding:8px;
+    cursor:pointer;
+    border-radius:6px;
+}
+
+.suggest-item:hover {
+    background:#2a2f3a;
+}
+
+/* Ergebnisse */
 .results {
     margin-top:30px;
     display:grid;
@@ -49,7 +76,17 @@ input {
 
 <h2>Geräte Suche</h2>
 
-<input id="s" placeholder="Gerät suchen..." oninput="search()">
+<div class="search-area">
+
+    <!-- LINKS -->
+    <div>
+        <input id="s" placeholder="Gerät suchen..." oninput="suggest()">
+    </div>
+
+    <!-- RECHTS -->
+    <div id="suggestions"></div>
+
+</div>
 
 <div id="results" class="results"></div>
 
@@ -70,7 +107,7 @@ const db = getDatabase(app);
 let geraete = [];
 let fahrzeuge = [];
 
-/* beide laden */
+/* Daten laden */
 onValue(ref(db,"geraete"), s=>{
     geraete = Object.values(s.val()||{});
 });
@@ -79,28 +116,86 @@ onValue(ref(db,"fahrzeuge"), s=>{
     fahrzeuge = Object.values(s.val()||{});
 });
 
-/* Suche */
-window.search = function(){
+
+// 🔥 Vorschläge
+window.suggest = function(){
+
+    let q = s.value.toLowerCase();
+    suggestions.innerHTML = "";
+
+    if(!q) return;
+
+    let found = new Set();
+
+    /* Geräte */
+    geraete.forEach(d=>{
+        if(d.geraete && d.geraete.toLowerCase().includes(q)){
+            found.add(d.geraete);
+        }
+    });
+
+    /* Fahrzeuge Beladung */
+    fahrzeuge.forEach(d=>{
+        if(d.beladung){
+
+            let teile = d.beladung.split(",");
+
+            teile.forEach(t=>{
+                let name = t.trim();
+
+                if(name.toLowerCase().includes(q)){
+                    found.add(name);
+                }
+            });
+        }
+    });
+
+    /* anzeigen */
+    found.forEach(name=>{
+        let div = document.createElement("div");
+        div.className="suggest-item";
+        div.innerText = name;
+
+        /* 🔥 Doppelklick */
+        div.ondblclick = ()=>{
+            s.value = name;
+            doSearch();
+        };
+
+        suggestions.appendChild(div);
+    });
+};
+
+
+// 🔎 Suche
+window.doSearch = function(){
 
     let q = s.value.toLowerCase();
     results.innerHTML="";
 
-    /* normale Geräte */
+    /* Geräte */
     geraete.forEach(d=>{
         if(d.geraete?.toLowerCase().includes(q)){
-            showCard(d, "gerät");
+            showCard(d,"gerät");
         }
     });
 
-    /* 🔥 Fahrzeuge durchsuchen */
+    /* Fahrzeuge */
     fahrzeuge.forEach(d=>{
         if(d.beladung?.toLowerCase().includes(q)){
-            showCard(d, "fahrzeug");
+            showCard(d,"fahrzeug");
         }
     });
 };
 
-function showCard(d, type){
+
+/* ENTER Taste */
+s.addEventListener("keypress", e=>{
+    if(e.key==="Enter") doSearch();
+});
+
+
+function showCard(d,type){
 
     let c = document.createElement("div");
     c.className="card";
@@ -111,7 +206,7 @@ function showCard(d, type){
         📍 liegt auf ${d.lagerort || "-"}<br><br>
         Ort: ${d.ort}<br>
         Adresse: ${d.adresse}<br>
-        Telefon: ${d.telefon}
+        Telefon: ${d.telefon || "-"}
         `;
     }
 
@@ -121,7 +216,7 @@ function showCard(d, type){
         📍 liegt auf Fahrzeug (${d.fahrzeug})<br><br>
         Ort: ${d.ort}<br>
         Adresse: ${d.adresse}<br>
-        Beladung enthält gesuchtes Gerät
+        🔧 enthält gesuchtes Gerät
         `;
     }
 
