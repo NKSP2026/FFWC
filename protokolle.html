@@ -63,6 +63,9 @@ button {
 <h3>✉ Empfänger</h3>
 <input id="mail_to" placeholder="z.B. leitstelle@zwickau.de">
 
+<h3>📌 Betreff</h3>
+<input id="mail_subject" placeholder="z.B. Einsatzmeldung">
+
 <h3>🚒 Einsatzdaten</h3>
 
 <input id="einsatz_art" placeholder="Einsatzart">
@@ -103,7 +106,7 @@ window.openP = function(){
     }
 };
 
-/* Fahrzeuge laden */
+/* Fahrzeuge */
 function loadFahrzeuge(){
 
     onValue(ref(db,"fahrzeuge"), snap=>{
@@ -127,7 +130,7 @@ function loadFahrzeuge(){
     });
 }
 
-/* 🔥 Fahrzeuge als Liste */
+/* Fahrzeuge Liste */
 function getSelectedFahrzeuge(){
 
     let checked = document.querySelectorAll("#fahrzeuge input:checked");
@@ -145,6 +148,7 @@ function getSelectedFahrzeuge(){
 window.sendMail = function(){
 
     let empfaenger = mail_to.value || "";
+    let betreff = mail_subject.value || "Einsatzbericht";
 
     let fahrzeugeListe = getSelectedFahrzeuge().join("\n");
 
@@ -165,9 +169,8 @@ Zeit: ${new Date().toLocaleString()}
 `;
 
     window.location.href =
-    `mailto:${encodeURIComponent(empfaenger)}?subject=Einsatzbericht&body=${encodeURIComponent(body)}`;
+    `mailto:${encodeURIComponent(empfaenger)}?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(body)}`;
 };
-
 
 /* 🔥 PDF */
 window.createPDF = function(){
