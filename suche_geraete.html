@@ -29,12 +29,11 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* ===== SUCHBEREICH ===== */
+/* Suchbereich */
 .search-area {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* 👉 rechts größer */
-    column-gap: 40px;              /* 👉 Abstand */
-    align-items: start;
+    grid-template-columns: 2fr 1fr;
+    column-gap: 40px;
 }
 
 /* Eingabe */
@@ -50,7 +49,7 @@ input {
 
 /* Vorschläge */
 #suggestions {
-    height: 220px;
+    height: 260px;
     background: #111318;
     border-radius: 12px;
     padding: 12px;
@@ -59,7 +58,7 @@ input {
 
 /* Vorschlag */
 .suggest-item {
-    padding: 8px;
+    padding: 10px;
     cursor: pointer;
     border-radius: 6px;
 }
@@ -92,7 +91,7 @@ button {
     color: white;
 }
 
-/* ===== ERGEBNISSE ===== */
+/* Ergebnisse */
 .results {
     margin-top: 30px;
     display: grid;
@@ -127,7 +126,6 @@ button {
 
 <div class="search-area">
 
-    <!-- LINKS -->
     <div>
         <input id="search" placeholder="Gerät suchen..." oninput="suggest()">
 
@@ -137,17 +135,13 @@ button {
         </div>
     </div>
 
-    <!-- RECHTS -->
     <div id="suggestions"></div>
 
 </div>
 
-<!-- Ergebnisse -->
 <div class="results" id="results"></div>
 
 </div>
-
-<!-- NUR DER WICHTIGE TEIL GEÄNDERT -->
 
 <script type="module">
 
@@ -172,14 +166,11 @@ let data = [];
 
 /* Daten laden */
 onValue(ref(db, "geraete"), snap => {
-    console.log("DATEN:", snap.val());
     data = Object.values(snap.val() || {});
 });
 
 
-/* =========================
-   🔎 VORSCHLÄGE (LIVE)
-========================= */
+/* Vorschläge */
 window.suggest = function(){
 
     let s = search.value.toLowerCase();
@@ -202,7 +193,6 @@ window.suggest = function(){
         div.className = "suggest-item";
         div.innerText = g;
 
-        /* Doppelklick = direkt suchen */
         div.ondblclick = ()=>{
             search.value = g;
             doSearch();
@@ -213,9 +203,52 @@ window.suggest = function(){
 };
 
 
-/* =========================
-   🔥 PROFI-SUCHE
-========================= */
+/* 🔥 INTELLIGENTE ORTSLOGIK */
+function getOrtText(d){
+
+    let lager = (d.lagerort || "").toLowerCase();
+    let fahrzeug = d.fahrzeug || "";
+    let ort = d.ort || "";
+
+    // 🔴 HLF + Gerätefach
+    if(lager.includes("hlf")){
+        if(lager.includes("gerätefach") || lager.includes("geraetefach")){
+            let fach = lager.match(/g\d+/i);
+            return `liegt auf ${fahrzeug} (${fach ? fach[0].toUpperCase() : "Fach"})`;
+        }
+        return `liegt auf ${fahrzeug}`;
+    }
+
+    // 🟠 Anhänger
+    if(lager.includes("anhänger") || lager.includes("anhaenger")){
+        return `liegt auf ${d.lagerort}`;
+    }
+
+    // 🟢 Regal
+    if(lager.includes("regal")){
+        return `liegt im ${d.lagerort}`;
+    }
+
+    // 🔵 Fahrzeughalle
+    if(lager.includes("halle")){
+        return `liegt in ${d.lagerort}`;
+    }
+
+    // 🟣 Lager allgemein
+    if(lager.includes("lager")){
+        return `liegt im ${d.lagerort}`;
+    }
+
+    // ⚪ Fallback
+    if(ort){
+        return `liegt bei Wache ${ort}`;
+    }
+
+    return "-";
+}
+
+
+/* Suche */
 window.doSearch = function(){
 
     let s = search.value.toLowerCase();
@@ -225,52 +258,18 @@ window.doSearch = function(){
 
         if(d.geraete && d.geraete.toLowerCase().includes(s)){
 
-            let ortText = "-";
-
-            let lager = (d.lagerort || "").toLowerCase();
-            let fahrzeug = (d.fahrzeug || "").toLowerCase();
-            let ort = d.ort || "";
-
-            /* 🔥 INTELLIGENTE ERKENNUNG */
-
-            if(lager.includes("hlf") || fahrzeug.includes("hlf")){
-                ortText = `liegt auf ${d.fahrzeug || d.lagerort}`;
-            }
-            else if(lager.includes("lf")){
-                ortText = `liegt auf ${d.lagerort}`;
-            }
-            else if(lager.includes("rtw") || lager.includes("nef")){
-                ortText = `liegt auf ${d.lagerort}`;
-            }
-            else if(lager.includes("anhänger") || lager.includes("anhaenger")){
-                ortText = `liegt auf ${d.lagerort}`;
-            }
-            else if(lager.includes("regal")){
-                ortText = `liegt im ${d.lagerort}`;
-            }
-            else if(lager.includes("halle")){
-                ortText = `liegt in ${d.lagerort}`;
-            }
-            else if(lager.includes("lager")){
-                ortText = `liegt im ${d.lagerort}`;
-            }
-            else if(ort){
-                ortText = `liegt bei Wache ${ort}`;
-            }
-
-            /* Karte */
             let card = document.createElement("div");
             card.className = "card";
 
             card.innerHTML = `
                 ${d.bild ? `<img src="${d.bild}">` : ""}
 
-                <div style="font-size:18px; font-weight:bold; margin-bottom:8px;">
+                <div style="font-size:18px; font-weight:bold;">
                     ${d.geraete || "-"}
                 </div>
 
-                <div style="color:#3b82f6; font-weight:bold; margin-bottom:10px;">
-                    📍 ${ortText}
+                <div style="color:#3b82f6; font-weight:bold; margin:10px 0;">
+                    📍 ${getOrtText(d)}
                 </div>
 
                 <div><b>Ort:</b> ${d.ort || "-"}</div>
@@ -293,3 +292,6 @@ window.back = function(){
 };
 
 </script>
+
+</body>
+</html>
