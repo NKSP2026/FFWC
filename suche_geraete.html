@@ -147,6 +147,8 @@ button {
 
 </div>
 
+<!-- NUR DER WICHTIGE TEIL GEÄNDERT -->
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -167,46 +169,10 @@ const db = getDatabase(app);
 
 let data = [];
 
-/* Daten laden */
 onValue(ref(db, "geraete"), snap => {
-    console.log("GERAETE:", snap.val());
     data = Object.values(snap.val() || {});
 });
 
-/* Vorschläge */
-window.suggest = function(){
-
-    let s = search.value.toLowerCase();
-    suggestions.innerHTML = "";
-
-    if(!s) return;
-
-    let found = [];
-
-    data.forEach(d=>{
-        if(d.geraete && d.geraete.toLowerCase().includes(s)){
-            if(!found.includes(d.geraete)){
-                found.push(d.geraete);
-            }
-        }
-    });
-
-    found.forEach(g=>{
-        let div = document.createElement("div");
-        div.className = "suggest-item";
-        div.innerText = g;
-
-        /* Doppelklick */
-        div.ondblclick = ()=>{
-            search.value = g;
-            doSearch();
-        };
-
-        suggestions.appendChild(div);
-    });
-};
-
-/* Suche */
 window.doSearch = function(){
 
     let s = search.value.toLowerCase();
@@ -223,6 +189,8 @@ window.doSearch = function(){
                 ${d.bild ? `<img src="${d.bild}">` : ""}
                 <b>Ort:</b> ${d.ort || "-"}<br>
                 <b>Einsatzgerät:</b> ${d.geraete || "-"}<br>
+                <b>Standort:</b> ${d.lagerort || "-"}<br>
+                <b>Telefon:</b> ${d.telefon || "-"}<br>
                 <b>Bemerkung:</b> ${d.bemerkung || "-"}
             `;
 
@@ -233,12 +201,6 @@ window.doSearch = function(){
 
 };
 
-/* Zurück */
-window.back = function(){
-    window.location.href = "index.html";
-};
+window.back = () => window.location.href = "index.html";
 
 </script>
-
-</body>
-</html>
