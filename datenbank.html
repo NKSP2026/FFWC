@@ -1,26 +1,214 @@
 <!DOCTYPE html>
 <html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Datenbank</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#0f1117;
+    color:white;
+}
+
+.container {
+    max-width:1100px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:15px;
+}
+
+input {
+    width:100%;
+    padding:8px;
+    border-radius:6px;
+    border:none;
+    background:#111318;
+    color:white;
+    margin-top:4px;
+}
+
+.entry {
+    background:#111318;
+    padding:15px;
+    border-radius:10px;
+    margin-top:15px;
+}
+
+button {
+    margin-top:10px;
+    padding:8px 12px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.save { background:#3b82f6; }
+.delete { background:#ef4444; }
+.back { background:#6b7280; }
+.open { background:#3b82f6; }
+
+h3 {
+    margin-top:30px;
+}
+</style>
+</head>
+
 <body>
 
-<input type="password" id="pw">
-<button onclick="openDB()">Öffnen</button>
+<div class="container">
+
+<h2>Datenbank</h2>
+
+<input type="password" id="pw" placeholder="Passwort">
+<button class="open" onclick="openDB()">Öffnen</button>
 
 <div id="content"></div>
 
+<button class="back" onclick="back()">Zurück</button>
+
+</div>
+
 <script type="module">
-import "./firebase.js";
 
-window.openDB=function(){
- if(pw.value!=="1234") return;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
- onValue(ref(db,"daten"), snap=>{
-    let html="";
-    Object.values(snap.val()||{}).forEach(d=>{
-        html+=`${d.ort} - ${d.fahrzeug}<br>`;
+const app = initializeApp({
+  apiKey:"AIzaSy...",
+  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
+});
+
+const db = getDatabase(app);
+
+/* Öffnen */
+window.openDB = function(){
+
+    if(pw.value !== "1234") return;
+
+    content.innerHTML = "<h3>Geräte</h3>";
+
+    /* Geräte */
+    onValue(ref(db,"geraete"), snap=>{
+
+        let html = "<h3>Geräte</h3>";
+
+        Object.entries(snap.val()||{}).forEach(([key,d])=>{
+
+            html += `
+            <div class="entry">
+
+                <b>Gerät</b>
+                <input id="g_geraete_${key}" value="${d.geraete||""}">
+
+                <b>Ort</b>
+                <input id="g_ort_${key}" value="${d.ort||""}">
+
+                <b>Adresse</b>
+                <input id="g_adresse_${key}" value="${d.adresse||""}">
+
+                <b>Lagerort</b>
+                <input id="g_lager_${key}" value="${d.lagerort||""}">
+
+                <b>Telefon</b>
+                <input id="g_tel_${key}" value="${d.telefon||""}">
+
+                <button class="save" onclick="saveG('${key}')">Speichern</button>
+                <button class="delete" onclick="del('geraete','${key}')">Löschen</button>
+
+            </div>
+            `;
+        });
+
+        content.innerHTML = html;
+
     });
-    content.innerHTML=html;
- });
-}
+
+    /* Fahrzeuge */
+    onValue(ref(db,"fahrzeuge"), snap=>{
+
+        let html = content.innerHTML + "<h3>Fahrzeuge</h3>";
+
+        Object.entries(snap.val()||{}).forEach(([key,d])=>{
+
+            html += `
+            <div class="entry">
+
+                <b>Fahrzeug</b>
+                <input id="f_name_${key}" value="${d.fahrzeug||""}">
+
+                <b>Ort</b>
+                <input id="f_ort_${key}" value="${d.ort||""}">
+
+                <b>Adresse</b>
+                <input id="f_adresse_${key}" value="${d.adresse||""}">
+
+                <b>Funk</b>
+                <input id="f_funk_${key}" value="${d.funk||""}">
+
+                <b>Stärke</b>
+                <input id="f_staerke_${key}" value="${d.staerke||""}">
+
+                <b>Beladung</b>
+                <input id="f_beladung_${key}" value="${d.beladung||""}">
+
+                <button class="save" onclick="saveF('${key}')">Speichern</button>
+                <button class="delete" onclick="del('fahrzeuge','${key}')">Löschen</button>
+
+            </div>
+            `;
+        });
+
+        content.innerHTML = html;
+
+    });
+};
+
+/* Geräte speichern */
+window.saveG = function(key){
+
+    update(ref(db,"geraete/"+key),{
+        geraete: document.getElementById("g_geraete_"+key).value,
+        ort: document.getElementById("g_ort_"+key).value,
+        adresse: document.getElementById("g_adresse_"+key).value,
+        lagerort: document.getElementById("g_lager_"+key).value,
+        telefon: document.getElementById("g_tel_"+key).value
+    });
+
+    alert("Gespeichert");
+};
+
+/* Fahrzeuge speichern */
+window.saveF = function(key){
+
+    update(ref(db,"fahrzeuge/"+key),{
+        fahrzeug: document.getElementById("f_name_"+key).value,
+        ort: document.getElementById("f_ort_"+key).value,
+        adresse: document.getElementById("f_adresse_"+key).value,
+        funk: document.getElementById("f_funk_"+key).value,
+        staerke: document.getElementById("f_staerke_"+key).value,
+        beladung: document.getElementById("f_beladung_"+key).value
+    });
+
+    alert("Gespeichert");
+};
+
+/* Löschen */
+window.del = function(type,key){
+
+    if(confirm("Wirklich löschen?")){
+        remove(ref(db,type+"/"+key));
+    }
+};
+
+/* Zurück */
+window.back = function(){
+    window.location.href = "index.html";
+};
+
 </script>
 
 </body>
