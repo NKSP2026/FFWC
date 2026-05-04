@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
-<head> 
+<head>
 <meta charset="UTF-8">
 <title>Einsatz Mail</title>
 
@@ -56,8 +56,11 @@ button {
 
 <input id="mail_to" placeholder="Empfänger">
 
-<input id="einsatz_art" placeholder="Einsatzart">
-<input id="einsatz_ort" placeholder="Ort">
+<!-- 🔥 NEU: Betreff -->
+<input id="mail_subject" placeholder="Betreff wird automatisch erstellt">
+
+<input id="einsatz_art" placeholder="Einsatzart" oninput="updateSubject()">
+<input id="einsatz_ort" placeholder="Ort" oninput="updateSubject()">
 <input id="einsatz_adresse" placeholder="Adresse">
 
 <textarea id="einsatz_info" placeholder="Infos"></textarea>
@@ -85,6 +88,7 @@ const db = getDatabase(app);
 
 let fahrzeugeData=[];
 
+/* Fahrzeuge laden */
 onValue(ref(db,"fahrzeuge"), snap=>{
 
     fahrzeuge.innerHTML="";
@@ -104,6 +108,7 @@ onValue(ref(db,"fahrzeuge"), snap=>{
     });
 });
 
+/* Fahrzeuge Liste */
 function getF(){
 
     let c=document.querySelectorAll("#fahrzeuge input:checked");
@@ -117,6 +122,25 @@ function getF(){
     return list;
 }
 
+/* 🔥 AUTO BETREFF */
+window.updateSubject = function(){
+
+    // wenn Benutzer selbst was eingegeben hat → nichts überschreiben
+    if(mail_subject.dataset.manual === "true") return;
+
+    let now=new Date();
+
+    let datum=now.toLocaleDateString("de-DE");
+    let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+
+    mail_subject.value = `${einsatz_art.value || "Einsatz"} - ${einsatz_ort.value || "-"} - ${datum} ${uhrzeit}`;
+};
+
+/* merken ob manuell geändert */
+mail_subject.addEventListener("input", ()=>{
+    mail_subject.dataset.manual = "true";
+});
+
 /* MAIL */
 window.sendMail=function(){
 
@@ -125,7 +149,7 @@ window.sendMail=function(){
     let datum=now.toLocaleDateString("de-DE");
     let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
 
-    let betreff=`${einsatz_art.value||"Einsatz"} - ${einsatz_ort.value||"-"} - ${datum} ${uhrzeit}`;
+    let betreff = mail_subject.value || `${einsatz_art.value} - ${einsatz_ort.value} - ${datum} ${uhrzeit}`;
 
     let body=`
 Einsatzbericht
@@ -153,7 +177,6 @@ window.createPDF=function(){
     const doc=new jsPDF();
 
     let y=10;
-
     function l(t){doc.text(t,10,y);y+=8;}
 
     let now=new Date();
@@ -168,7 +191,6 @@ window.createPDF=function(){
 
     l("");
     l("Fahrzeuge:");
-
     getF().forEach(f=>l("- "+f));
 
     l("");
@@ -185,8 +207,11 @@ window.createPDF=function(){
     doc.save(`Einsatz_${safeOrt}_${safeDatum}_${safeUhrzeit}.pdf`);
 };
 
-/* back */
+/* zurück */
 window.back=()=>location.href="index.html";
+
+/* initial setzen */
+updateSubject();
 
 </script>
 
