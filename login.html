@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:#0f1117;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box {
+    background:#1c1f26;
+    padding:30px;
+    border-radius:15px;
+    width:300px;
+    text-align:center;
+}
+
+input {
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    background:#111318;
+    color:white;
+}
+
+button {
+    margin-top:15px;
+    padding:10px;
+    width:100%;
+    border:none;
+    border-radius:8px;
+    background:#3b82f6;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>🔒 Zugriff</h2>
+
+<input type="password" id="pw" placeholder="Passwort">
+
+<button onclick="login()">Login</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSy...",
+  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
+});
+
+const db = getDatabase(app);
+
+window.login = async function(){
+
+    let input = pw.value;
+
+    let snap = await get(ref(db,"config/passwort"));
+    let korrekt = snap.val();
+
+    if(input === korrekt){
+        localStorage.setItem("login","ok");
+        window.location.href = "index.html";
+    } else {
+        msg.innerText = "Falsches Passwort!";
+    }
+};
+
+</script>
+
+</body>
+</html>
