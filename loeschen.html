@@ -7,7 +7,7 @@
 <style>
 body {
     margin: 0;
-    font-family: "Segoe UI", Arial;
+    font-family: "Segoe UI";
     background: #0f1117;
     color: white;
 }
@@ -37,7 +37,6 @@ select, input {
     border: none;
 }
 
-/* Liste */
 .list {
     margin-top: 20px;
     display: grid;
@@ -50,7 +49,6 @@ select, input {
     border-radius: 10px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 button {
@@ -77,7 +75,7 @@ button {
 
 <h2>Daten löschen</h2>
 
-<!-- Schritt 1 -->
+<!-- Typ -->
 <div class="box">
     <label>Was löschen?</label>
     <select id="typ" onchange="loadOrte()">
@@ -87,22 +85,22 @@ button {
     </select>
 </div>
 
-<!-- Schritt 2 -->
+<!-- Ort -->
 <div class="box">
     <label>Ort</label>
-    <select id="ort" onchange="loadLagerorte()"></select>
+    <select id="ort" onchange="nextStep()"></select>
 </div>
 
-<!-- Schritt 3 -->
-<div class="box">
+<!-- Lagerort (nur Geräte) -->
+<div class="box" id="lagerBox">
     <label>Lagerort</label>
     <select id="lager" onchange="loadItems()"></select>
 </div>
 
-<!-- 🔎 NEU: Suchfeld -->
+<!-- Suche -->
 <div class="box">
-    <label>Suche (Gerät/Fahrzeug)</label>
-    <input id="search" placeholder="z.B. Schlauch, Tauchpumpe..." oninput="filterList()">
+    <label>Suche</label>
+    <input id="search" oninput="filterList()" placeholder="z.B. Schlauch, HLF...">
 </div>
 
 <!-- Liste -->
@@ -117,17 +115,11 @@ button {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "ffwc-d3994.firebaseapp.com",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "ffwc-d3994",
-  storageBucket: "ffwc-d3994.appspot.com",
-  messagingSenderId: "591233232022",
-  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7"
-};
+const app = initializeApp({
+  apiKey:"AIzaSy...",
+  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
+});
 
-const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let rawData = {};
@@ -137,8 +129,8 @@ let currentItems = [];
 const typSelect = document.getElementById("typ");
 const ortSelect = document.getElementById("ort");
 const lagerSelect = document.getElementById("lager");
+const lagerBox = document.getElementById("lagerBox");
 const liste = document.getElementById("liste");
-const searchInput = document.getElementById("search");
 
 /* Orte laden */
 window.loadOrte = function(){
@@ -161,14 +153,32 @@ window.loadOrte = function(){
         orte.forEach(o=>{
             ortSelect.innerHTML += `<option>${o}</option>`;
         });
+
+        liste.innerHTML = "";
+        lagerSelect.innerHTML = "";
     });
 };
 
-/* Lagerorte */
+/* nächster Schritt */
+window.nextStep = function(){
+
+    let typ = typSelect.value;
+
+    if(typ === "fahrzeuge"){
+        /* 🔥 Lagerort AUSBLENDEN */
+        lagerBox.style.display = "none";
+        loadItems();
+    } else {
+        /* Geräte */
+        lagerBox.style.display = "block";
+        loadLagerorte();
+    }
+};
+
+/* Lagerorte (nur Geräte) */
 window.loadLagerorte = function(){
 
     let ort = ortSelect.value;
-
     let lagerSet = new Set();
 
     Object.values(rawData).forEach(d=>{
@@ -187,6 +197,7 @@ window.loadLagerorte = function(){
 /* Items laden */
 window.loadItems = function(){
 
+    let typ = typSelect.value;
     let ort = ortSelect.value;
     let lager = lagerSelect.value;
 
@@ -194,18 +205,24 @@ window.loadItems = function(){
 
     Object.entries(rawData).forEach(([key, d])=>{
 
-        if(d.ort === ort && d.lagerort === lager){
-            currentItems.push({key, d});
+        if(typ === "fahrzeuge"){
+            if(d.ort === ort){
+                currentItems.push({key, d});
+            }
+        } else {
+            if(d.ort === ort && d.lagerort === lager){
+                currentItems.push({key, d});
+            }
         }
     });
 
     renderList(currentItems);
 };
 
-/* 🔎 Filter */
+/* Filter */
 window.filterList = function(){
 
-    let s = searchInput.value.toLowerCase();
+    let s = search.value.toLowerCase();
 
     let filtered = currentItems.filter(item => {
 
@@ -216,7 +233,7 @@ window.filterList = function(){
     renderList(filtered);
 };
 
-/* Liste anzeigen */
+/* Anzeige */
 function renderList(items){
 
     liste.innerHTML = "";
