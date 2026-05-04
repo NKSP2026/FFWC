@@ -56,10 +56,10 @@ button {
 
 <h2>📄 Protokolle</h2>
 
-<input type="file" id="file">
+<input type="file" id="file" accept="application/pdf">
 <button class="upload" onclick="upload()">PDF hochladen</button>
 
-<div id="list"></div>
+<div id="list">Lade Daten...</div>
 
 <button class="back" onclick="back()">Zurück</button>
 
@@ -67,6 +67,7 @@ button {
 
 <script type="module">
 
+/* 🔒 LOGIN */
 if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
@@ -84,44 +85,72 @@ const app = initializeApp({
 const db = getDatabase(app);
 const storage = getStorage(app);
 
-/* Upload */
+/* 🔥 UPLOAD */
 window.upload = async function(){
 
     let f = file.files[0];
-    if(!f) return;
 
-    let path = "pdfs/" + Date.now() + "_" + f.name;
+    if(!f){
+        alert("Bitte Datei auswählen!");
+        return;
+    }
 
-    let storageRef = sRef(storage, path);
+    if(!f.name.endsWith(".pdf")){
+        alert("Nur PDF erlaubt!");
+        return;
+    }
 
-    await uploadBytes(storageRef, f);
+    try{
 
-    let url = await getDownloadURL(storageRef);
+        let path = "pdfs/" + Date.now() + "_" + f.name;
 
-    await push(ref(db,"pdfs"), {
-        name: f.name,
-        url: url,
-        time: new Date().toLocaleString()
-    });
+        let storageRef = sRef(storage, path);
 
-    alert("Upload fertig");
+        await uploadBytes(storageRef, f);
+
+        let url = await getDownloadURL(storageRef);
+
+        await push(ref(db,"pdfs"), {
+            name: f.name,
+            url: url,
+            time: new Date().toLocaleString()
+        });
+
+        alert("Upload erfolgreich!");
+
+        file.value = ""; // reset
+
+    }catch(e){
+        alert("Fehler beim Upload!");
+        console.error(e);
+    }
 };
 
-/* Liste */
+/* 🔥 LISTE */
 onValue(ref(db,"pdfs"), snap=>{
 
     list.innerHTML="";
 
-    let data = snap.val()||{};
+    let data = snap.val() || {};
 
-    Object.values(data).forEach(f=>{
+    let arr = Object.values(data);
+
+    /* 🔥 NEU: sortiert nach neuestem */
+    arr.sort((a,b)=> new Date(b.time) - new Date(a.time));
+
+    if(arr.length === 0){
+        list.innerHTML = "Keine Protokolle vorhanden";
+        return;
+    }
+
+    arr.forEach(f=>{
 
         let div = document.createElement("div");
         div.className="file";
 
         div.innerHTML = `
             <b>${f.name}</b><br>
-            <a href="${f.url}" target="_blank">Öffnen / Download</a><br>
+            <a href="${f.url}" target="_blank" style="color:#3b82f6">Öffnen / Download</a><br>
             <small>${f.time}</small>
         `;
 
@@ -129,10 +158,8 @@ onValue(ref(db,"pdfs"), snap=>{
     });
 });
 
-/* zurück */
-window.back = ()=>{
-    location.href="index.html";
-};
+/* 🔙 */
+window.back = ()=> location.href="index.html";
 
 </script>
 
