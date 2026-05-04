@@ -2,36 +2,163 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Neu</title>
+<title>Neu Anlegen</title>
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+
+/* Fenster Style */
+.window {
+    width: 800px;
+    margin: 40px auto;
+    background: #dcdcdc;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Felder */
+label {
+    font-weight: bold;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+/* Textarea breit */
+.full {
+    grid-column: span 2;
+}
+
+/* Buttons */
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-weight: bold;
+}
+
+</style>
+
 </head>
 <body>
 
-<h2>Neu Anlegen</h2>
+<div class="window">
 
-<input id="ort" placeholder="Ort"><br>
-<input id="fahrzeug" placeholder="Fahrzeug"><br>
-<input id="funk" placeholder="Funkkenner"><br>
-<input id="geraete" placeholder="Geräte"><br>
-<textarea id="bemerkung" placeholder="Bemerkung"></textarea><br>
+    <h2>Neu Anlegen</h2>
 
-<button onclick="save()">Speichern</button>
+    <div class="form-grid">
 
+        <div>
+            <label>Ort / Ortsteil</label>
+            <input id="ort">
+        </div>
+
+        <div>
+            <label>Fahrzeug</label>
+            <input id="fahrzeug">
+        </div>
+
+        <div>
+            <label>Funkkenner</label>
+            <input id="funk">
+        </div>
+
+        <div>
+            <label>Stärke</label>
+            <input id="staerke">
+        </div>
+
+        <div>
+            <label>Einsatzgeräte</label>
+            <input id="geraete">
+        </div>
+
+        <div>
+            <label>Sondergeräte</label>
+            <input id="sonder">
+        </div>
+
+        <div class="full">
+            <label>Bemerkung / Adresse</label>
+            <textarea id="bemerkung"></textarea>
+        </div>
+
+        <div class="full">
+            <label><input type="checkbox" id="einsatz"> Einsatz-/Sondergeräte</label><br>
+            <label><input type="checkbox" id="fahrzeuge"> Fahrzeuge/Anhänger</label>
+        </div>
+
+    </div>
+
+    <div class="buttons">
+        <button onclick="save()">Speichern</button>
+        <button onclick="back()">Abbrechen</button>
+    </div>
+
+</div>
+
+<!-- Firebase -->
 <script type="module">
-import "./firebase.js";
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
+  authDomain: "ffwc-d3994.firebaseapp.com",
+  databaseURL: "https://ffwc-d3994-default-rtdb.firebaseio.com/",
+  projectId: "ffwc-d3994",
+  storageBucket: "ffwc-d3994.firebasestorage.app",
+  messagingSenderId: "591233232022",
+  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 window.save = function(){
-    const data = {
-        ort: ort.value,
-        fahrzeug: fahrzeug.value,
-        funk: funk.value,
-        geraete: geraete.value,
-        bemerkung: bemerkung.value
+
+    let data = {
+        ort: document.getElementById("ort").value,
+        fahrzeug: document.getElementById("fahrzeug").value,
+        funk: document.getElementById("funk").value,
+        staerke: document.getElementById("staerke").value,
+        geraete: document.getElementById("geraete").value,
+        sonder: document.getElementById("sonder").value,
+        bemerkung: document.getElementById("bemerkung").value,
+        zeit: new Date().toLocaleString()
     };
 
-    push(ref(db,"daten"), data);
-    alert("Gespeichert");
+    if(document.getElementById("einsatz").checked){
+        push(ref(db, "geraete"), data);
+    }
+
+    if(document.getElementById("fahrzeuge").checked){
+        push(ref(db, "fahrzeuge"), data);
+    }
+
+    alert("Gespeichert!");
 }
+
+window.back = function(){
+    window.location.href = "index.html";
+}
+
 </script>
 
 </body>
