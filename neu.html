@@ -33,7 +33,8 @@ h2 {
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    column-gap: 40px;   /* 👉 mehr Abstand links/rechts */
+    row-gap: 20px;
 }
 
 /* Felder */
@@ -121,11 +122,16 @@ input:focus, textarea:focus {
 </div>
 
 <!-- Checkbox -->
-<div class="full checkbox">
-    <label><input type="checkbox" id="einsatz"> Einsatz-/Sondergeräte</label><br>
-    <label><input type="checkbox" id="fahrzeuge"> Fahrzeuge/Anhänger</label>
-</div>
+<div class="checkbox">
+    <label class="checkline">
+        <input type="checkbox" id="einsatz">
+        Einsatz-/Sondergeräte
+    </label>
 
+    <label class="checkline">
+        <input type="checkbox" id="fahrzeuge">
+        Fahrzeuge/Anhänger
+    </label>
 </div>
 
 <div class="buttons">
