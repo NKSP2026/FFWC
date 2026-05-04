@@ -24,12 +24,11 @@ h2 {
     margin-bottom: 20px;
 }
 
-/* Schritte */
 .box {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
-select {
+select, input {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
@@ -45,7 +44,6 @@ select {
     gap: 10px;
 }
 
-/* Eintrag */
 .item {
     background: #111318;
     padding: 12px;
@@ -101,7 +99,13 @@ button {
     <select id="lager" onchange="loadItems()"></select>
 </div>
 
-<!-- Ergebnis -->
+<!-- 🔎 NEU: Suchfeld -->
+<div class="box">
+    <label>Suche (Gerät/Fahrzeug)</label>
+    <input id="search" placeholder="z.B. Schlauch, Tauchpumpe..." oninput="filterList()">
+</div>
+
+<!-- Liste -->
 <div id="liste" class="list"></div>
 
 <button class="back" onclick="back()">Zurück</button>
@@ -127,23 +131,14 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let rawData = {};
+let currentItems = [];
 
-/* Daten laden */
-function loadData(){
-    let typ = typSelect.value;
-    if(!typ) return;
-
-    onValue(ref(db, typ), snap => {
-        rawData = snap.val() || {};
-        loadOrte();
-    });
-}
-
-/* HTML refs */
+/* HTML */
 const typSelect = document.getElementById("typ");
 const ortSelect = document.getElementById("ort");
 const lagerSelect = document.getElementById("lager");
 const liste = document.getElementById("liste");
+const searchInput = document.getElementById("search");
 
 /* Orte laden */
 window.loadOrte = function(){
@@ -169,7 +164,7 @@ window.loadOrte = function(){
     });
 };
 
-/* Lagerorte laden */
+/* Lagerorte */
 window.loadLagerorte = function(){
 
     let ort = ortSelect.value;
@@ -177,8 +172,8 @@ window.loadLagerorte = function(){
     let lagerSet = new Set();
 
     Object.values(rawData).forEach(d=>{
-        if(d.ort === ort){
-            if(d.lagerort) lagerSet.add(d.lagerort);
+        if(d.ort === ort && d.lagerort){
+            lagerSet.add(d.lagerort);
         }
     });
 
@@ -195,24 +190,52 @@ window.loadItems = function(){
     let ort = ortSelect.value;
     let lager = lagerSelect.value;
 
-    liste.innerHTML = "";
+    currentItems = [];
 
     Object.entries(rawData).forEach(([key, d])=>{
 
         if(d.ort === ort && d.lagerort === lager){
-
-            let div = document.createElement("div");
-            div.className = "item";
-
-            div.innerHTML = `
-                <span>${d.geraete || d.fahrzeug || "-"}</span>
-                <button class="delete" onclick="del('${key}')">Löschen</button>
-            `;
-
-            liste.appendChild(div);
+            currentItems.push({key, d});
         }
     });
+
+    renderList(currentItems);
 };
+
+/* 🔎 Filter */
+window.filterList = function(){
+
+    let s = searchInput.value.toLowerCase();
+
+    let filtered = currentItems.filter(item => {
+
+        let name = (item.d.geraete || item.d.fahrzeug || "").toLowerCase();
+        return name.includes(s);
+    });
+
+    renderList(filtered);
+};
+
+/* Liste anzeigen */
+function renderList(items){
+
+    liste.innerHTML = "";
+
+    items.forEach(item => {
+
+        let name = item.d.geraete || item.d.fahrzeug || "-";
+
+        let div = document.createElement("div");
+        div.className = "item";
+
+        div.innerHTML = `
+            <span>${name}</span>
+            <button class="delete" onclick="del('${item.key}')">Löschen</button>
+        `;
+
+        liste.appendChild(div);
+    });
+}
 
 /* Löschen */
 window.del = function(key){
