@@ -44,6 +44,8 @@ button {
 .open { background:#3b82f6; }
 .mail { background:#10b981; }
 .pdf { background:#f59e0b; }
+.back { background:#6b7280; }
+
 </style>
 </head>
 
@@ -73,6 +75,7 @@ button {
 
 <button class="mail" onclick="sendMail()">Einsatz-Mail</button>
 <button class="pdf" onclick="createPDF()">PDF erstellen</button>
+<button class="back" onclick="back()">Zurück</button>
 
 </div>
 
@@ -100,7 +103,7 @@ window.openP = function(){
     }
 };
 
-/* Fahrzeuge */
+/* Fahrzeuge laden */
 function loadFahrzeuge(){
 
     onValue(ref(db,"fahrzeuge"), snap=>{
@@ -124,7 +127,7 @@ function loadFahrzeuge(){
     });
 }
 
-/* Auswahl */
+/* 🔥 Fahrzeuge als Liste */
 function getSelectedFahrzeuge(){
 
     let checked = document.querySelectorAll("#fahrzeuge input:checked");
@@ -132,16 +135,18 @@ function getSelectedFahrzeuge(){
 
     checked.forEach(c=>{
         let f = fahrzeugeData[c.value];
-        list.push(f.fahrzeug + " (" + (f.funk||"-") + ")");
+        list.push(`${f.fahrzeug} (${f.funk||"-"})`);
     });
 
-    return list.join(", ");
+    return list;
 }
 
-/* 🔥 Mail */
+/* 🔥 MAIL */
 window.sendMail = function(){
 
-    let empfaenger = mail_to.value || ""; // frei eingeben
+    let empfaenger = mail_to.value || "";
+
+    let fahrzeugeListe = getSelectedFahrzeuge().join("\n");
 
     let body = `
 Einsatzbericht
@@ -151,7 +156,7 @@ Ort: ${einsatz_ort.value}
 Adresse: ${einsatz_adresse.value}
 
 Fahrzeuge:
-${getSelectedFahrzeuge()}
+${fahrzeugeListe}
 
 Info:
 ${einsatz_info.value}
@@ -163,7 +168,8 @@ Zeit: ${new Date().toLocaleString()}
     `mailto:${encodeURIComponent(empfaenger)}?subject=Einsatzbericht&body=${encodeURIComponent(body)}`;
 };
 
-/* PDF */
+
+/* 🔥 PDF */
 window.createPDF = function(){
 
     const { jsPDF } = window.jspdf;
@@ -185,7 +191,10 @@ window.createPDF = function(){
 
     line("");
     line("Fahrzeuge:");
-    line(getSelectedFahrzeuge());
+
+    getSelectedFahrzeuge().forEach(f=>{
+        line("- " + f);
+    });
 
     line("");
     line("Info:");
@@ -195,6 +204,11 @@ window.createPDF = function(){
     line("Zeit: " + new Date().toLocaleString());
 
     doc.save("Einsatzbericht.pdf");
+};
+
+/* Zurück */
+window.back = function(){
+    window.location.href = "index.html";
 };
 
 </script>
