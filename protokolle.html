@@ -63,8 +63,8 @@ button {
 <h3>✉ Empfänger</h3>
 <input id="mail_to" placeholder="z.B. leitstelle@zwickau.de">
 
-<h3>📌 Betreff</h3>
-<input id="mail_subject" placeholder="z.B. Einsatzmeldung">
+<h3>📌 Betreff (optional)</h3>
+<input id="mail_subject" placeholder="Automatisch: Einsatz - Ort - Datum">
 
 <h3>🚒 Einsatzdaten</h3>
 
@@ -106,7 +106,7 @@ window.openP = function(){
     }
 };
 
-/* Fahrzeuge */
+/* Fahrzeuge laden */
 function loadFahrzeuge(){
 
     onValue(ref(db,"fahrzeuge"), snap=>{
@@ -148,7 +148,19 @@ function getSelectedFahrzeuge(){
 window.sendMail = function(){
 
     let empfaenger = mail_to.value || "";
-    let betreff = mail_subject.value || "Einsatzbericht";
+
+    let now = new Date();
+
+    let datum = now.toLocaleDateString("de-DE");
+    let uhrzeit = now.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    /* 🔥 automatischer Betreff */
+    let autoBetreff = `${einsatz_art.value || "Einsatz"} - ${einsatz_ort.value || "-"} - ${datum} ${uhrzeit}`;
+
+    let betreff = mail_subject.value || autoBetreff;
 
     let fahrzeugeListe = getSelectedFahrzeuge().join("\n");
 
@@ -165,12 +177,13 @@ ${fahrzeugeListe}
 Info:
 ${einsatz_info.value}
 
-Zeit: ${new Date().toLocaleString()}
+Zeit: ${datum} ${uhrzeit}
 `;
 
     window.location.href =
     `mailto:${encodeURIComponent(empfaenger)}?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(body)}`;
 };
+
 
 /* 🔥 PDF */
 window.createPDF = function(){
@@ -184,6 +197,13 @@ window.createPDF = function(){
         doc.text(txt, 10, y);
         y += 8;
     }
+
+    let now = new Date();
+    let datum = now.toLocaleDateString("de-DE");
+    let uhrzeit = now.toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
 
     line("Einsatzbericht");
     line("----------------");
@@ -204,9 +224,9 @@ window.createPDF = function(){
     line(einsatz_info.value);
 
     line("");
-    line("Zeit: " + new Date().toLocaleString());
+    line("Zeit: " + datum + " " + uhrzeit);
 
-    doc.save("Einsatzbericht.pdf");
+    doc.save(`Einsatz_${einsatz_ort.value}_${datum}.pdf`);
 };
 
 /* Zurück */
