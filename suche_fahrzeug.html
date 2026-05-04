@@ -1,31 +1,265 @@
 <!DOCTYPE html>
 <html lang="de">
-<head><meta charset="UTF-8"></head>
+<head>
+<meta charset="UTF-8">
+<title>Fahrzeug Suche</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial;
+    background: #0f1117;
+    color: white;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: #1c1f26;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+/* Suche */
+.search-area {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: #111318;
+    color: white;
+}
+
+/* Vorschläge */
+#suggestions {
+    height: 260px;
+    background: #111318;
+    border-radius: 12px;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.suggest-item {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.suggest-item:hover {
+    background: #2a2f3a;
+}
+
+/* Buttons */
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.search-btn { background: #3b82f6; }
+.cancel-btn { background: #ef4444; }
+
+/* Ergebnisse */
+.results {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
+    gap: 20px;
+}
+
+/* Karte */
+.card {
+    background: #111318;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+/* Bild */
+.card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* Detail */
+.detail {
+    margin-top: 10px;
+    padding: 10px;
+    background: #1c1f26;
+    border-radius: 8px;
+}
+</style>
+</head>
+
 <body>
 
-<input id="s" oninput="search()">
-<select id="list" size="10"></select>
-<div id="out"></div>
+<div class="container">
+
+<h2>Fahrzeug Suche</h2>
+
+<div class="search-area">
+
+<div>
+<input id="search" placeholder="Fahrzeug oder Gerät suchen..." oninput="suggest()">
+
+<div class="buttons">
+<button class="search-btn" onclick="doSearch()">Suchen</button>
+<button class="cancel-btn" onclick="back()">Abbrechen</button>
+</div>
+</div>
+
+<div id="suggestions"></div>
+
+</div>
+
+<div id="results" class="results"></div>
+
+</div>
 
 <script type="module">
-import "./firebase.js";
 
-let all=[];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-onValue(ref(db,"daten"), snap=>{
-    all = Object.values(snap.val()||{});
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "ffwc-d3994.firebaseapp.com",
+  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "ffwc-d3994"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let data = [];
+
+/* Daten laden */
+onValue(ref(db, "fahrzeuge"), snap => {
+    data = Object.values(snap.val() || {});
 });
 
-window.search=function(){
-    list.innerHTML="";
-    all.forEach(d=>{
-        if(d.fahrzeug?.toLowerCase().includes(s.value.toLowerCase())){
-            let o=new Option(d.fahrzeug+" - "+d.ort);
-            o.onclick=()=>out.innerHTML+=d.fahrzeug+"<br>";
-            list.add(o);
+/* 🔎 Vorschläge mit Abkürzungen */
+window.suggest = function(){
+
+    let s = search.value.toLowerCase();
+    suggestions.innerHTML = "";
+
+    if(!s) return;
+
+    let found = new Set();
+
+    data.forEach(d => {
+
+        let name = d.fahrzeug || "";
+        let beladung = (d.beladung || "").toLowerCase();
+
+        /* normale Suche */
+        if(name.toLowerCase().includes(s)) found.add(name);
+
+        /* 🔥 Abkürzungen */
+        if(s === "hlf" && name.toLowerCase().includes("hilfeleistung")) found.add(name);
+        if(s === "dl" && name.toLowerCase().includes("drehleiter")) found.add(name);
+        if(s === "rtb" && name.toLowerCase().includes("rettungsboot")) found.add(name);
+
+        /* 🔥 Beladung durchsuchen */
+        if(beladung.includes(s)) found.add(name);
+
+    });
+
+    found.forEach(name => {
+
+        let div = document.createElement("div");
+        div.className = "suggest-item";
+        div.innerText = name;
+
+        div.ondblclick = () => {
+            search.value = name;
+            doSearch();
+        };
+
+        suggestions.appendChild(div);
+    });
+};
+
+/* 🔥 Suche */
+window.doSearch = function(){
+
+    let s = search.value.toLowerCase();
+    results.innerHTML = "";
+
+    data.forEach(d => {
+
+        let name = d.fahrzeug || "";
+        let beladung = (d.beladung || "").toLowerCase();
+
+        if(name.toLowerCase().includes(s) || beladung.includes(s)){
+
+            let card = document.createElement("div");
+            card.className = "card";
+
+            card.innerHTML = `
+                ${d.bild ? `<img src="${d.bild}">` : ""}
+
+                <b>${name}</b><br><br>
+
+                <b>Ort:</b> ${d.ort || "-"}<br>
+                <b>Adresse:</b> ${d.adresse || "-"}<br>
+                <b>Funkkenner:</b> ${d.funk || "-"}<br>
+                <b>Stärke:</b> ${d.staerke || "-"}
+            `;
+
+            /* Klick → Details */
+            card.onclick = () => {
+
+                let detail = document.createElement("div");
+                detail.className = "detail";
+
+                detail.innerHTML = `
+                    <b>Beladung:</b><br>
+                    ${d.beladung || "Keine Daten"}
+                `;
+
+                card.appendChild(detail);
+                card.onclick = null;
+            };
+
+            results.appendChild(card);
         }
     });
-}
+};
+
+/* Zurück */
+window.back = function(){
+    window.location.href = "index.html";
+};
+
 </script>
 
 </body>
