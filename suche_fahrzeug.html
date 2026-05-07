@@ -24,6 +24,7 @@ h2 {
     margin-bottom: 20px;
 }
 
+/* Suchbereich */
 .search-area {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -37,8 +38,10 @@ input {
     border: none;
     background: #111318;
     color: white;
+    box-sizing: border-box;
 }
 
+/* Vorschläge */
 #suggestions {
     height: 260px;
     background: #111318;
@@ -57,6 +60,7 @@ input {
     background: #2a2f3a;
 }
 
+/* Buttons */
 .buttons {
     display: flex;
     gap: 10px;
@@ -71,9 +75,17 @@ button {
     cursor: pointer;
 }
 
-.search-btn { background: #3b82f6; }
-.cancel-btn { background: #ef4444; }
+.search-btn {
+    background: #3b82f6;
+    color: white;
+}
 
+.cancel-btn {
+    background: #ef4444;
+    color: white;
+}
+
+/* Ergebnisse */
 .results {
     margin-top: 30px;
     display: grid;
@@ -81,26 +93,45 @@ button {
     gap: 20px;
 }
 
+/* Karten */
 .card {
     background: #111318;
     border-radius: 12px;
     padding: 15px;
     cursor: pointer;
+    transition: 0.2s;
 }
 
+.card:hover {
+    transform: scale(1.02);
+}
+
+/* Bild */
 .card img {
     width: 100%;
-    height: 160px;
+    height: 180px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 10px;
 }
 
+/* Details */
 .detail {
-    margin-top: 10px;
-    padding: 10px;
+    margin-top: 12px;
+    padding: 12px;
     background: #1c1f26;
     border-radius: 8px;
+    line-height: 1.5;
+}
+
+/* Telefon Link */
+.phone {
+    color: #60a5fa;
+    text-decoration: none;
+}
+
+.phone:hover {
+    text-decoration: underline;
 }
 </style>
 </head>
@@ -113,19 +144,28 @@ button {
 
 <div class="search-area">
 
-<div>
-<input id="search" placeholder="Fahrzeug oder Gerät suchen..." oninput="suggest()">
+    <!-- LINKS -->
+    <div>
 
-<div class="buttons">
-<button class="search-btn" onclick="doSearch()">Suchen</button>
-<button class="cancel-btn" onclick="back()">Abbrechen</button>
+        <input 
+            id="search" 
+            placeholder="Fahrzeug oder Gerät suchen..." 
+            oninput="suggest()"
+        >
+
+        <div class="buttons">
+            <button class="search-btn" onclick="doSearch()">Suchen</button>
+            <button class="cancel-btn" onclick="back()">Abbrechen</button>
+        </div>
+
+    </div>
+
+    <!-- RECHTS -->
+    <div id="suggestions"></div>
+
 </div>
-</div>
 
-<div id="suggestions"></div>
-
-</div>
-
+<!-- Ergebnisse -->
 <div id="results" class="results"></div>
 
 </div>
@@ -137,27 +177,35 @@ if(localStorage.getItem("login") !== "ok"){
     window.location.href = "login.html";
 }
 
+/* Firebase */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const app = initializeApp({
-  apiKey: "AIzaSy...",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
-});
+const firebaseConfig = {
+    apiKey: "AIzaSy...",
+    authDomain: "ffwc-d3994.firebaseapp.com",
+    databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
+    projectId: "ffwc-d3994",
+    storageBucket: "ffwc-d3994.firebasestorage.app"
+};
 
+const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 let data = [];
 
-/* 🔥 Daten laden */
+/* 🔥 Fahrzeuge laden */
 onValue(ref(db, "fahrzeuge"), snap => {
+
     data = Object.values(snap.val() || {});
+
 });
 
-/* 🔎 Vorschläge (verbessert) */
+/* 🔎 Vorschläge */
 window.suggest = function(){
 
-    let s = search.value.toLowerCase();
+    let s = search.value.toLowerCase().trim();
+
     suggestions.innerHTML = "";
 
     if(!s) return;
@@ -169,16 +217,37 @@ window.suggest = function(){
         let name = (d.fahrzeug || "").toLowerCase();
         let beladung = (d.beladung || "").toLowerCase();
 
-        /* 🔥 Teilwortsuche */
-        if(name.includes(s)) found.add(d.fahrzeug);
+        /* normale Suche */
+        if(name.includes(s)){
+            found.add(d.fahrzeug);
+        }
 
-        /* 🔥 Beladung */
-        if(beladung.includes(s)) found.add(d.fahrzeug);
+        /* Beladung durchsuchen */
+        if(beladung.includes(s)){
+            found.add(d.fahrzeug);
+        }
 
-        /* 🔥 Abkürzungen erweitert */
-        if(name.includes("hilfeleistung") && s.includes("hlf")) found.add(d.fahrzeug);
-        if(name.includes("drehleiter") && s.includes("dl")) found.add(d.fahrzeug);
-        if(name.includes("rettungsboot") && s.includes("rtb")) found.add(d.fahrzeug);
+        /* Abkürzungen */
+        if(
+            s.includes("hlf") &&
+            name.includes("hilfeleistung")
+        ){
+            found.add(d.fahrzeug);
+        }
+
+        if(
+            s.includes("dl") &&
+            name.includes("drehleiter")
+        ){
+            found.add(d.fahrzeug);
+        }
+
+        if(
+            s.includes("rtb") &&
+            name.includes("rettungsboot")
+        ){
+            found.add(d.fahrzeug);
+        }
 
     });
 
@@ -186,26 +255,33 @@ window.suggest = function(){
 
     found.forEach(name => {
 
-        if(count > 15) return; // max 15 Vorschläge
+        if(count >= 15) return;
 
         let div = document.createElement("div");
+
         div.className = "suggest-item";
         div.innerText = name;
 
+        /* Doppelklick */
         div.ondblclick = () => {
+
             search.value = name;
             doSearch();
+
         };
 
         suggestions.appendChild(div);
+
         count++;
     });
+
 };
 
 /* 🔥 Suche */
 window.doSearch = function(){
 
-    let s = search.value.toLowerCase();
+    let s = search.value.toLowerCase().trim();
+
     results.innerHTML = "";
 
     data.forEach(d => {
@@ -213,36 +289,58 @@ window.doSearch = function(){
         let name = (d.fahrzeug || "").toLowerCase();
         let beladung = (d.beladung || "").toLowerCase();
 
-        if(name.includes(s) || beladung.includes(s)){
+        if(
+            name.includes(s) ||
+            beladung.includes(s)
+        ){
 
             let card = document.createElement("div");
+
             card.className = "card";
 
             card.innerHTML = `
+
                 ${d.bild ? `<img src="${d.bild}">` : ""}
-                <b>${d.fahrzeug}</b><br><br>
+
+                <b>${d.fahrzeug || "-"}</b>
+
+                <br><br>
+
                 <b>Ort:</b> ${d.ort || "-"}<br>
+
                 <b>Adresse:</b> ${d.adresse || "-"}<br>
+
+                <b>Telefon:</b> 
+                ${
+                    d.telefon
+                    ? `<a class="phone" href="tel:${d.telefon}">${d.telefon}</a>`
+                    : "-"
+                }
+                <br>
+
                 <b>Funk:</b> ${d.funk || "-"}<br>
+
                 <b>Stärke:</b> ${d.staerke || "-"}
             `;
 
-            /* 🔥 Toggle Details */
+            /* 🔥 Klick = Details anzeigen */
             card.onclick = () => {
 
-                let existing = card.querySelector(".detail");
+                let old = card.querySelector(".detail");
 
-                if(existing){
-                    existing.remove();
+                /* schließen */
+                if(old){
+                    old.remove();
                     return;
                 }
 
                 let detail = document.createElement("div");
+
                 detail.className = "detail";
 
                 detail.innerHTML = `
-                    <b>Beladung:</b><br>
-                    ${d.beladung || "Keine Daten"}
+                    <b>Beladung:</b><br><br>
+                    ${d.beladung || "Keine Daten vorhanden"}
                 `;
 
                 card.appendChild(detail);
@@ -250,11 +348,26 @@ window.doSearch = function(){
 
             results.appendChild(card);
         }
+
     });
+
 };
 
-/* 🔙 */
-window.back = () => location.href = "index.html";
+/* ENTER */
+search.addEventListener("keypress", e => {
+
+    if(e.key === "Enter"){
+        doSearch();
+    }
+
+});
+
+/* Zurück */
+window.back = function(){
+
+    window.location.href = "index.html";
+
+};
 
 </script>
 
