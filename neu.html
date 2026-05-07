@@ -9,7 +9,7 @@ body {
     margin: 0;
     font-family: "Segoe UI";
     background: #0f1117;
-    color: white; 
+    color: white;
 }
 
 .container {
@@ -20,7 +20,6 @@ body {
     border-radius: 15px;
 }
 
-/* GRID */
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -33,52 +32,10 @@ input, textarea {
     border: none;
     background: #111318;
     color: white;
-    width: 100%;
 }
 
-/* Fokus */
-input:focus, textarea:focus {
-    outline: 2px solid #3b82f6;
-}
-
-/* volle Breite */
 .full {
     grid-column: span 2;
-}
-
-/* Bild */
-.preview {
-    margin-top: 10px;
-    max-height: 120px;
-    border-radius: 8px;
-}
-
-/* UNTERER BEREICH */
-.bottom {
-    margin-top: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-}
-
-/* Checkbox Bereich */
-.left {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.checkline {
-    display: flex;
-    justify-content: space-between;
-    width: 260px;
-}
-
-/* Buttons */
-.right {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
 }
 
 button {
@@ -87,12 +44,16 @@ button {
     border: none;
     font-weight: bold;
     cursor: pointer;
-    width: 150px;
 }
 
 .save { background:#3b82f6; }
 .cancel { background:#ef4444; }
 
+.bottom {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
 </style>
 </head>
 
@@ -116,31 +77,22 @@ button {
 <input id="geraete" placeholder="Gerät">
 <input id="lagerort" placeholder="Lagerort (z.B. HLF G3 / Regal A)">
 
-<textarea id="beladung" class="full" placeholder="Beladung (für Suche wichtig!)"></textarea>
-<textarea id="bemerkung" class="full" placeholder="Bemerkung"></textarea>
+<textarea id="beladung" class="full" placeholder="Beladung (wichtig für Suche!)"></textarea>
+<textarea id="bemerkung" class="full" placeholder="Bemerkung (Zusatzinformation!)"></textarea>
 
-
+<input type="file" id="bild" class="full">
+<img id="preview" style="max-height:120px">
 
 </div>
 
-<!-- UNTEN -->
 <div class="bottom">
 
-<div class="left">
-
-<label class="checkline">
-<span>Geräte</span>
-<input type="checkbox" id="einsatz">
-</label>
-
-<label class="checkline">
-<span>Fahrzeuge</span>
-<input type="checkbox" id="fahrzeuge">
-</label>
-
+<div>
+<label><input type="checkbox" id="einsatz"> Geräte</label><br>
+<label><input type="checkbox" id="fahrzeuge"> Fahrzeuge</label>
 </div>
 
-<div class="right">
+<div>
 <button class="save" onclick="save()">Speichern</button>
 <button class="cancel" onclick="back()">Abbrechen</button>
 </div>
@@ -150,11 +102,6 @@ button {
 </div>
 
 <script type="module">
-
-/* 🔒 LOGIN */
-if(localStorage.getItem("login") !== "ok"){
-    window.location.href = "login.html";
-}
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -168,30 +115,13 @@ const app = initializeApp({
 const db = getDatabase(app);
 const storage = getStorage(app);
 
-/* Bild Vorschau */
 bild.onchange = e=>{
-    if(e.target.files[0]){
-        preview.src = URL.createObjectURL(e.target.files[0]);
-    }
+    preview.src = URL.createObjectURL(e.target.files[0]);
 };
 
-/* 🔥 SPEICHERN */
 window.save = async function(){
 
-    /* 🔥 MINDEST CHECK */
-    if(!ort.value){
-        alert("Ort fehlt!");
-        return;
-    }
-
-    if(!einsatz.checked && !fahrzeuge.checked){
-        alert("Bitte auswählen: Gerät oder Fahrzeug");
-        return;
-    }
-
-    let img = "";
-
-    /* Bild Upload */
+    let img="";
     if(bild.files[0]){
         let r = sRef(storage,"bilder/"+Date.now());
         await uploadBytes(r,bild.files[0]);
@@ -202,43 +132,26 @@ window.save = async function(){
         ort: ort.value,
         adresse: adresse.value,
         telefon: telefon.value,
-
         fahrzeug: fahrzeug.value,
         funk: funk.value,
         staerke: staerke.value,
-
         geraete: geraete.value,
         lagerort: lagerort.value,
-
         beladung: beladung.value,
-        bemerkung: bemerkung.value,
-
-        bild: img,
-        zeit: new Date().toLocaleString()
+        bild: img
     };
 
-    /* 🔥 SPEICHERN */
     if(einsatz.checked){
-        await push(ref(db,"geraete"), data);
+        push(ref(db,"geraete"), data);
     }
 
     if(fahrzeuge.checked){
-        await push(ref(db,"fahrzeuge"), data);
+        push(ref(db,"fahrzeuge"), data);
     }
 
     alert("Gespeichert!");
-
-    /* 🔥 FELDER LEEREN */
-    document.querySelectorAll("input, textarea").forEach(f=>{
-        if(f.type !== "checkbox") f.value="";
-    });
-
-    einsatz.checked = false;
-    fahrzeuge.checked = false;
-    preview.src = "";
 };
 
-/* zurück */
 window.back = ()=> location.href="index.html";
 
 </script>
