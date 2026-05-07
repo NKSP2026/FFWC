@@ -39,8 +39,8 @@ body {
 /* ===== WAPPEN ===== */
 .wappen {
     position: absolute;
-    top: 80px;
-    right: 60px;
+    top: 10px;
+    right: 20px;
     width: 350px;
 }
 
@@ -112,8 +112,8 @@ button:active {
     }
 
     .wappen {
-        width: 20px;
-        top: 90px;
+        width: 90px;
+        top: 20px;
         right: 20px;
     }
 
