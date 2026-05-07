@@ -41,7 +41,7 @@ body {
     position: absolute;
     top: 80px;
     right: 60px;
-    width: 300px;
+    width: 350px;
 }
 
 /* ===== MENÜ ===== */
@@ -112,8 +112,8 @@ button:active {
     }
 
     .wappen {
-        width: 90px;
-        top: 20px;
+        width: 20px;
+        top: 90px;
         right: 20px;
     }
 
