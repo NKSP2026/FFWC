@@ -1,12 +1,11 @@
-/* ===== BASIS ===== */
+/* Grund */
 body {
     margin: 0;
-    font-family: "Segoe UI", Arial;
-    background: #0f1117;
-    color: white;
+    font-family: Arial;
+    background: black;
 }
 
-/* ===== CONTAINER ===== */
+/* Container */
 .container {
     position: relative;
     width: 100%;
@@ -14,119 +13,108 @@ body {
     overflow: hidden;
 }
 
-/* ===== HINTERGRUND ===== */
+/* Hintergrund */
 .background {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-image: url("feuerwehr.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: brightness(0.6);
+    background: url("bg.jpg") no-repeat center;
+    background-size: contain;
 }
 
-/* ===== TITEL ===== */
+/* Titel */
 .title {
     position: absolute;
-    top: 80px;
-    left: 60px;
-    font-size: 48px;
+    top: 8%;
+    left: 17%;
+    font-size: clamp(28px, 4vw, 60px);
+    font-weight: bold;
     color: #ff6b6b;
-    text-shadow: 0 5px 20px rgba(0,0,0,0.7);
+    text-shadow: 4px 4px 12px black;
 }
 
-/* ===== WAPPEN ===== */
+/* Wappen */
 .wappen {
     position: absolute;
-    top: 80px;
-    right: 60px;
-    width: 200px;
+    top: -8%;
+    right: 2%;
+    width: clamp(260px, 30vw, 550px);
 }
 
-/* ===== MENÜ ===== */
+/* Menü */
 .menu {
     position: absolute;
-    right: 60px;
-    top: 250px;
+    top: 69%;
+    right: 15%;
+    transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    width: 260px;
+    gap: 18px;
 }
 
-/* ===== BUTTON BASIS (3D!) ===== */
-button {
-    padding: 14px;
-    border-radius: 12px;
-    border: none;
+/* Buttons */
+.menu button {
+    width: clamp(220px, 20vw, 360px);
+    padding: clamp(10px, 1.5vw, 18px);
+    font-size: clamp(14px, 1.2vw, 22px);
     font-weight: bold;
+    color: black;
+
+    border-radius: 12px;
+    border: 1px solid #2c3e50;
+
+    background: linear-gradient(to bottom, #7fa6bd, #4a6a7d);
+
+    box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.6),
+        0 8px 0 #2c3e50,
+        0 12px 15px rgba(0,0,0,0.8);
+
     cursor: pointer;
-    font-size: 15px;
-
-    /* 3D Effekt */
-    box-shadow: 0 6px 0 rgba(0,0,0,0.6);
-    transition: all 0.1s ease-in-out;
+    transition: all 0.15s ease;
 }
 
-/* Klick Effekt */
-button:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.6);
+.menu button:hover {
+    transform: translateY(-3px);
 }
 
-/* ===== STANDARD BUTTONS ===== */
-.menu button:not(.delete):not(.logout) {
-    background: linear-gradient(to bottom, #9ca3af, #4b5563);
-    color: white;
+.menu button:active {
+    transform: translateY(6px);
+    box-shadow:
+        inset 0 4px 10px rgba(0,0,0,0.7),
+        0 2px 0 #2c3e50,
+        0 4px 6px rgba(0,0,0,0.7);
 }
 
-/* Hover */
-.menu button:not(.delete):not(.logout):hover {
-    background: linear-gradient(to bottom, #b5bcc6, #6b7280);
-}
-
-/* ===== LÖSCHEN (ROT 3D!) ===== */
+/* Löschen */
 .delete {
-    background: linear-gradient(to bottom, #ff4d4d, #991b1b);
-    color: white;
+    background: linear-gradient(to bottom, #ff4d4d, #b30000) !important;
+    box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.4),
+        0 8px 0 #660000,
+        0 12px 15px rgba(0,0,0,0.9);
 }
 
-.delete:hover {
-    background: linear-gradient(to bottom, #ff6666, #b91c1c);
-}
-
-/* ===== LOGOUT ===== */
-.logout {
-    margin-top: 20px;
-    background: linear-gradient(to bottom, #6b7280, #374151);
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px){
+/* Mobile */
+@media (max-width: 768px) {
 
     .title {
+        left: 8%;
         font-size: 28px;
-        left: 20px;
-        top: 40px;
     }
 
     .wappen {
-        width: 90px;
-        top: 20px;
-        right: 20px;
+        width: 200px;
     }
 
     .menu {
-        position: relative;
-        top: auto;
-        right: auto;
-        margin: 200px auto 0 auto;
-        width: 90%;
+        top: 65%;
+        right: 10%;
+        transform: none;
     }
 
-    .container {
-        height: auto;
-        padding-bottom: 40px;
+    .menu button {
+        width: 220px;
+        font-size: 14px;
     }
 }
