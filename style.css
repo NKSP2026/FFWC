@@ -1,120 +1,226 @@
-/* Grund */
-body {
-    margin: 0;
-    font-family: Arial;
-    background: black;
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    overflow:hidden;
+    background:black;
 }
 
-/* Container */
-.container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
+/* Hauptbereich */
+.container{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
 }
 
 /* Hintergrund */
-.background {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: url("feuerwehr.jpg") no-repeat center;
-    background-size: contain;
+.background{
+    position:absolute;
+    inset:0;
+
+    background-image:url("feuerwehr.jpg");
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+
+    filter:brightness(0.55);
+
+    z-index:1;
+}
+
+/* dunkler Overlay */
+.background::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.25);
 }
 
 /* Titel */
-.title {
-    position: absolute;
-    top: 8%;
-    left: 17%;
-    font-size: clamp(28px, 4vw, 60px);
-    font-weight: bold;
-    color: #ff6b6b;
-    text-shadow: 4px 4px 12px black;
+.title{
+    position:absolute;
+    top:10%;
+    left:5%;
+
+    color:#ff6b6b;
+
+    font-size:clamp(32px,4vw,80px);
+    font-weight:bold;
+    line-height:1.1;
+
+    z-index:3;
+
+    text-shadow:
+        0 0 10px rgba(255,0,0,0.5),
+        0 0 20px rgba(255,0,0,0.3);
 }
 
 /* Wappen */
-.wappen {
-    position: absolute;
-    top: -8%;
-    right: 2%;
-    width: clamp(260px, 30vw, 550px);
+.wappen{
+    position:absolute;
+    top:3%;
+    right:4%;
+
+    width:16vw;
+    max-width:260px;
+    min-width:110px;
+
+    z-index:3;
 }
 
 /* Menü */
-.menu {
-    position: absolute;
-    top: 69%;
-    right: 15%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+.menu{
+    position:absolute;
+
+    right:4%;
+    top:35%;
+
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+
+    width:26vw;
+    max-width:320px;
+    min-width:220px;
+
+    z-index:3;
 }
 
 /* Buttons */
-.menu button {
-    width: clamp(220px, 20vw, 360px);
-    padding: clamp(10px, 1.5vw, 18px);
-    font-size: clamp(14px, 1.2vw, 22px);
-    font-weight: bold;
-    color: black;
+.menu button{
+    padding:18px;
 
-    border-radius: 12px;
-    border: 1px solid #2c3e50;
+    border:none;
+    border-radius:16px;
 
-    background: linear-gradient(to bottom, #7fa6bd, #4a6a7d);
+    font-size:clamp(16px,1vw,24px);
+    font-weight:bold;
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #9dc2db 0%,
+            #6d92ad 50%,
+            #48657d 100%
+        );
 
     box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.6),
-        0 8px 0 #2c3e50,
-        0 12px 15px rgba(0,0,0,0.8);
-
-    cursor: pointer;
-    transition: all 0.15s ease;
+        inset 0 2px 3px rgba(255,255,255,0.5),
+        inset 0 -4px 6px rgba(0,0,0,0.5),
+        0 6px 12px rgba(0,0,0,0.5);
 }
 
-.menu button:hover {
-    transform: translateY(-3px);
+/* Hover */
+.menu button:hover{
+    transform:translateY(-2px);
 }
 
-.menu button:active {
-    transform: translateY(6px);
+/* Klick */
+.menu button:active{
+    transform:translateY(2px);
+
     box-shadow:
-        inset 0 4px 10px rgba(0,0,0,0.7),
-        0 2px 0 #2c3e50,
-        0 4px 6px rgba(0,0,0,0.7);
+        inset 0 4px 6px rgba(0,0,0,0.6),
+        0 2px 4px rgba(0,0,0,0.4);
 }
 
 /* Löschen */
-.delete {
-    background: linear-gradient(to bottom, #ff4d4d, #b30000) !important;
-    box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.4),
-        0 8px 0 #660000,
-        0 12px 15px rgba(0,0,0,0.9);
+.menu .delete{
+    background:
+        linear-gradient(
+            to bottom,
+            #ff7b7b 0%,
+            #ff0000 45%,
+            #a00000 100%
+        );
 }
 
-/* Mobile */
-@media (max-width: 768px) {
+/* Logout */
+.menu .logout{
+    margin-top:25px;
 
-    .title {
-        left: 8%;
-        font-size: 28px;
+    background:
+        linear-gradient(
+            to bottom,
+            #80889b 0%,
+            #586276 45%,
+            #3f4757 100%
+        );
+}
+
+/* ================================= */
+/* TABLET + HANDY */
+/* ================================= */
+
+@media(max-width:1000px){
+
+    .container{
+        height:100dvh;
     }
 
-    .wappen {
-        width: 200px;
+    .background{
+        background-position:center;
     }
 
-    .menu {
-        top: 65%;
-        right: 10%;
-        transform: none;
+    .title{
+        top:7%;
+        left:5%;
+        right:5%;
+
+        font-size:clamp(28px,7vw,55px);
+
+        width:90%;
     }
 
-    .menu button {
-        width: 220px;
-        font-size: 14px;
+    .wappen{
+        width:22vw;
+        top:2%;
+        right:4%;
+    }
+
+    .menu{
+        left:50%;
+        transform:translateX(-50%);
+
+        top:auto;
+        bottom:4%;
+
+        width:90%;
+        max-width:none;
+        min-width:unset;
+    }
+
+    .menu button{
+        padding:16px;
+        font-size:20px;
+    }
+}
+
+/* kleine Handys */
+@media(max-width:600px){
+
+    .title{
+        top:6%;
+        font-size:clamp(24px,8vw,42px);
+    }
+
+    .wappen{
+        width:28vw;
+    }
+
+    .menu{
+        gap:10px;
+    }
+
+    .menu button{
+        padding:14px;
+        font-size:18px;
+        border-radius:14px;
     }
 }
