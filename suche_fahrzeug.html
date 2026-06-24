@@ -1,271 +1,325 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Fahrzeug Suche</title>
 
+<link rel="stylesheet" href="style.css">
+
 <style>
-body {
-    margin: 0;
-    font-family: "Segoe UI", Arial;
-    background: #0f1117;
-    color: white; 
+
+.page{
+    max-width:1400px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:20px;
 }
 
-.container {
-    max-width: 1100px;
-    margin: 40px auto;
-    background: #1c1f26;
-    padding: 30px;
-    border-radius: 15px;
+.top{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:25px;
 }
 
-h2 {
-    margin-bottom: 20px;
+.searchBox input{
+    width:100%;
+    box-sizing:border-box;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:#111318;
+    color:white;
+    font-size:16px;
 }
 
-/* Suchbereich */
-.search-area {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 40px;
+.buttons{
+    margin-top:15px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
-input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    border: none;
-    background: #111318;
-    color: white;
-    box-sizing: border-box;
+button{
+    border:none;
+    border-radius:12px;
+    padding:12px 18px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
 }
 
-/* Vorschläge */
-#suggestions {
-    height: 260px;
-    background: #111318;
-    border-radius: 12px;
-    padding: 12px;
-    overflow-y: auto;
+button:hover{
+    transform:translateY(-2px);
 }
 
-.suggest-item {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 6px;
+.searchBtn{
+    background:#2563eb;
 }
 
-.suggest-item:hover {
-    background: #2a2f3a;
+.back{
+    background:#6b7280;
 }
 
-/* Buttons */
-.buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
+.logout{
+    background:#f59e0b;
 }
 
-button {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
+.suggestions{
+    background:#111318;
+    border-radius:16px;
+    min-height:300px;
+    max-height:300px;
+    overflow:auto;
+    padding:10px;
 }
 
-.search-btn {
-    background: #3b82f6;
-    color: white;
+.suggest{
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.2s;
 }
 
-.cancel-btn {
-    background: #ef4444;
-    color: white;
+.suggest:hover{
+    background:#1c1f26;
 }
 
-/* Ergebnisse */
-.results {
-    margin-top: 30px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
-    gap: 20px;
+.status{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;
 }
 
-/* Karten */
-.card {
-    background: #111318;
-    border-radius: 12px;
-    padding: 15px;
-    cursor: pointer;
-    transition: 0.2s;
+.results{
+    margin-top:35px;
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fill,minmax(350px,1fr));
+    gap:25px;
 }
 
-.card:hover {
-    transform: scale(1.02);
+.card{
+    background:#111318;
+    border-radius:20px;
+    overflow:hidden;
+    transition:0.2s;
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
 }
 
-/* Bild */
-.card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 10px;
+.card:hover{
+    transform:translateY(-4px);
 }
 
-/* Details */
-.detail {
-    margin-top: 12px;
-    padding: 12px;
-    background: #1c1f26;
-    border-radius: 8px;
-    line-height: 1.5;
+.card img{
+    width:100%;
+    height:240px;
+    object-fit:cover;
 }
 
-/* Telefon Link */
-.phone {
-    color: #60a5fa;
-    text-decoration: none;
+.content{
+    padding:20px;
 }
 
-.phone:hover {
-    text-decoration: underline;
+.title{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:15px;
 }
+
+.line{
+    margin-bottom:10px;
+    line-height:1.5;
+}
+
+.phone{
+    color:#60a5fa;
+    text-decoration:none;
+}
+
+.phone:hover{
+    text-decoration:underline;
+}
+
+.detail{
+    margin-top:18px;
+    background:#1c1f26;
+    padding:15px;
+    border-radius:14px;
+    white-space:pre-wrap;
+    line-height:1.6;
+}
+
+.toggle{
+    margin-top:15px;
+    background:#374151;
+    width:100%;
+}
+
+.empty{
+    text-align:center;
+    padding:40px;
+    font-size:18px;
+}
+
+@media(max-width:950px){
+
+    .top{
+        grid-template-columns:1fr;
+    }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
 
 <h2>Fahrzeug Suche</h2>
 
-<div class="search-area">
+<div class="top">
 
-    <!-- LINKS -->
-    <div>
+    <div class="searchBox">
 
-        <input 
-            id="search" 
-            placeholder="Fahrzeug oder Gerät suchen..." 
-            oninput="suggest()"
-        >
+        <input
+        id="search"
+        placeholder="Fahrzeug, Funkrufname oder Gerät suchen..."
+        oninput="suggest()">
 
         <div class="buttons">
-            <button class="search-btn" onclick="doSearch()">Suchen</button>
-            <button class="cancel-btn" onclick="back()">Abbrechen</button>
+
+            <button
+            class="searchBtn"
+            onclick="doSearch()">
+
+                Suchen
+
+            </button>
+
+            <button
+            class="back"
+            onclick="back()">
+
+                Zurück
+
+            </button>
+
+            <button
+            class="logout"
+            onclick="logout()">
+
+                Logout
+
+            </button>
+
         </div>
 
     </div>
 
-    <!-- RECHTS -->
-    <div id="suggestions"></div>
+    <div
+    id="suggestions"
+    class="suggestions">
+    </div>
 
 </div>
 
-<!-- Ergebnisse -->
+<div id="status" class="status"></div>
+
 <div id="results" class="results"></div>
 
 </div>
 
 <script type="module">
 
-/* 🔒 LOGIN */
-if(localStorage.getItem("login") !== "ok"){
-    window.location.href = "login.html";
-}
+/* ZENTRALES FIREBASE */
+import "./firebase.js";
 
-/* Firebase */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+let fahrzeuge = [];
 
-const firebaseConfig = {
-    apiKey: "AIzaSy...",
-    authDomain: "ffwc-d3994.firebaseapp.com",
-    databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-    projectId: "ffwc-d3994",
-    storageBucket: "ffwc-d3994.firebasestorage.app"
-};
+/* Fahrzeuge laden */
+onValue(ref(db,"fahrzeuge"), snap=>{
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+    fahrzeuge =
+        Object.values(
+            snap.val() || {}
+        );
 
-let data = [];
-
-/* 🔥 Fahrzeuge laden */
-onValue(ref(db, "fahrzeuge"), snap => {
-
-    data = Object.values(snap.val() || {});
+    status.innerHTML =
+        "✅ Fahrzeuge geladen";
 
 });
 
-/* 🔎 Vorschläge */
+/* Vorschläge */
 window.suggest = function(){
 
-    let s = search.value.toLowerCase().trim();
+    let q =
+        search.value
+        .toLowerCase()
+        .trim();
 
     suggestions.innerHTML = "";
 
-    if(!s) return;
+    if(!q) return;
 
     let found = new Set();
 
-    data.forEach(d => {
+    fahrzeuge.forEach(f=>{
 
-        let name = (d.fahrzeug || "").toLowerCase();
-        let beladung = (d.beladung || "").toLowerCase();
+        let text =
+            JSON.stringify(f)
+            .toLowerCase();
 
-        /* normale Suche */
-        if(name.includes(s)){
-            found.add(d.fahrzeug);
-        }
+        if(text.includes(q)){
 
-        /* Beladung durchsuchen */
-        if(beladung.includes(s)){
-            found.add(d.fahrzeug);
+            found.add(
+                f.fahrzeug
+            );
+
         }
 
         /* Abkürzungen */
         if(
-            s.includes("hlf") &&
-            name.includes("hilfeleistung")
+            q.includes("hlf") &&
+            text.includes("hilfeleistung")
         ){
-            found.add(d.fahrzeug);
+            found.add(f.fahrzeug);
         }
 
         if(
-            s.includes("dl") &&
-            name.includes("drehleiter")
+            q.includes("dl") &&
+            text.includes("drehleiter")
         ){
-            found.add(d.fahrzeug);
-        }
-
-        if(
-            s.includes("rtb") &&
-            name.includes("rettungsboot")
-        ){
-            found.add(d.fahrzeug);
+            found.add(f.fahrzeug);
         }
 
     });
 
     let count = 0;
 
-    found.forEach(name => {
+    [...found]
+    .sort()
+    .forEach(name=>{
 
         if(count >= 15) return;
 
-        let div = document.createElement("div");
+        let div =
+            document.createElement("div");
 
-        div.className = "suggest-item";
-        div.innerText = name;
+        div.className = "suggest";
 
-        /* Doppelklick */
-        div.ondblclick = () => {
+        div.innerHTML = name;
+
+        div.onclick = ()=>{
 
             search.value = name;
+
             doSearch();
 
         };
@@ -273,91 +327,158 @@ window.suggest = function(){
         suggestions.appendChild(div);
 
         count++;
+
     });
 
 };
 
-/* 🔥 Suche */
+/* Suche */
 window.doSearch = function(){
 
-    let s = search.value.toLowerCase().trim();
+    let q =
+        search.value
+        .toLowerCase()
+        .trim();
 
     results.innerHTML = "";
 
-    data.forEach(d => {
+    let found = 0;
 
-        let name = (d.fahrzeug || "").toLowerCase();
-        let beladung = (d.beladung || "").toLowerCase();
+    fahrzeuge.forEach(f=>{
 
-        if(
-            name.includes(s) ||
-            beladung.includes(s)
-        ){
+        let text =
+            JSON.stringify(f)
+            .toLowerCase();
 
-            let card = document.createElement("div");
+        if(!text.includes(q)) return;
 
-            card.className = "card";
+        found++;
 
-            card.innerHTML = `
+        let card =
+            document.createElement("div");
 
-                ${d.bild ? `<img src="${d.bild}">` : ""}
+        card.className = "card";
 
-                <b>${d.fahrzeug || "-"}</b>
+        card.innerHTML = `
 
-                <br><br>
+            ${f.bild
+                ? `<img src="${f.bild}">`
+                : ""
+            }
 
-                <b>Ort:</b> ${d.ort || "-"}<br>
+            <div class="content">
 
-                <b>Adresse:</b> ${d.adresse || "-"}<br>
+                <div class="title">
+                    ${f.fahrzeug || "-"}
+                </div>
 
-                <b>Telefon:</b> 
-                ${
-                    d.telefon
-                    ? `<a class="phone" href="tel:${d.telefon}">${d.telefon}</a>`
-                    : "-"
-                }
-                <br>
+                <div class="line">
+                    <b>Ort:</b>
+                    ${f.ort || "-"}
+                </div>
 
-                <b>Funk:</b> ${d.funk || "-"}<br>
+                <div class="line">
+                    <b>Adresse:</b>
+                    ${f.adresse || "-"}
+                </div>
 
-                <b>Stärke:</b> ${d.staerke || "-"}
-            `;
+                <div class="line">
+                    <b>Telefon:</b>
 
-            /* 🔥 Klick = Details anzeigen */
-            card.onclick = () => {
+                    ${
+                        f.telefon
+                        ? `
+                        <a
+                        class="phone"
+                        href="tel:${f.telefon}">
+                            ${f.telefon}
+                        </a>
+                        `
+                        : "-"
+                    }
+                </div>
 
-                let old = card.querySelector(".detail");
+                <div class="line">
+                    <b>Funk:</b>
+                    ${f.funk || "-"}
+                </div>
 
-                /* schließen */
-                if(old){
-                    old.remove();
-                    return;
-                }
+                <div class="line">
+                    <b>Stärke:</b>
+                    ${f.staerke || "-"}
+                </div>
 
-                let detail = document.createElement("div");
+                <button
+                class="toggle"
+                onclick="toggleDetail(this)">
 
-                detail.className = "detail";
+                    Beladung anzeigen
 
-                detail.innerHTML = `
-                    <b>Beladung:</b><br><br>
-                    ${d.beladung || "Keine Daten vorhanden"}
-                `;
+                </button>
 
-                card.appendChild(detail);
-            };
+                <div
+                class="detail"
+                style="display:none;">
 
-            results.appendChild(card);
-        }
+                    ${
+                        f.beladung ||
+                        "Keine Beladung vorhanden"
+                    }
+
+                </div>
+
+            </div>
+
+        `;
+
+        results.appendChild(card);
 
     });
+
+    if(found === 0){
+
+        results.innerHTML = `
+            <div class="empty">
+                Keine Fahrzeuge gefunden
+            </div>
+        `;
+
+    }
+
+};
+
+/* Details */
+window.toggleDetail = function(btn){
+
+    let detail =
+        btn.parentElement
+        .querySelector(".detail");
+
+    if(detail.style.display === "none"){
+
+        detail.style.display = "block";
+
+        btn.innerHTML =
+            "Beladung ausblenden";
+
+    }else{
+
+        detail.style.display = "none";
+
+        btn.innerHTML =
+            "Beladung anzeigen";
+
+    }
 
 };
 
 /* ENTER */
-search.addEventListener("keypress", e => {
+search.addEventListener("keypress", e=>{
 
     if(e.key === "Enter"){
+
         doSearch();
+
     }
 
 });
@@ -365,7 +486,7 @@ search.addEventListener("keypress", e => {
 /* Zurück */
 window.back = function(){
 
-    window.location.href = "index.html";
+    location.href = "index.html";
 
 };
 
