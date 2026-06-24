@@ -1,63 +1,83 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Landfunkstelle Crimmitschau</title>
 
 <link rel="stylesheet" href="style.css">
 
 </head>
+
 <body>
 
 <div class="container">
 
+    <!-- Hintergrund -->
     <div class="background"></div>
 
+    <!-- Titel -->
     <h1 class="title">
         Ortsfeste Landfunkstelle<br>
         Crimmitschau
     </h1>
 
+    <!-- Wappen -->
     <img src="wappen.png" class="wappen">
 
+    <!-- Menü -->
     <div class="menu">
-        <button class="delete" onclick="go('loeschen.html')">Löschen</button>
-        <button onclick="go('neu.html')">Neu Anlegen</button>
-        <button onclick="go('suche_geraete.html')">Einsatz-/ Sondergerät Suche</button>
-        <button onclick="go('suche_fahrzeug.html')">Fahrzeug Suche</button>
-        <button onclick="go('mail.html')">Mail</button>
-        <button onclick="go('protokolle.html')">Protokolle</button>
-        <button onclick="go('datenbank.html')">Datenbank öffnen</button>
 
-        <!-- 🔥 NEU: Logout -->
-        <button onclick="logout()" style="
-            margin-top:15px;
-            background: linear-gradient(to bottom, #6b7280, #374151);
-            color: white;
-        ">
+        <button class="delete" onclick="go('loeschen.html')">
+            Löschen
+        </button>
+
+        <button onclick="go('neu.html')">
+            Neu Anlegen
+        </button>
+
+        <button onclick="go('suche_geraete.html')">
+            Einsatz-/ Sondergerät Suche
+        </button>
+
+        <button onclick="go('suche_fahrzeug.html')">
+            Fahrzeug Suche
+        </button>
+
+        <button onclick="go('mail.html')">
+            Mail
+        </button>
+
+        <button onclick="go('protokolle.html')">
+            Protokolle
+        </button>
+
+        <button onclick="go('datenbank.html')">
+            Datenbank öffnen
+        </button>
+
+        <!-- Logout -->
+        <button class="logout" onclick="logout()">
             Logout
         </button>
+
     </div>
 
 </div>
 
-<script>
+<script type="module">
 
-/* 🔐 Login Check */
-if(localStorage.getItem("login") !== "ok"){
-    window.location.href = "login.html";
-}
+/* Firebase Schutz */
+import "./firebase.js";
 
-/* Navigation */
-function go(x){
+/* Seitenwechsel */
+window.go = function(x){
+
     window.location.href = x;
-}
 
-/* 🔓 Logout */
-function logout(){
-    localStorage.removeItem("login");
-    window.location.href = "login.html";
-}
+};
 
 </script>
 
