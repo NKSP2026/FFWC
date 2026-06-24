@@ -2,48 +2,70 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Login</title>
 
 <style>
-body {
+
+body{
     margin:0;
-    font-family:Arial;
+    font-family:"Segoe UI";
     background:#0f1117;
-    color:white;
     display:flex;
     justify-content:center;
     align-items:center;
     height:100vh;
+    color:white;
 }
 
-.box {
+.box{
+    width:350px;
     background:#1c1f26;
-    padding:30px;
-    border-radius:15px;
-    width:300px;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
     text-align:center;
 }
 
-input {
-    width:100%;
-    padding:10px;
-    border-radius:8px;
-    border:none;
-    background:#111318;
-    color:white;
+h1{
+    margin-bottom:30px;
+    color:#ff6b6b;
 }
 
-button {
-    margin-top:15px;
-    padding:10px;
+input{
     width:100%;
+    padding:14px;
     border:none;
-    border-radius:8px;
+    border-radius:10px;
+    background:#111318;
+    color:white;
+    margin-bottom:20px;
+    box-sizing:border-box;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
     background:#3b82f6;
     color:white;
+    font-size:16px;
     font-weight:bold;
     cursor:pointer;
 }
+
+button:hover{
+    background:#2563eb;
+}
+
+#error{
+    margin-top:15px;
+    color:#ff4d4d;
+}
+
 </style>
 </head>
 
@@ -51,42 +73,65 @@ button {
 
 <div class="box">
 
-<h2>🔒 Zugriff</h2>
+<h1>Landfunkstelle</h1>
 
-<input type="password" id="pw" placeholder="Passwort">
+<input type="password" id="password" placeholder="Passwort">
 
-<button onclick="login()">Login</button>
+<button onclick="login()">Anmelden</button>
 
-<p id="msg"></p>
+<div id="error"></div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-const app = initializeApp({
-  apiKey:"AIzaSy...",
-  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
-});
+import {
+getAuth,
+signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const db = getDatabase(app);
+const firebaseConfig = {
+
+  apiKey: "AIzaSy...",
+  authDomain: "ffwc-d3994.firebaseapp.com",
+  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "ffwc-d3994",
+  storageBucket: "ffwc-d3994.firebasestorage.app",
+  messagingSenderId: "591233232022",
+  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 window.login = async function(){
 
-    let input = pw.value;
+    error.innerHTML = "";
 
-    let snap = await get(ref(db,"config/passwort"));
-    let korrekt = snap.val();
+    try{
 
-    if(input === korrekt){
+        await signInWithEmailAndPassword(
+            auth,
+            "winklerronny10@gmail.com",
+            password.value
+        );
+
         localStorage.setItem("login","ok");
+
         window.location.href = "index.html";
-    } else {
-        msg.innerText = "Falsches Passwort!";
+
+    }catch(e){
+
+        error.innerHTML = "Falsches Passwort";
+
     }
-};
+
+}
 
 </script>
 
