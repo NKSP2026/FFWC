@@ -1,277 +1,538 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
-<title>Löschen</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Daten löschen</title>
+
+<link rel="stylesheet" href="style.css">
 
 <style>
-body {
-    margin: 0;
-    font-family: "Segoe UI";
-    background: #0f1117; 
-    color: white;
+
+.page{
+    max-width:1200px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:20px;
 }
 
-.container {
-    max-width: 1000px;
-    margin: 40px auto;
-    background: #1c1f26;
-    padding: 30px;
-    border-radius: 15px;
+.top{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:20px;
+    margin-bottom:20px;
 }
 
-h2 {
-    margin-bottom: 20px;
+.box label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
 }
 
-.box {
-    margin-bottom: 20px;
+select,
+input{
+    width:100%;
+    box-sizing:border-box;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#111318;
+    color:white;
+    font-size:15px;
 }
 
-select, input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    background: #111318;
-    color: white;
-    border: none;
+.list{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fill,minmax(320px,1fr));
+    gap:20px;
+    margin-top:30px;
 }
 
-.list {
-    margin-top: 20px;
-    display: grid;
-    gap: 10px;
+.card{
+    background:#111318;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 0 10px rgba(0,0,0,0.3);
 }
 
-.item {
-    background: #111318;
-    padding: 12px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.card img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
 }
 
-button {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+.content{
+    padding:20px;
 }
 
-.delete {
-    background: #ef4444;
+.title{
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:15px;
 }
 
-.back {
-    margin-top: 20px;
-    background: #3b82f6;
+.info{
+    margin-bottom:10px;
+    line-height:1.5;
 }
+
+.actions{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+button{
+    border:none;
+    border-radius:12px;
+    padding:12px 18px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.delete{
+    background:#dc2626;
+}
+
+.back{
+    background:#6b7280;
+}
+
+.logout{
+    background:#f59e0b;
+}
+
+.status{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.bottom{
+    margin-top:30px;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+@media(max-width:900px){
+
+    .top{
+        grid-template-columns:1fr;
+    }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
 
 <h2>Daten löschen</h2>
 
-<!-- Typ -->
-<div class="box">
-    <label>Was löschen?</label>
-    <select id="typ" onchange="loadData()">
-        <option value="">Bitte wählen</option>
-        <option value="geraete">Geräte</option>
-        <option value="fahrzeuge">Fahrzeuge</option>
-    </select>
+<div class="top">
+
+    <div class="box">
+
+        <label>Typ</label>
+
+        <select id="typ" onchange="loadData()">
+
+            <option value="">
+                Bitte wählen
+            </option>
+
+            <option value="geraete">
+                Geräte
+            </option>
+
+            <option value="fahrzeuge">
+                Fahrzeuge
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="box">
+
+        <label>Ort</label>
+
+        <select id="ort" onchange="nextStep()">
+        </select>
+
+    </div>
+
+    <div class="box" id="lagerBox">
+
+        <label>Lagerort</label>
+
+        <select id="lager" onchange="loadItems()">
+        </select>
+
+    </div>
+
 </div>
 
-<!-- Ort -->
 <div class="box">
-    <label>Ort</label>
-    <select id="ort" onchange="nextStep()"></select>
-</div>
 
-<!-- Lagerort -->
-<div class="box" id="lagerBox">
-    <label>Lagerort</label>
-    <select id="lager" onchange="loadItems()"></select>
-</div>
-
-<!-- Suche -->
-<div class="box">
     <label>Suche</label>
-    <input id="search" oninput="filterList()" placeholder="z.B. Schlauch, HLF...">
+
+    <input
+    id="search"
+    placeholder="Suche..."
+    oninput="filterList()">
+
 </div>
 
-<!-- Liste -->
+<div id="status" class="status"></div>
+
 <div id="liste" class="list"></div>
 
-<button class="back" onclick="back()">Zurück</button>
+<div class="bottom">
+
+    <button class="back" onclick="back()">
+        Zurück
+    </button>
+
+    <button class="logout" onclick="logout()">
+        Logout
+    </button>
+
+</div>
 
 </div>
 
 <script type="module">
 
-/* 🔒 LOGIN CHECK */
-if(localStorage.getItem("login") !== "ok"){
-    window.location.href = "login.html";
-}
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const app = initializeApp({
-  apiKey:"AIzaSy...",
-  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
-});
-
-const db = getDatabase(app);
+/* ZENTRALES FIREBASE */
+import "./firebase.js";
 
 let rawData = {};
 let currentItems = [];
 
-/* HTML */
-const typSelect = document.getElementById("typ");
-const ortSelect = document.getElementById("ort");
-const lagerSelect = document.getElementById("lager");
-const lagerBox = document.getElementById("lagerBox");
-const liste = document.getElementById("liste");
-
-/* 🔥 DATEN LADEN */
+/* Daten laden */
 window.loadData = function(){
 
-    let typ = typSelect.value;
-    if(!typ) return;
+    let type = typ.value;
 
-    onValue(ref(db, typ), snap => {
+    if(!type) return;
+
+    status.innerHTML =
+        "Lade Daten...";
+
+    onValue(ref(db,type), snap=>{
 
         rawData = snap.val() || {};
 
         let orte = new Set();
 
         Object.values(rawData).forEach(d=>{
-            if(d.ort) orte.add(d.ort);
+
+            if(d.ort){
+
+                orte.add(d.ort);
+
+            }
+
         });
 
-        ortSelect.innerHTML = "<option value=''>Ort wählen</option>";
+        ort.innerHTML =
+            "<option value=''>Ort wählen</option>";
 
-        orte.forEach(o=>{
-            ortSelect.innerHTML += `<option>${o}</option>`;
+        [...orte]
+        .sort()
+        .forEach(o=>{
+
+            ort.innerHTML += `
+                <option>${o}</option>
+            `;
+
         });
 
         liste.innerHTML = "";
-        lagerSelect.innerHTML = "";
+
+        lager.innerHTML = "";
+
+        status.innerHTML =
+            "✅ Daten geladen";
+
     });
+
 };
 
-/* 🔥 SCHRITT LOGIK */
+/* Schrittlogik */
 window.nextStep = function(){
 
-    let typ = typSelect.value;
+    if(typ.value === "fahrzeuge"){
 
-    if(typ === "fahrzeuge"){
-        lagerBox.style.display = "none";
+        lagerBox.style.display =
+            "none";
+
         loadItems();
-    } else {
-        lagerBox.style.display = "block";
+
+    }else{
+
+        lagerBox.style.display =
+            "block";
+
         loadLagerorte();
+
     }
+
 };
 
-/* 🔥 LAGERORTE */
+/* Lagerorte */
 window.loadLagerorte = function(){
 
-    let ort = ortSelect.value;
-
-    let lagerSet = new Set();
+    let set = new Set();
 
     Object.values(rawData).forEach(d=>{
-        if(d.ort === ort && d.lagerort){
-            lagerSet.add(d.lagerort);
+
+        if(
+            d.ort === ort.value &&
+            d.lagerort
+        ){
+
+            set.add(d.lagerort);
+
         }
+
     });
 
-    lagerSelect.innerHTML = "<option value=''>Lagerort wählen</option>";
+    lager.innerHTML =
+        "<option value=''>Lagerort wählen</option>";
 
-    lagerSet.forEach(l=>{
-        lagerSelect.innerHTML += `<option>${l}</option>`;
+    [...set]
+    .sort()
+    .forEach(l=>{
+
+        lager.innerHTML += `
+            <option>${l}</option>
+        `;
+
     });
+
 };
 
-/* 🔥 ITEMS */
+/* Elemente laden */
 window.loadItems = function(){
-
-    let typ = typSelect.value;
-    let ort = ortSelect.value;
-    let lager = lagerSelect.value;
 
     currentItems = [];
 
-    Object.entries(rawData).forEach(([key, d])=>{
+    Object.entries(rawData).forEach(([key,d])=>{
 
-        if(typ === "fahrzeuge"){
-            if(d.ort === ort){
-                currentItems.push({key, d});
+        if(typ.value === "fahrzeuge"){
+
+            if(d.ort === ort.value){
+
+                currentItems.push({
+                    key,
+                    d
+                });
+
             }
-        } else {
-            if(d.ort === ort && d.lagerort === lager){
-                currentItems.push({key, d});
+
+        }else{
+
+            if(
+                d.ort === ort.value &&
+                d.lagerort === lager.value
+            ){
+
+                currentItems.push({
+                    key,
+                    d
+                });
+
             }
+
         }
+
     });
 
     renderList(currentItems);
+
 };
 
-/* 🔍 FILTER */
+/* Filter */
 window.filterList = function(){
 
-    let s = search.value.toLowerCase();
+    let q =
+        search.value.toLowerCase();
 
-    let filtered = currentItems.filter(item => {
+    let filtered =
+        currentItems.filter(item=>{
 
-        let name = (item.d.geraete || item.d.fahrzeug || "").toLowerCase();
-        return name.includes(s);
-    });
+            return JSON.stringify(item.d)
+            .toLowerCase()
+            .includes(q);
+
+        });
 
     renderList(filtered);
+
 };
 
-/* 🔥 ANZEIGE */
+/* Anzeige */
 function renderList(items){
 
     liste.innerHTML = "";
 
-    items.forEach(item => {
+    if(items.length === 0){
 
-        let name = item.d.geraete || item.d.fahrzeug || "-";
+        liste.innerHTML = `
+            <div class="status">
+                Keine Daten gefunden
+            </div>
+        `;
 
-        let div = document.createElement("div");
-        div.className = "item";
+        return;
+    }
+
+    items.forEach(item=>{
+
+        let d = item.d;
+
+        let name =
+            d.geraete ||
+            d.fahrzeug ||
+            "-";
+
+        let div =
+            document.createElement("div");
+
+        div.className = "card";
 
         div.innerHTML = `
-            <span>${name}</span>
-            <button class="delete" onclick="del('${item.key}')">Löschen</button>
+
+            ${d.bild
+                ? `<img src="${d.bild}">`
+                : ""
+            }
+
+            <div class="content">
+
+                <div class="title">
+                    ${name}
+                </div>
+
+                <div class="info">
+                    <b>Ort:</b>
+                    ${d.ort || "-"}
+                </div>
+
+                <div class="info">
+                    <b>Adresse:</b>
+                    ${d.adresse || "-"}
+                </div>
+
+                <div class="info">
+                    <b>Telefon:</b>
+                    ${d.telefon || "-"}
+                </div>
+
+                ${
+                    d.lagerort
+                    ? `
+                    <div class="info">
+                        <b>Lagerort:</b>
+                        ${d.lagerort}
+                    </div>
+                    `
+                    : ""
+                }
+
+                ${
+                    d.funk
+                    ? `
+                    <div class="info">
+                        <b>Funk:</b>
+                        ${d.funk}
+                    </div>
+                    `
+                    : ""
+                }
+
+                <div class="actions">
+
+                    <button
+                    class="delete"
+                    onclick="deleteEntry(
+                        '${item.key}'
+                    )">
+
+                        Löschen
+
+                    </button>
+
+                </div>
+
+            </div>
+
         `;
 
         liste.appendChild(div);
+
     });
+
 }
 
-/* 🔥 DELETE */
-window.del = function(key){
+/* Löschen */
+window.deleteEntry = async function(key){
 
-    let typ = typSelect.value;
+    if(
+        !confirm(
+            "Wirklich löschen?"
+        )
+    ) return;
 
-    if(confirm("Wirklich löschen?")){
-        remove(ref(db, typ + "/" + key));
+    try{
+
+        status.innerHTML =
+            "Lösche...";
+
+        await remove(
+            ref(
+                db,
+                typ.value + "/" + key
+            )
+        );
+
+        status.innerHTML =
+            "🗑️ Gelöscht";
+
+    }catch(e){
+
+        console.error(e);
+
+        status.innerHTML =
+            "❌ Fehler beim Löschen";
+
     }
+
 };
 
-/* 🔙 BACK */
+/* Zurück */
 window.back = function(){
-    window.location.href = "index.html";
+
+    location.href = "index.html";
+
 };
 
 </script>
