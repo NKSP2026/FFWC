@@ -21,7 +21,7 @@ signOut
 
 const firebaseConfig = {
 
-  apiKey: "AIzaSy...",
+  apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
   authDomain: "ffwc-d3994.firebaseapp.com",
   databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "ffwc-d3994",
