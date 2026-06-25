@@ -480,55 +480,6 @@ function showGeraet(g){
             `
             : "-"
         }
-
-    </div>
-
-    <div class="line">
-        <b>Funk:</b>
-        ${g.funk || "-"}
-    </div>
-
-    <div class="line">
-        <b>Stärke:</b>
-        ${g.staerke || "-"}
-    </div>
-
-    <button
-    class="toggle"
-    onclick="toggleDetail(this)">
-
-        Details anzeigen
-
-    </button>
-
-    <div class="detail">
-
-        <div class="line">
-            <b>Beladung:</b><br>
-            ${g.beladung || "-"}
-        </div>
-
-        <div class="line">
-            <b>Bemerkung:</b><br>
-            ${g.bemerkung || "-"}
-        </div>
-
-    </div>
-
-</div>
-
-                ${
-                    g.telefon
-                    ? `
-                    <a
-                    class="phone"
-                    href="tel:${g.telefon}">
-                        ${g.telefon}
-                    </a>
-                    `
-                    : "-"
-                }
-
             </div>
 
         </div>
