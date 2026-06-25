@@ -1,212 +1,516 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Datenbank</title>
 
-<style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:#0f1117;
-    color:white;
-}
+<link rel="stylesheet" href="style.css">
 
-.container {
-    max-width:1100px;
+<style>
+
+.page{
+    max-width:1300px;
     margin:40px auto;
     background:#1c1f26;
     padding:30px;
-    border-radius:15px;
+    border-radius:20px;
 }
 
-input {
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.search{
+    flex:1;
+    min-width:250px;
+}
+
+.search input{
     width:100%;
-    padding:8px;
-    border-radius:6px;
+    box-sizing:border-box;
+    padding:14px;
     border:none;
+    border-radius:12px;
     background:#111318;
     color:white;
-    margin-top:4px;
+    font-size:15px;
 }
 
-.entry {
-    background:#111318;
-    padding:15px;
-    border-radius:10px;
-    margin-top:15px;
+.buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
-button {
-    margin-top:10px;
-    padding:8px 12px;
+button{
     border:none;
-    border-radius:6px;
+    border-radius:12px;
+    padding:12px 18px;
+    color:white;
+    font-weight:bold;
     cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.back{
+    background:#6b7280;
+}
+
+.logout{
+    background:#f59e0b;
+}
+
+.save{
+    background:#2563eb;
+}
+
+.delete{
+    background:#dc2626;
+}
+
+.sectionTitle{
+    margin-top:40px;
+    margin-bottom:20px;
+    font-size:28px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(400px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#111318;
+    border-radius:18px;
+    padding:20px;
+}
+
+.card img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+
+.field{
+    margin-bottom:14px;
+}
+
+.field label{
+    display:block;
+    margin-bottom:5px;
     font-weight:bold;
 }
 
-.save { background:#3b82f6; }
-.delete { background:#ef4444; }
-.back { background:#6b7280; }
-.open { background:#3b82f6; }
-
-h3 {
-    margin-top:30px;
+.field input,
+.field textarea{
+    width:100%;
+    box-sizing:border-box;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#1c1f26;
+    color:white;
 }
+
+.field textarea{
+    min-height:100px;
+    resize:vertical;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+    flex-wrap:wrap;
+}
+
+.status{
+    margin-top:20px;
+    font-weight:bold;
+    text-align:center;
+}
+
+@media(max-width:700px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
 
-<h2>Datenbank</h2>
+<div class="top">
 
-<input type="password" id="pw" placeholder="Passwort">
-<button class="open" onclick="openDB()">Öffnen</button>
+    <div class="search">
+        <input
+        id="search"
+        placeholder="Suche nach Fahrzeug, Gerät, Ort..."
+        oninput="renderAll()">
+    </div>
 
-<div id="content"></div>
+    <div class="buttons">
 
-<button class="back" onclick="back()">Zurück</button>
+        <button class="back" onclick="back()">
+            Zurück
+        </button>
+
+        <button class="logout" onclick="logout()">
+            Logout
+        </button>
+
+    </div>
+
+</div>
+
+<div id="status" class="status"></div>
+
+<h2 class="sectionTitle">Geräte</h2>
+
+<div id="geraeteList" class="grid"></div>
+
+<h2 class="sectionTitle">Fahrzeuge</h2>
+
+<div id="fahrzeugeList" class="grid"></div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+/* ZENTRALES FIREBASE */
+import "./firebase.js";
 
-const app = initializeApp({
-  apiKey:"AIzaSy...",
-  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
+let geraeteData = {};
+let fahrzeugeData = {};
+
+/* Geräte laden */
+onValue(ref(db,"geraete"), snap=>{
+
+    geraeteData = snap.val() || {};
+
+    renderAll();
+
 });
 
-const db = getDatabase(app);
+/* Fahrzeuge laden */
+onValue(ref(db,"fahrzeuge"), snap=>{
 
-/* Öffnen */
-window.openDB = function(){
+    fahrzeugeData = snap.val() || {};
 
-    if(pw.value !== "1234") return;
+    renderAll();
 
-    content.innerHTML = "<h3>Geräte</h3>";
+});
 
-    /* Geräte */
-    onValue(ref(db,"geraete"), snap=>{
+/* Alles rendern */
+window.renderAll = function(){
 
-        let html = "<h3>Geräte</h3>";
+    let q =
+        search.value.toLowerCase();
 
-        Object.entries(snap.val()||{}).forEach(([key,d])=>{
+    renderSection(
+        geraeteList,
+        geraeteData,
+        "geraete",
+        q
+    );
 
-            html += `
-            <div class="entry">
-
-                <b>Gerät</b>
-                <input id="g_geraete_${key}" value="${d.geraete||""}">
-
-                <b>Ort</b>
-                <input id="g_ort_${key}" value="${d.ort||""}">
-
-                <b>Adresse</b>
-                <input id="g_adresse_${key}" value="${d.adresse||""}">
-
-                <b>Lagerort</b>
-                <input id="g_lager_${key}" value="${d.lagerort||""}">
-
-                <b>Telefon</b>
-                <input id="g_tel_${key}" value="${d.telefon||""}">
-
-                <button class="save" onclick="saveG('${key}')">Speichern</button>
-                <button class="delete" onclick="del('geraete','${key}')">Löschen</button>
-
-            </div>
-            `;
-        });
-
-        content.innerHTML = html;
-
-    });
-
-    /* Fahrzeuge */
-    onValue(ref(db,"fahrzeuge"), snap=>{
-
-        let html = content.innerHTML + "<h3>Fahrzeuge</h3>";
-
-        Object.entries(snap.val()||{}).forEach(([key,d])=>{
-
-            html += `
-            <div class="entry">
-
-                <b>Fahrzeug</b>
-                <input id="f_name_${key}" value="${d.fahrzeug||""}">
-
-                <b>Ort</b>
-                <input id="f_ort_${key}" value="${d.ort||""}">
-
-                <b>Adresse</b>
-                <input id="f_adresse_${key}" value="${d.adresse||""}">
-
-                <b>Funk</b>
-                <input id="f_funk_${key}" value="${d.funk||""}">
-
-                <b>Stärke</b>
-                <input id="f_staerke_${key}" value="${d.staerke||""}">
-
-                <b>Beladung</b>
-                <input id="f_beladung_${key}" value="${d.beladung||""}">
-
-                <button class="save" onclick="saveF('${key}')">Speichern</button>
-                <button class="delete" onclick="del('fahrzeuge','${key}')">Löschen</button>
-
-            </div>
-            `;
-        });
-
-        content.innerHTML = html;
-
-    });
+    renderSection(
+        fahrzeugeList,
+        fahrzeugeData,
+        "fahrzeuge",
+        q
+    );
 };
 
-/* Geräte speichern */
-window.saveG = function(key){
+/* Bereich rendern */
+function renderSection(
+    target,
+    data,
+    type,
+    q
+){
 
-    update(ref(db,"geraete/"+key),{
-        geraete: document.getElementById("g_geraete_"+key).value,
-        ort: document.getElementById("g_ort_"+key).value,
-        adresse: document.getElementById("g_adresse_"+key).value,
-        lagerort: document.getElementById("g_lager_"+key).value,
-        telefon: document.getElementById("g_tel_"+key).value
+    target.innerHTML = "";
+
+    Object.entries(data).forEach(([key,d])=>{
+
+        let text =
+            JSON.stringify(d)
+            .toLowerCase();
+
+        if(q && !text.includes(q)) return;
+
+        let card =
+            document.createElement("div");
+
+        card.className = "card";
+
+        card.innerHTML = `
+
+            ${d.bild
+                ? `<img src="${d.bild}">`
+                : ""
+            }
+
+            <div class="field">
+                <label>
+                    ${
+                        type==="geraete"
+                        ? "Gerät"
+                        : "Fahrzeug"
+                    }
+                </label>
+
+                <input
+                id="${type}_name_${key}"
+                value="${
+                    d.geraete ||
+                    d.fahrzeug ||
+                    ""
+                }">
+            </div>
+
+            <div class="field">
+                <label>Ort</label>
+
+                <input
+                id="${type}_ort_${key}"
+                value="${d.ort || ""}">
+            </div>
+
+            <div class="field">
+                <label>Adresse</label>
+
+                <input
+                id="${type}_adresse_${key}"
+                value="${d.adresse || ""}">
+            </div>
+
+            <div class="field">
+                <label>Telefon</label>
+
+                <input
+                id="${type}_telefon_${key}"
+                value="${d.telefon || ""}">
+            </div>
+
+            <div class="field">
+                <label>Funk</label>
+
+                <input
+                id="${type}_funk_${key}"
+                value="${d.funk || ""}">
+            </div>
+
+            <div class="field">
+                <label>Stärke</label>
+
+                <input
+                id="${type}_staerke_${key}"
+                value="${d.staerke || ""}">
+            </div>
+
+            <div class="field">
+                <label>Lagerort</label>
+
+                <input
+                id="${type}_lager_${key}"
+                value="${d.lagerort || ""}">
+            </div>
+
+            <div class="field">
+                <label>Beladung</label>
+
+                <textarea
+                id="${type}_beladung_${key}">${
+                    d.beladung || ""
+                }</textarea>
+            </div>
+
+            <div class="field">
+                <label>Bemerkung</label>
+
+                <textarea
+                id="${type}_bemerkung_${key}">${
+                    d.bemerkung || ""
+                }</textarea>
+            </div>
+
+            <div class="actions">
+
+                <button
+                class="save"
+                onclick="saveEntry(
+                    '${type}',
+                    '${key}'
+                )">
+                    Speichern
+                </button>
+
+                <button
+                class="delete"
+                onclick="deleteEntry(
+                    '${type}',
+                    '${key}'
+                )">
+                    Löschen
+                </button>
+
+            </div>
+
+        `;
+
+        target.appendChild(card);
+
     });
 
-    alert("Gespeichert");
-};
+}
 
-/* Fahrzeuge speichern */
-window.saveF = function(key){
+/* Speichern */
+window.saveEntry = async function(
+    type,
+    key
+){
 
-    update(ref(db,"fahrzeuge/"+key),{
-        fahrzeug: document.getElementById("f_name_"+key).value,
-        ort: document.getElementById("f_ort_"+key).value,
-        adresse: document.getElementById("f_adresse_"+key).value,
-        funk: document.getElementById("f_funk_"+key).value,
-        staerke: document.getElementById("f_staerke_"+key).value,
-        beladung: document.getElementById("f_beladung_"+key).value
-    });
+    try{
 
-    alert("Gespeichert");
+        status.innerHTML =
+            "Speichere...";
+
+        let data = {
+
+            ort:
+                document.getElementById(
+                    `${type}_ort_${key}`
+                ).value,
+
+            adresse:
+                document.getElementById(
+                    `${type}_adresse_${key}`
+                ).value,
+
+            telefon:
+                document.getElementById(
+                    `${type}_telefon_${key}`
+                ).value,
+
+            funk:
+                document.getElementById(
+                    `${type}_funk_${key}`
+                ).value,
+
+            staerke:
+                document.getElementById(
+                    `${type}_staerke_${key}`
+                ).value,
+
+            lagerort:
+                document.getElementById(
+                    `${type}_lager_${key}`
+                ).value,
+
+            beladung:
+                document.getElementById(
+                    `${type}_beladung_${key}`
+                ).value,
+
+            bemerkung:
+                document.getElementById(
+                    `${type}_bemerkung_${key}`
+                ).value
+        };
+
+        if(type==="geraete"){
+
+            data.geraete =
+                document.getElementById(
+                    `${type}_name_${key}`
+                ).value;
+
+        }else{
+
+            data.fahrzeug =
+                document.getElementById(
+                    `${type}_name_${key}`
+                ).value;
+        }
+
+        await update(
+            ref(db,`${type}/${key}`),
+            data
+        );
+
+        status.innerHTML =
+            "✅ Gespeichert";
+
+    }catch(e){
+
+        console.error(e);
+
+        status.innerHTML =
+            "❌ Fehler beim Speichern";
+
+    }
+
 };
 
 /* Löschen */
-window.del = function(type,key){
+window.deleteEntry = async function(
+    type,
+    key
+){
 
-    if(confirm("Wirklich löschen?")){
-        remove(ref(db,type+"/"+key));
+    if(
+        !confirm(
+            "Wirklich löschen?"
+        )
+    ) return;
+
+    try{
+
+        await remove(
+            ref(db,`${type}/${key}`)
+        );
+
+        status.innerHTML =
+            "🗑️ Gelöscht";
+
+    }catch(e){
+
+        console.error(e);
+
+        status.innerHTML =
+            "❌ Fehler beim Löschen";
+
     }
+
 };
 
 /* Zurück */
 window.back = function(){
-    window.location.href = "index.html";
+
+    location.href = "index.html";
+
 };
 
 </script>
