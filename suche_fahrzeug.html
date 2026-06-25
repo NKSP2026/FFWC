@@ -366,67 +366,73 @@ window.doSearch = function(){
                 : ""
             }
 
-            <div class="content">
+          <div class="content">
 
-                <div class="title">
-                    ${f.fahrzeug || "-"}
-                </div>
+    <div class="title">
+        ${f.fahrzeug || "-"}
+    </div>
 
-                <div class="line">
-                    <b>Ort:</b>
-                    ${f.ort || "-"}
-                </div>
+    <div class="line">
+        <b>Ort:</b>
+        ${f.ort || "-"}
+    </div>
 
-                <div class="line">
-                    <b>Adresse:</b>
-                    ${f.adresse || "-"}
-                </div>
+    <div class="line">
+        <b>Adresse:</b>
+        ${f.adresse || "-"}
+    </div>
 
-                <div class="line">
-                    <b>Telefon:</b>
+    <div class="line">
+        <b>Telefon:</b>
 
-                <div class="line">
-                    <b>E-Mail:</b>
-                    
-                    ${
-                        f.email
-                        ? `
-                        <a
-                        class="phone"
-                        href="mailto:${f.email}">
-                            ${f.email}
-                        </a>
-                        `
-                        : "-"
-                     }
-                 </div>
+        ${
+            f.telefon
+            ? `
+            <a
+            class="phone"
+            href="tel:${f.telefon}">
+                ${f.telefon}
+            </a>
+            `
+            : "-"
+        }
 
-                    ${
-                        f.telefon
-                        ? `
-                        <a
-                        class="phone"
-                        href="tel:${f.telefon}">
-                            ${f.telefon}
-                        </a>
-                        `
-                        : "-"
-                    }
-                </div>
+    </div>
 
-                <div class="line">
-                    <b>Funk:</b>
-                    ${f.funk || "-"}
-                </div>
+    <div class="line">
+        <b>E-Mail:</b>
 
-                <div class="line">
-                    <b>Stärke:</b>
-                    ${f.staerke || "-"}
-                </div>
+        ${
+            f.email
+            ? `
+            <a
+            class="phone"
+            href="mailto:${f.email}">
+                ${f.email}
+            </a>
+            `
+            : "-"
+        }
 
-                <button
-                class="toggle"
-                onclick="toggleDetail(this)">
+    </div>
+
+    <div class="line">
+        <b>Funk:</b>
+        ${f.funk || "-"}
+    </div>
+
+    <div class="line">
+        <b>Stärke:</b>
+        ${f.staerke || "-"}
+    </div>
+
+    <button
+    class="toggle"
+    onclick="toggleDetail(this)">
+
+        Beladung anzeigen
+
+    </button>
 
                     Beladung anzeigen
 
