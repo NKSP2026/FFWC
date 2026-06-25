@@ -49,16 +49,25 @@ const auth = getAuth(app);
 
 /* LOGIN PRÜFUNG */
 
+let authGeladen = false;
+
 onAuthStateChanged(auth, (user) => {
 
-if(!user){
+authGeladen = true;
+
+if(user){
+
+console.log("✅ Eingeloggt:", user.email);
+
+}else{
+
+console.log("❌ Nicht eingeloggt");
 
 window.location.href = "login.html";
 
 }
 
 });
-
 
 /* LOGOUT */
 
