@@ -295,7 +295,7 @@ window.save = async function(){
 
     try{
 
-        status.innerHTML =
+       document.getElementById("status").innerHTML =
             "Speichere...";
 
         /* PRÜFUNG */
@@ -308,7 +308,7 @@ window.save = async function(){
                 "Bitte Geräte oder Fahrzeuge auswählen"
             );
 
-            status.innerHTML =
+            document.getElementById("status").innerHTML =
                 "❌ Keine Kategorie ausgewählt";
 
             return;
@@ -420,7 +420,7 @@ window.save = async function(){
 
         }
 
-        status.innerHTML =
+       document.getElementById("status").innerHTML =
             "✅ Erfolgreich gespeichert";
 
         alert("Gespeichert");
@@ -434,7 +434,7 @@ window.save = async function(){
 
         console.error(error);
 
-        status.innerHTML =
+        document.getElementById("status").innerHTML =
             "❌ Fehler beim Speichern";
 
         alert(
