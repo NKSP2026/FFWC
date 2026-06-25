@@ -276,6 +276,7 @@ import {
 getDatabase,
 ref,
 push,
+set,
 get,
 child
 
@@ -368,20 +369,15 @@ window.save = async function(){
 
 try{
 
-status.innerHTML =
-"Speichere...";
+status.innerHTML = "Speichere...";
 
 let img = "";
 
 if(bild.files[0]){
 
 let r = sRef(
-
 storage,
-
-"bilder/" +
-Date.now()
-
+"bilder/" + Date.now()
 );
 
 await uploadBytes(
@@ -396,63 +392,82 @@ await getDownloadURL(r);
 
 let data = {
 
-ort: ort.value,
+ort: ort.value || "",
 
-adresse: adresse.value,
+adresse: adresse.value || "",
 
-telefon: telefon.value,
+telefon: telefon.value || "",
 
-email: email.value,
+email: email.value || "",
 
-fahrzeug: fahrzeug.value,
+fahrzeug: fahrzeug.value || "",
 
-funk: funk.value,
+funk: funk.value || "",
 
-staerke: staerke.value,
+staerke: staerke.value || "",
 
-geraete: geraete.value,
+geraete: geraete.value || "",
 
-lagerort: lagerort.value,
+lagerort: lagerort.value || "",
 
-beladung: beladung.value,
+beladung: beladung.value || "",
 
-bemerkung: bemerkung.value,
+bemerkung: bemerkung.value || "",
 
-bild: img
+bild: img || "",
+
+erstelltAm:
+new Date().toISOString()
 
 };
 
+/* GERÄTE */
+
 if(einsatz.checked){
 
-await push(
-ref(db,"geraete"),
+const neueGeraeteRef =
+push(ref(db,"geraete"));
+
+await set(
+neueGeraeteRef,
 data
 );
 
 }
 
+/* FAHRZEUGE */
+
 if(fahrzeuge.checked){
 
-await push(
-ref(db,"fahrzeuge"),
+const neueFahrzeugRef =
+push(ref(db,"fahrzeuge"));
+
+await set(
+neueFahrzeugRef,
 data
 );
 
 }
 
 status.innerHTML =
-"✅ Gespeichert!";
+"✅ Erfolgreich gespeichert";
 
 alert("Gespeichert!");
 
-}catch(e){
+}catch(error){
 
-console.error(e);
+console.error(error);
+
+alert(
+"Fehler: " + error.message
+);
 
 status.innerHTML =
 "❌ Fehler beim Speichern";
 
 }
+
+};
 
 /* LEEREN */
 
