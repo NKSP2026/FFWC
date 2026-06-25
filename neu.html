@@ -1,12 +1,235 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Neues Fahrzeug</title>
+<title>Neu Anlegen</title>
 
 <link rel="stylesheet" href="style.css">
+
+<style>
+
+.page{
+    max-width:1000px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.4);
+}
+
+h2{
+    margin-top:0;
+    margin-bottom:30px;
+    text-align:center;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+input,
+textarea{
+    width:100%;
+    box-sizing:border-box;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#111318;
+    color:white;
+    font-size:15px;
+}
+
+textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
+.full{
+    grid-column:span 2;
+}
+
+.previewBox{
+    margin-top:10px;
+    text-align:center;
+}
+
+#preview{
+    max-width:100%;
+    max-height:250px;
+    border-radius:12px;
+    display:none;
+}
+
+.bottom{
+    margin-top:30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.types{
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+}
+
+.types label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+button{
+    padding:14px 20px;
+    border:none;
+    border-radius:12px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.save{
+    background:#2563eb;
+}
+
+.cancel{
+    background:#ef4444;
+}
+
+.logout{
+    background:#f59e0b;
+}
+
+.status{
+    margin-top:20px;
+    font-weight:bold;
+    text-align:center;
+}
+
+@media(max-width:800px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:span 1;
+    }
+
+    .bottom{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+<h2>Neu Anlegen</h2>
+
+<div class="grid">
+
+<input id="ort" placeholder="Ort">
+
+<input id="adresse" placeholder="Adresse">
+
+<input id="telefon" placeholder="Telefon">
+
+<input id="fahrzeug" placeholder="Fahrzeug">
+
+<input id="funk" placeholder="Funkkenner">
+
+<input id="staerke" placeholder="Stärke">
+
+<input id="geraete" placeholder="Gerät">
+
+<input id="lagerort" placeholder="Lagerort (z.B. HLF G3 / Regal A)">
+
+<textarea
+id="beladung"
+class="full"
+placeholder="Beladung (für Suche wichtig)">
+</textarea>
+
+<textarea
+id="bemerkung"
+class="full"
+placeholder="Bemerkung / Zusatzinformationen">
+</textarea>
+
+<input
+type="file"
+id="bild"
+class="full"
+accept="image/*">
+
+<div class="previewBox full">
+    <img id="preview">
+</div>
+
+</div>
+
+<div class="bottom">
+
+<div class="types">
+
+<label>
+<input type="checkbox" id="einsatz">
+Geräte
+</label>
+
+<label>
+<input type="checkbox" id="fahrzeuge">
+Fahrzeuge
+</label>
+
+</div>
+
+<div class="buttons">
+
+<button class="save" onclick="save()">
+Speichern
+</button>
+
+<button class="cancel" onclick="back()">
+Zurück
+</button>
+
+<button class="logout" onclick="logout()">
+Logout
+</button>
+
+</div>
+
+</div>
+
+<div id="status" class="status"></div>
+
+</div>
 
 <script type="module">
 
