@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -12,13 +11,12 @@
 
 <style>
 
-.page{
-    max-width:1100px;
+.container{
+    max-width:1000px;
     margin:40px auto;
     background:#1c1f26;
     padding:30px;
     border-radius:20px;
-    box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
 .topbar{
@@ -28,11 +26,6 @@
     margin-bottom:30px;
     gap:20px;
     flex-wrap:wrap;
-}
-
-.topbar h1{
-    margin:0;
-    color:white;
 }
 
 .grid{
@@ -51,55 +44,24 @@ textarea{
     background:#111318;
     color:white;
     font-size:15px;
-    outline:none;
 }
 
 textarea{
-    min-height:120px;
+    min-height:140px;
     resize:vertical;
-}
-
-input::placeholder,
-textarea::placeholder{
-    color:#9ca3af;
 }
 
 .full{
     grid-column:span 2;
 }
 
-.previewBox{
-    margin-top:10px;
-    text-align:center;
-}
-
-#preview{
-    max-width:100%;
-    max-height:260px;
-    border-radius:12px;
-    display:none;
-}
-
 .bottom{
-    margin-top:30px;
+    margin-top:25px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     gap:20px;
     flex-wrap:wrap;
-}
-
-.types{
-    display:flex;
-    gap:25px;
-    flex-wrap:wrap;
-}
-
-.types label{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:white;
 }
 
 .buttons{
@@ -115,42 +77,31 @@ button{
     color:white;
     font-weight:bold;
     cursor:pointer;
-    transition:0.2s;
-}
-
-button:hover{
-    transform:translateY(-2px);
 }
 
 .save{
     background:#2563eb;
 }
 
-.save:hover{
-    background:#1d4ed8;
-}
-
 .back{
     background:#6b7280;
-}
-
-.back:hover{
-    background:#4b5563;
 }
 
 .logout{
     background:#dc2626;
 }
 
-.logout:hover{
-    background:#b91c1c;
+#preview{
+    max-height:160px;
+    border-radius:12px;
+    margin-top:10px;
+    display:none;
 }
 
 .status{
     margin-top:20px;
-    font-weight:bold;
     text-align:center;
-    color:#10b981;
+    font-weight:bold;
 }
 
 @media(max-width:850px){
@@ -163,11 +114,6 @@ button:hover{
         grid-column:span 1;
     }
 
-    .bottom{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-
 }
 
 </style>
@@ -176,19 +122,19 @@ button:hover{
 
 <body>
 
-<div class="page">
+<div class="container">
 
 <div class="topbar">
 
-    <h1>Neu Anlegen</h1>
+<h2>Neu Anlegen</h2>
 
-    <button
-    class="logout"
-    onclick="logout()">
+<button
+class="logout"
+onclick="logout()">
 
-        Logout
+Logout
 
-    </button>
+</button>
 
 </div>
 
@@ -210,12 +156,18 @@ placeholder="Adresse">
 
 <input
 id="telefon"
-placeholder="Telefonnummer">
+list="telefone"
+placeholder="Telefon">
+
+<datalist id="telefone"></datalist>
 
 <input
 id="email"
+list="emails"
 type="email"
 placeholder="E-Mail Adresse">
+
+<datalist id="emails"></datalist>
 
 <input
 id="fahrzeug"
@@ -223,7 +175,10 @@ placeholder="Fahrzeug">
 
 <input
 id="funk"
+list="funkliste"
 placeholder="Funkkenner">
+
+<datalist id="funkliste"></datalist>
 
 <input
 id="staerke"
@@ -235,18 +190,21 @@ placeholder="Gerät">
 
 <input
 id="lagerort"
-placeholder="Lagerort (z.B. HLF G3 / Regal A)">
+list="lagerliste"
+placeholder="Lagerort">
+
+<datalist id="lagerliste"></datalist>
 
 <textarea
 id="beladung"
 class="full"
-placeholder="Beladung / wichtige Suchbegriffe">
+placeholder="Beladung (wichtig für Suche!)">
 </textarea>
 
 <textarea
 id="bemerkung"
 class="full"
-placeholder="Bemerkung / Zusatzinformationen">
+placeholder="Bemerkung">
 </textarea>
 
 <input
@@ -255,9 +213,9 @@ id="bild"
 class="full"
 accept="image/*">
 
-<div class="previewBox full">
+<div class="full">
 
-    <img id="preview">
+<img id="preview">
 
 </div>
 
@@ -265,12 +223,14 @@ accept="image/*">
 
 <div class="bottom">
 
-<div class="types">
+<div>
 
 <label>
 <input type="checkbox" id="einsatz">
 Geräte
 </label>
+
+<br><br>
 
 <label>
 <input type="checkbox" id="fahrzeuge">
@@ -285,7 +245,7 @@ Fahrzeuge
 class="save"
 onclick="save()">
 
-    Speichern
+Speichern
 
 </button>
 
@@ -293,7 +253,7 @@ onclick="save()">
 class="back"
 onclick="back()">
 
-    Zurück
+Zurück
 
 </button>
 
@@ -309,106 +269,96 @@ onclick="back()">
 
 import {
 initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
 import {
 
 getDatabase,
 ref,
 push,
-set,
 get,
 child
 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-import {
-
-getAuth,
-onAuthStateChanged,
-signOut
-
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 import {
 
 getStorage,
-ref as storageRef,
+ref as sRef,
 uploadBytes,
 getDownloadURL
 
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+import {
+
+getAuth,
+signOut
+
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 /* FIREBASE */
 
-const firebaseConfig = {
+const app = initializeApp({
 
-  apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
+apiKey:
+"AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
 
-  authDomain: "ffwc-d3994.firebaseapp.com",
+authDomain:
+"ffwc-d3994.firebaseapp.com",
 
-  databaseURL:
-  "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+databaseURL:
+"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
 
-  projectId: "ffwc-d3994",
+projectId:
+"ffwc-d3994",
 
-  storageBucket: "ffwc-d3994.firebasestorage.app",
+storageBucket:
+"ffwc-d3994.firebasestorage.app",
 
-  messagingSenderId: "591233232022",
+messagingSenderId:
+"591233232022",
 
-  appId:
-  "1:591233232022:web:66ce4e0349d426e94ae6b7",
+appId:
+"1:591233232022:web:66ce4e0349d426e94ae6b7"
 
-  measurementId: "G-BG75M1KXHL"
-
-};
-
-const app = initializeApp(firebaseConfig);
+});
 
 const db = getDatabase(app);
 
-const auth = getAuth(app);
-
 const storage = getStorage(app);
 
-/* LOGIN */
-
-onAuthStateChanged(auth, (user)=>{
-
-    if(!user){
-
-        window.location.href =
-            "login.html";
-
-    }
-
-});
+const auth = getAuth(app);
 
 /* LOGOUT */
 
 window.logout = async function(){
 
-    await signOut(auth);
+await signOut(auth);
 
-    window.location.href =
-        "login.html";
+location.href = "login.html";
 
 };
 
 /* BILD VORSCHAU */
 
+const bild =
+document.getElementById("bild");
+
+const preview =
+document.getElementById("preview");
+
 bild.onchange = e=>{
 
-    let file =
-        e.target.files[0];
+if(!e.target.files[0]) return;
 
-    if(!file) return;
+preview.src =
+URL.createObjectURL(
+e.target.files[0]
+);
 
-    preview.src =
-        URL.createObjectURL(file);
-
-    preview.style.display =
-        "block";
+preview.style.display =
+"block";
 
 };
 
@@ -416,239 +366,243 @@ bild.onchange = e=>{
 
 window.save = async function(){
 
-    try{
+try{
 
-        status.innerHTML =
-            "Speichere...";
+status.innerHTML =
+"Speichere...";
 
-        let imageUrl = "";
+let img = "";
 
-        /* Bild Upload */
+if(bild.files[0]){
 
-        if(bild.files[0]){
+let r = sRef(
 
-            status.innerHTML =
-                "Bild wird hochgeladen...";
+storage,
 
-            let file =
-                bild.files[0];
+"bilder/" +
+Date.now()
 
-            let path =
+);
 
-                "bilder/" +
+await uploadBytes(
+r,
+bild.files[0]
+);
 
-                Date.now() +
-
-                "_" +
-
-                file.name;
-
-            let imgRef =
-                storageRef(storage,path);
-
-            await uploadBytes(
-                imgRef,
-                file
-            );
-
-            imageUrl =
-                await getDownloadURL(
-                    imgRef
-                );
-
-        }
-
-        let data = {
-
-            ort:
-                ort.value || "",
-
-            adresse:
-                adresse.value || "",
-
-            telefon:
-                telefon.value || "",
-
-            email:
-                email.value || "",
-
-            fahrzeug:
-                fahrzeug.value || "",
-
-            funk:
-                funk.value || "",
-
-            staerke:
-                staerke.value || "",
-
-            geraete:
-                geraete.value || "",
-
-            lagerort:
-                lagerort.value || "",
-
-            beladung:
-                beladung.value || "",
-
-            bemerkung:
-                bemerkung.value || "",
-
-            bild:
-                imageUrl,
-
-            erstelltAm:
-                new Date().toLocaleString()
-
-        };
-
-        if(einsatz.checked){
-
-            await push(
-                ref(db,"geraete"),
-                data
-            );
-
-        }
-
-        if(fahrzeuge.checked){
-
-            await push(
-                ref(db,"fahrzeuge"),
-                data
-            );
-
-        }
-
-        status.innerHTML =
-            "✅ Erfolgreich gespeichert";
-
-        clearForm();
-
-    }catch(e){
-
-        console.error(e);
-
-        status.innerHTML =
-            "❌ Fehler beim Speichern";
-
-    }
-
-};
-
-/* FORMULAR LEEREN */
-
-function clearForm(){
-
-    [
-
-        ort,
-        adresse,
-        telefon,
-        email,
-        fahrzeug,
-        funk,
-        staerke,
-        geraete,
-        lagerort,
-        beladung,
-        bemerkung
-
-    ].forEach(f=>{
-
-        f.value = "";
-
-    });
-
-    bild.value = "";
-
-    einsatz.checked = false;
-
-    fahrzeuge.checked = false;
-
-    preview.style.display = "none";
+img =
+await getDownloadURL(r);
 
 }
 
-/* ZURÜCK */
+let data = {
 
-window.back = function(){
+ort: ort.value,
 
-    window.location.href =
-        "index.html";
+adresse: adresse.value,
+
+telefon: telefon.value,
+
+email: email.value,
+
+fahrzeug: fahrzeug.value,
+
+funk: funk.value,
+
+staerke: staerke.value,
+
+geraete: geraete.value,
+
+lagerort: lagerort.value,
+
+beladung: beladung.value,
+
+bemerkung: bemerkung.value,
+
+bild: img
 
 };
 
-/* VORSCHLÄGE LADEN */
+if(einsatz.checked){
+
+await push(
+ref(db,"geraete"),
+data
+);
+
+}
+
+if(fahrzeuge.checked){
+
+await push(
+ref(db,"fahrzeuge"),
+data
+);
+
+}
+
+status.innerHTML =
+"✅ Gespeichert!";
+
+alert("Gespeichert!");
+
+}catch(e){
+
+console.error(e);
+
+status.innerHTML =
+"❌ Fehler beim Speichern";
+
+}
+
+/* LEEREN */
+
+[
+ort,
+adresse,
+telefon,
+email,
+fahrzeug,
+funk,
+staerke,
+geraete,
+lagerort,
+beladung,
+bemerkung
+
+].forEach(x=>{
+
+x.value = "";
+
+});
+
+bild.value = "";
+
+preview.style.display =
+"none";
+
+einsatz.checked = false;
+
+fahrzeuge.checked = false;
+
+};
+
+/* ZURÜCK */
+
+window.back = ()=>{
+
+location.href =
+"index.html";
+
+};
+
+/* VORSCHLÄGE */
 
 async function ladeVorschlaege(){
 
-    const dbRef = ref(db);
+const dbRef = ref(db);
 
-    const snapshot =
-        await get(
-            child(dbRef,"fahrzeuge")
-        );
+const snapshot =
+await get(
+child(dbRef,"fahrzeuge")
+);
 
-    const ortListe =
-        document.getElementById("orte");
+if(!snapshot.exists()) return;
 
-    const adressListe =
-        document.getElementById("adressen");
+const ortSet = new Set();
 
-    const orte = new Set();
+const adrSet = new Set();
 
-    const adressen = new Set();
+const telSet = new Set();
 
-    if(snapshot.exists()){
+const mailSet = new Set();
 
-        snapshot.forEach((child)=>{
+const funkSet = new Set();
 
-            const daten =
-                child.val();
+const lagerSet = new Set();
 
-            if(daten.ort){
+snapshot.forEach((c)=>{
 
-                orte.add(daten.ort);
+const d = c.val();
 
-            }
+if(d.ort){
 
-            if(daten.adresse){
+ortSet.add(d.ort);
 
-                adressen.add(
-                    daten.adresse
-                );
+}
 
-            }
+if(d.adresse){
 
-        });
+adrSet.add(d.adresse);
 
-    }
+}
 
-    orte.forEach((ort)=>{
+if(d.telefon){
 
-        const option =
-            document.createElement(
-                "option"
-            );
+telSet.add(d.telefon);
 
-        option.value = ort;
+}
 
-        ortListe.appendChild(option);
+if(d.email){
 
-    });
+mailSet.add(d.email);
 
-    adressen.forEach((adresse)=>{
+}
 
-        const option =
-            document.createElement(
-                "option"
-            );
+if(d.funk){
 
-        option.value = adresse;
+funkSet.add(d.funk);
 
-        adressListe.appendChild(option);
+}
 
-    });
+if(d.lagerort){
+
+lagerSet.add(d.lagerort);
+
+}
+
+});
+
+ortSet.forEach(o=>{
+
+orte.innerHTML +=
+`<option value="${o}">`;
+
+});
+
+adrSet.forEach(a=>{
+
+adressen.innerHTML +=
+`<option value="${a}">`;
+
+});
+
+telSet.forEach(t=>{
+
+telefone.innerHTML +=
+`<option value="${t}">`;
+
+});
+
+mailSet.forEach(m=>{
+
+emails.innerHTML +=
+`<option value="${m}">`;
+
+});
+
+funkSet.forEach(f=>{
+
+funkliste.innerHTML +=
+`<option value="${f}">`;
+
+});
+
+lagerSet.forEach(l=>{
+
+lagerliste.innerHTML +=
+`<option value="${l}">`;
+
+});
 
 }
 
@@ -658,4 +612,4 @@ ladeVorschlaege();
 
 </body>
 </html>
-```
+
