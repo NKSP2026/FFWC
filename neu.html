@@ -252,280 +252,319 @@ Abbrechen
 
 </div>
 
+
 <script type="module">
 
-import {
-initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+/* ZENTRALES FIREBASE SYSTEM */
+import "./firebase.js";
 
-import {
-
-getDatabase,
-ref,
-push,
-set,
-get,
-child
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-import {
-
-getStorage,
-ref as sRef,
-uploadBytes,
-getDownloadURL
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-/* FIREBASE */
-
-const app = initializeApp({
-
-apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
-
-authDomain: "ffwc-d3994.firebaseapp.com",
-
-databaseURL:
-"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
-
-projectId: "ffwc-d3994",
-
-storageBucket: "ffwc-d3994.firebasestorage.app",
-
-messagingSenderId: "591233232022",
-
-appId:
-"1:591233232022:web:66ce4e0349d426e94ae6b7"
-
-});
-
-const db = getDatabase(app);
-
-const storage = getStorage(app);
-
-/* BILD VORSCHAU */
+/* =========================================
+   BILD VORSCHAU
+========================================= */
 
 bild.onchange = e=>{
 
-if(!e.target.files[0]) return;
+    if(!e.target.files[0]) return;
 
-preview.src =
-URL.createObjectURL(
-e.target.files[0]
-);
+    preview.src =
+        URL.createObjectURL(
+            e.target.files[0]
+        );
 
-preview.style.display =
-"block";
+    preview.style.display = "block";
 
 };
 
-/* SPEICHERN */
+/* =========================================
+   SPEICHERN
+========================================= */
 
 window.save = async function(){
 
-try{
+    try{
 
-status.innerHTML =
-"Speichere...";
+        status.innerHTML =
+            "Speichere...";
 
-let img = "";
+        /* PRÜFUNG */
+        if(
+            !einsatz.checked &&
+            !fahrzeuge.checked
+        ){
 
-if(bild.files[0]){
+            alert(
+                "Bitte Geräte oder Fahrzeuge auswählen"
+            );
 
-let r = sRef(
-storage,
-"bilder/" + Date.now()
-);
+            status.innerHTML =
+                "❌ Keine Kategorie ausgewählt";
 
-await uploadBytes(
-r,
-bild.files[0]
-);
+            return;
+        }
 
-img =
-await getDownloadURL(r);
+        let img = "";
 
-}
+        /* =========================================
+           BILD UPLOAD
+        ========================================= */
 
-let data = {
+        if(bild.files[0]){
 
-ort: ort.value || "",
+            let r = storageRef(
+                storage,
+                "bilder/" + Date.now()
+            );
 
-adresse: adresse.value || "",
+            await uploadBytes(
+                r,
+                bild.files[0]
+            );
 
-telefon: telefon.value || "",
+            img =
+                await getDownloadURL(r);
 
-email: email.value || "",
+        }
 
-fahrzeug: fahrzeug.value || "",
+        /* =========================================
+           DATEN
+        ========================================= */
 
-funk: funk.value || "",
+        let data = {
 
-staerke: staerke.value || "",
+            ort:
+                ort.value || "",
 
-geraete: geraete.value || "",
+            adresse:
+                adresse.value || "",
 
-lagerort: lagerort.value || "",
+            telefon:
+                telefon.value || "",
 
-beladung: beladung.value || "",
+            email:
+                email.value || "",
 
-bemerkung: bemerkung.value || "",
+            fahrzeug:
+                fahrzeug.value || "",
 
-bild: img || "",
+            funk:
+                funk.value || "",
 
-erstelltAm:
-new Date().toISOString()
+            staerke:
+                staerke.value || "",
+
+            geraete:
+                geraete.value || "",
+
+            lagerort:
+                lagerort.value || "",
+
+            beladung:
+                beladung.value || "",
+
+            bemerkung:
+                bemerkung.value || "",
+
+            bild:
+                img || "",
+
+            erstelltAm:
+                new Date().toISOString()
+
+        };
+
+        /* =========================================
+           GERÄTE SPEICHERN
+        ========================================= */
+
+        if(einsatz.checked){
+
+            const newRef =
+                push(
+                    ref(db,"geraete")
+                );
+
+            await set(
+                newRef,
+                data
+            );
+
+        }
+
+        /* =========================================
+           FAHRZEUGE SPEICHERN
+        ========================================= */
+
+        if(fahrzeuge.checked){
+
+            const newRef =
+                push(
+                    ref(db,"fahrzeuge")
+                );
+
+            await set(
+                newRef,
+                data
+            );
+
+        }
+
+        status.innerHTML =
+            "✅ Erfolgreich gespeichert";
+
+        alert("Gespeichert");
+
+        /* FORMULAR LEEREN */
+        document.querySelector("form")?.reset();
+
+        preview.style.display = "none";
+
+    }catch(error){
+
+        console.error(error);
+
+        status.innerHTML =
+            "❌ Fehler beim Speichern";
+
+        alert(
+            "Fehler: " + error.message
+        );
+
+    }
 
 };
 
-/* GERÄTE */
-
-if(einsatz.checked){
-
-const newRef =
-push(ref(db,"geraete"));
-
-await set(newRef,data);
-
-}
-
-/* FAHRZEUGE */
-
-if(fahrzeuge.checked){
-
-const newRef =
-push(ref(db,"fahrzeuge"));
-
-await set(newRef,data);
-
-}
-
-status.innerHTML =
-"✅ Erfolgreich gespeichert";
-
-alert("Gespeichert!");
-
-}catch(error){
-
-console.error(error);
-
-status.innerHTML =
-"❌ Fehler beim Speichern";
-
-alert(error.message);
-
-}
-
-};
-
-/* ZURÜCK */
+/* =========================================
+   ZURÜCK
+========================================= */
 
 window.back = ()=>{
 
-location.href="index.html";
+    location.href = "index.html";
 
 };
 
-/* VORSCHLÄGE LADEN */
+/* =========================================
+   VORSCHLÄGE LADEN
+========================================= */
 
 async function ladeVorschlaege(){
 
-const dbRef = ref(db);
+    try{
 
-const snapshot =
-await get(
-child(dbRef,"fahrzeuge")
-);
+        const dbRef = ref(db);
 
-if(!snapshot.exists()) return;
+        const snapshot =
+            await get(
+                child(
+                    dbRef,
+                    "fahrzeuge"
+                )
+            );
 
-const ortSet = new Set();
+        if(!snapshot.exists()) return;
 
-const adrSet = new Set();
+        const ortSet =
+            new Set();
 
-const telSet = new Set();
+        const adrSet =
+            new Set();
 
-const lagerSet = new Set();
+        const telSet =
+            new Set();
 
-const mailSet = new Set();
+        const lagerSet =
+            new Set();
 
-snapshot.forEach((c)=>{
+        const mailSet =
+            new Set();
 
-const d = c.val();
+        snapshot.forEach((c)=>{
 
-if(d.ort){
+            const d = c.val();
 
-ortSet.add(d.ort);
+            if(d.ort){
 
-}
+                ortSet.add(d.ort);
 
-if(d.adresse){
+            }
 
-adrSet.add(d.adresse);
+            if(d.adresse){
 
-}
+                adrSet.add(d.adresse);
 
-if(d.telefon){
+            }
 
-telSet.add(d.telefon);
+            if(d.telefon){
 
-}
+                telSet.add(d.telefon);
 
-if(d.lagerort){
+            }
 
-lagerSet.add(d.lagerort);
+            if(d.lagerort){
 
-}
+                lagerSet.add(d.lagerort);
 
-if(d.email){
+            }
 
-mailSet.add(d.email);
+            if(d.email){
 
-}
+                mailSet.add(d.email);
 
-});
+            }
 
-ortSet.forEach(o=>{
+        });
 
-orte.innerHTML +=
-`<option value="${o}">`;
+        /* ORTE */
+        ortSet.forEach(o=>{
 
-});
+            orte.innerHTML +=
+                `<option value="${o}">`;
 
-adrSet.forEach(a=>{
+        });
 
-adressen.innerHTML +=
-`<option value="${a}">`;
+        /* ADRESSEN */
+        adrSet.forEach(a=>{
 
-});
+            adressen.innerHTML +=
+                `<option value="${a}">`;
 
-telSet.forEach(t=>{
+        });
 
-telefone.innerHTML +=
-`<option value="${t}">`;
+        /* TELEFON */
+        telSet.forEach(t=>{
 
-});
+            telefone.innerHTML +=
+                `<option value="${t}">`;
 
-lagerSet.forEach(l=>{
+        });
 
-lagerorte.innerHTML +=
-`<option value="${l}">`;
+        /* LAGERORTE */
+        lagerSet.forEach(l=>{
 
-});
+            lagerorte.innerHTML +=
+                `<option value="${l}">`;
 
-mailSet.forEach(m=>{
+        });
 
-emails.innerHTML +=
-`<option value="${m}">`;
+        /* EMAILS */
+        mailSet.forEach(m=>{
 
-});
+            emails.innerHTML +=
+                `<option value="${m}">`;
+
+        });
+
+    }catch(error){
+
+        console.error(
+            "Vorschlag Fehler:",
+            error
+        );
+
+    }
 
 }
 
 ladeVorschlaege();
 
 </script>
-
-</body>
-</html>
