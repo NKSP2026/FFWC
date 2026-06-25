@@ -1,3 +1,4 @@
+```html id="k2v9qm"
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -9,43 +10,36 @@
 
 <style>
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:"Segoe UI", Arial, sans-serif;
-}
-
 body{
-    background:#0f1117;
+    margin:0;
+    font-family:"Segoe UI";
+    background:#0b1020;
     display:flex;
     justify-content:center;
     align-items:center;
-    min-height:100vh;
-    color:white;
+    height:100vh;
     overflow:hidden;
+    color:white;
 }
 
 .box{
-    width:380px;
+    width:360px;
     background:#1c1f26;
     padding:40px;
-    border-radius:20px;
-    box-shadow:0 0 25px rgba(0,0,0,0.5);
+    border-radius:22px;
+    box-shadow:0 0 40px rgba(0,0,0,0.5);
+    text-align:center;
 }
 
 h1{
-    text-align:center;
-    margin-bottom:30px;
-    color:#60a5fa;
-    font-size:32px;
+    margin-bottom:10px;
+    color:#6ea8ff;
+    font-size:44px;
 }
 
-.subtitle{
-    text-align:center;
-    margin-bottom:30px;
+p{
     color:#9ca3af;
-    font-size:15px;
+    margin-bottom:30px;
 }
 
 input{
@@ -55,13 +49,10 @@ input{
     border-radius:12px;
     background:#111318;
     color:white;
-    margin-bottom:20px;
     font-size:16px;
+    box-sizing:border-box;
+    margin-bottom:20px;
     outline:none;
-}
-
-input::placeholder{
-    color:#6b7280;
 }
 
 button{
@@ -79,26 +70,12 @@ button{
 
 button:hover{
     background:#1d4ed8;
-    transform:translateY(-2px);
 }
 
 #error{
-    margin-top:20px;
-    text-align:center;
-    color:#ef4444;
+    margin-top:18px;
+    color:#ff4d4d;
     font-weight:bold;
-}
-
-#status{
-    margin-top:20px;
-    text-align:center;
-    color:#10b981;
-    font-weight:bold;
-}
-
-.loading{
-    opacity:0.7;
-    pointer-events:none;
 }
 
 </style>
@@ -109,24 +86,20 @@ button:hover{
 
 <div class="box">
 
-    <h1>Landfunkstelle</h1>
+<h1>Landfunkstelle</h1>
 
-    <div class="subtitle">
-        Anmeldung Feuerwehrsystem
-    </div>
+<p>Anmeldung Feuerwehrsystem</p>
 
-    <input
-    type="password"
-    id="password"
-    placeholder="Passwort eingeben">
+<input
+type="password"
+id="password"
+placeholder="Passwort">
 
-    <button id="loginBtn" onclick="login()">
-        Anmelden
-    </button>
+<button onclick="login()">
+Anmelden
+</button>
 
-    <div id="status"></div>
-
-    <div id="error"></div>
+<div id="error"></div>
 
 </div>
 
@@ -137,20 +110,11 @@ initializeApp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-
 getAuth,
-
 signInWithEmailAndPassword,
-
 setPersistence,
-
-browserLocalPersistence,
-
-onAuthStateChanged
-
+browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-/* FIREBASE */
 
 const firebaseConfig = {
 
@@ -178,61 +142,18 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 
-/* LOGIN STATUS PRÜFEN */
-
-onAuthStateChanged(auth, (user)=>{
-
-    if(user){
-
-        console.log("✅ Bereits eingeloggt");
-
-        window.location.href = "index.html";
-
-    }
-
-});
-
 /* LOGIN */
 
 window.login = async function(){
 
     error.innerHTML = "";
-    status.innerHTML = "";
-
-    let pw = password.value.trim();
-
-    if(pw === ""){
-
-        error.innerHTML =
-            "Bitte Passwort eingeben";
-
-        return;
-
-    }
 
     try{
 
-        document.body.classList.add(
-            "loading"
-        );
-
-        loginBtn.innerHTML =
-            "Anmeldung läuft...";
-
-        status.innerHTML =
-            "Verbinde mit Firebase...";
-
-        /* LOGIN DAUERHAFT SPEICHERN */
-
         await setPersistence(
-
             auth,
-
             browserLocalPersistence
-
         );
-
-        /* LOGIN */
 
         await signInWithEmailAndPassword(
 
@@ -240,35 +161,19 @@ window.login = async function(){
 
             "winklerronny10@gmail.com",
 
-            pw
+            password.value
 
         );
 
-        status.innerHTML =
-            "✅ Anmeldung erfolgreich";
-
-        setTimeout(()=>{
-
-            window.location.href =
-                "index.html";
-
-        },800);
+        window.location.href =
+            "index.html";
 
     }catch(e){
 
         console.error(e);
 
         error.innerHTML =
-            "❌ Falsches Passwort";
-
-        status.innerHTML = "";
-
-        document.body.classList.remove(
-            "loading"
-        );
-
-        loginBtn.innerHTML =
-            "Anmelden";
+            "Falsches Passwort";
 
     }
 
@@ -277,19 +182,19 @@ window.login = async function(){
 /* ENTER TASTE */
 
 password.addEventListener(
-    "keypress",
-    e=>{
+"keypress",
+function(e){
 
-        if(e.key === "Enter"){
+    if(e.key === "Enter"){
 
-            login();
-
-        }
+        login();
 
     }
-);
+
+});
 
 </script>
 
 </body>
 </html>
+```
