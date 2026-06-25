@@ -428,43 +428,61 @@ function showGeraet(g){
             : ""
         }
 
-        <div class="content">
+       <div class="content">
 
-            <div class="title">
-                ${g.geraete || "-"}
-            </div>
+    <div class="title">
+        ${g.geraete || "-"}
+    </div>
 
-            <div class="line">
-                <b>Lagerort:</b>
-                ${g.lagerort || "-"}
-            </div>
+    <div class="line">
+        <b>Lagerort:</b>
+        ${g.lagerort || "-"}
+    </div>
 
-            <div class="line">
-                <b>Ort:</b>
-                ${g.ort || "-"}
-            </div>
+    <div class="line">
+        <b>Ort:</b>
+        ${g.ort || "-"}
+    </div>
 
-            <div class="line">
-                <b>Adresse:</b>
-                ${g.adresse || "-"}
-            </div>
+    <div class="line">
+        <b>Adresse:</b>
+        ${g.adresse || "-"}
+    </div>
 
-            <div class="line">
-                <b>Telefon:</b>
-                <div class="line">
-    <b>E-Mail:</b>
+    <div class="line">
+        <b>Telefon:</b>
 
-    ${
-        g.email
-        ? `
-        <a
-        class="phone"
-        href="mailto:${g.email}">
-            ${g.email}
-        </a>
-        `
-        : "-"
-    }
+        ${
+            g.telefon
+            ? `
+            <a
+            class="phone"
+            href="tel:${g.telefon}">
+                ${g.telefon}
+            </a>
+            `
+            : "-"
+        }
+
+    </div>
+
+    <div class="line">
+        <b>E-Mail:</b>
+
+        ${
+            g.email
+            ? `
+            <a
+            class="phone"
+            href="mailto:${g.email}">
+                ${g.email}
+            </a>
+            `
+            : "-"
+        }
+
+    </div>
+
 </div>
 
                 ${
