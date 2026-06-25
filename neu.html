@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -12,7 +13,7 @@
 <style>
 
 .page{
-    max-width:1000px;
+    max-width:1100px;
     margin:40px auto;
     background:#1c1f26;
     padding:30px;
@@ -20,10 +21,18 @@
     box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
-h2{
-    margin-top:0;
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     margin-bottom:30px;
-    text-align:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.topbar h1{
+    margin:0;
+    color:white;
 }
 
 .grid{
@@ -42,11 +51,17 @@ textarea{
     background:#111318;
     color:white;
     font-size:15px;
+    outline:none;
 }
 
 textarea{
     min-height:120px;
     resize:vertical;
+}
+
+input::placeholder,
+textarea::placeholder{
+    color:#9ca3af;
 }
 
 .full{
@@ -60,7 +75,7 @@ textarea{
 
 #preview{
     max-width:100%;
-    max-height:250px;
+    max-height:260px;
     border-radius:12px;
     display:none;
 }
@@ -84,6 +99,7 @@ textarea{
     display:flex;
     align-items:center;
     gap:10px;
+    color:white;
 }
 
 .buttons{
@@ -110,21 +126,34 @@ button:hover{
     background:#2563eb;
 }
 
-.cancel{
-    background:#ef4444;
+.save:hover{
+    background:#1d4ed8;
+}
+
+.back{
+    background:#6b7280;
+}
+
+.back:hover{
+    background:#4b5563;
 }
 
 .logout{
-    background:#f59e0b;
+    background:#dc2626;
+}
+
+.logout:hover{
+    background:#b91c1c;
 }
 
 .status{
     margin-top:20px;
     font-weight:bold;
     text-align:center;
+    color:#10b981;
 }
 
-@media(max-width:800px){
+@media(max-width:850px){
 
     .grid{
         grid-template-columns:1fr;
@@ -149,30 +178,69 @@ button:hover{
 
 <div class="page">
 
-<h2>Neu Anlegen</h2>
+<div class="topbar">
+
+    <h1>Neu Anlegen</h1>
+
+    <button
+    class="logout"
+    onclick="logout()">
+
+        Logout
+
+    </button>
+
+</div>
 
 <div class="grid">
 
-<input id="ort" placeholder="Ort">
+<input
+id="ort"
+list="orte"
+placeholder="Ort">
 
-<input id="adresse" placeholder="Adresse">
+<datalist id="orte"></datalist>
 
-<input id="telefon" placeholder="Telefon">
+<input
+id="adresse"
+list="adressen"
+placeholder="Adresse">
 
-<input id="fahrzeug" placeholder="Fahrzeug">
+<datalist id="adressen"></datalist>
 
-<input id="funk" placeholder="Funkkenner">
+<input
+id="telefon"
+placeholder="Telefonnummer">
 
-<input id="staerke" placeholder="Stärke">
+<input
+id="email"
+type="email"
+placeholder="E-Mail Adresse">
 
-<input id="geraete" placeholder="Gerät">
+<input
+id="fahrzeug"
+placeholder="Fahrzeug">
 
-<input id="lagerort" placeholder="Lagerort (z.B. HLF G3 / Regal A)">
+<input
+id="funk"
+placeholder="Funkkenner">
+
+<input
+id="staerke"
+placeholder="Stärke">
+
+<input
+id="geraete"
+placeholder="Gerät">
+
+<input
+id="lagerort"
+placeholder="Lagerort (z.B. HLF G3 / Regal A)">
 
 <textarea
 id="beladung"
 class="full"
-placeholder="Beladung (für Suche wichtig)">
+placeholder="Beladung / wichtige Suchbegriffe">
 </textarea>
 
 <textarea
@@ -188,7 +256,9 @@ class="full"
 accept="image/*">
 
 <div class="previewBox full">
+
     <img id="preview">
+
 </div>
 
 </div>
@@ -211,8 +281,12 @@ Fahrzeuge
 
 <div class="buttons">
 
-<button class="save" onclick="save()">
-Speichern
+<button
+class="save"
+onclick="save()">
+
+    Speichern
+
 </button>
 
 <button
@@ -221,10 +295,6 @@ onclick="back()">
 
     Zurück
 
-</button>
-
-<button class="logout" onclick="logout()">
-Logout
 </button>
 
 </div>
@@ -237,32 +307,58 @@ Logout
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+
 getDatabase,
 ref,
 push,
 set,
 get,
 child
+
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 import {
+
 getAuth,
 onAuthStateChanged,
 signOut
+
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+import {
+
+getStorage,
+ref as storageRef,
+uploadBytes,
+getDownloadURL
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+/* FIREBASE */
 
 const firebaseConfig = {
 
   apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
+
   authDomain: "ffwc-d3994.firebaseapp.com",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+
+  databaseURL:
+  "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+
   projectId: "ffwc-d3994",
+
   storageBucket: "ffwc-d3994.firebasestorage.app",
+
   messagingSenderId: "591233232022",
-  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7",
+
+  appId:
+  "1:591233232022:web:66ce4e0349d426e94ae6b7",
+
   measurementId: "G-BG75M1KXHL"
 
 };
@@ -273,26 +369,18 @@ const db = getDatabase(app);
 
 const auth = getAuth(app);
 
+const storage = getStorage(app);
 
-/* LOGIN PRÜFUNG */
+/* LOGIN */
 
-let authGeladen = false;
+onAuthStateChanged(auth, (user)=>{
 
-onAuthStateChanged(auth, (user) => {
+    if(!user){
 
-authGeladen = true;
+        window.location.href =
+            "login.html";
 
-if(user){
-
-console.log("✅ Eingeloggt:", user.email);
-
-}else{
-
-console.log("❌ Nicht eingeloggt");
-
-window.location.href = "login.html";
-
-}
+    }
 
 });
 
@@ -300,111 +388,267 @@ window.location.href = "login.html";
 
 window.logout = async function(){
 
-await signOut(auth);
+    await signOut(auth);
 
-window.location.href = "login.html";
+    window.location.href =
+        "login.html";
 
 };
 
+/* BILD VORSCHAU */
+
+bild.onchange = e=>{
+
+    let file =
+        e.target.files[0];
+
+    if(!file) return;
+
+    preview.src =
+        URL.createObjectURL(file);
+
+    preview.style.display =
+        "block";
+
+};
 
 /* SPEICHERN */
 
-window.speichern = async function(){
+window.save = async function(){
 
-const fahrzeug = document.getElementById("fahrzeug").value;
-const ort = document.getElementById("ort").value;
-const adresse = document.getElementById("adresse").value;
-const telefon = document.getElementById("telefon").value;
-const email = document.getElementById("email").value;
-const funk = document.getElementById("funk").value;
-const staerke = document.getElementById("staerke").value;
-const beladung = document.getElementById("beladung").value;
+    try{
 
-if(fahrzeug === ""){
+        status.innerHTML =
+            "Speichere...";
 
-alert("Bitte Fahrzeug eingeben");
-return;
+        let imageUrl = "";
 
-}
+        /* Bild Upload */
 
-const neueRef = push(ref(db, "fahrzeuge"));
+        if(bild.files[0]){
 
-await set(neueRef, {
+            status.innerHTML =
+                "Bild wird hochgeladen...";
 
-fahrzeug,
-ort,
-adresse,
-telefon,
-email,
-funk,
-staerke,
-beladung,
-erstelltAm: new Date().toISOString()
+            let file =
+                bild.files[0];
 
-});
+            let path =
 
-alert("Fahrzeug gespeichert");
+                "bilder/" +
 
-document.getElementById("formular").reset();
+                Date.now() +
+
+                "_" +
+
+                file.name;
+
+            let imgRef =
+                storageRef(storage,path);
+
+            await uploadBytes(
+                imgRef,
+                file
+            );
+
+            imageUrl =
+                await getDownloadURL(
+                    imgRef
+                );
+
+        }
+
+        let data = {
+
+            ort:
+                ort.value || "",
+
+            adresse:
+                adresse.value || "",
+
+            telefon:
+                telefon.value || "",
+
+            email:
+                email.value || "",
+
+            fahrzeug:
+                fahrzeug.value || "",
+
+            funk:
+                funk.value || "",
+
+            staerke:
+                staerke.value || "",
+
+            geraete:
+                geraete.value || "",
+
+            lagerort:
+                lagerort.value || "",
+
+            beladung:
+                beladung.value || "",
+
+            bemerkung:
+                bemerkung.value || "",
+
+            bild:
+                imageUrl,
+
+            erstelltAm:
+                new Date().toLocaleString()
+
+        };
+
+        if(einsatz.checked){
+
+            await push(
+                ref(db,"geraete"),
+                data
+            );
+
+        }
+
+        if(fahrzeuge.checked){
+
+            await push(
+                ref(db,"fahrzeuge"),
+                data
+            );
+
+        }
+
+        status.innerHTML =
+            "✅ Erfolgreich gespeichert";
+
+        clearForm();
+
+    }catch(e){
+
+        console.error(e);
+
+        status.innerHTML =
+            "❌ Fehler beim Speichern";
+
+    }
 
 };
 
+/* FORMULAR LEEREN */
 
-/* ORTSVORSCHLÄGE */
+function clearForm(){
+
+    [
+
+        ort,
+        adresse,
+        telefon,
+        email,
+        fahrzeug,
+        funk,
+        staerke,
+        geraete,
+        lagerort,
+        beladung,
+        bemerkung
+
+    ].forEach(f=>{
+
+        f.value = "";
+
+    });
+
+    bild.value = "";
+
+    einsatz.checked = false;
+
+    fahrzeuge.checked = false;
+
+    preview.style.display = "none";
+
+}
+
+/* ZURÜCK */
+
+window.back = function(){
+
+    window.location.href =
+        "index.html";
+
+};
+
+/* VORSCHLÄGE LADEN */
 
 async function ladeVorschlaege(){
 
-const dbRef = ref(db);
+    const dbRef = ref(db);
 
-const snapshot = await get(child(dbRef, "fahrzeuge"));
+    const snapshot =
+        await get(
+            child(dbRef,"fahrzeuge")
+        );
 
-const ortListe = document.getElementById("orte");
-const adressListe = document.getElementById("adressen");
+    const ortListe =
+        document.getElementById("orte");
 
-const orte = new Set();
-const adressen = new Set();
+    const adressListe =
+        document.getElementById("adressen");
 
-if(snapshot.exists()){
+    const orte = new Set();
 
-snapshot.forEach((child) => {
+    const adressen = new Set();
 
-const daten = child.val();
+    if(snapshot.exists()){
 
-if(daten.ort){
+        snapshot.forEach((child)=>{
 
-orte.add(daten.ort);
+            const daten =
+                child.val();
 
-}
+            if(daten.ort){
 
-if(daten.adresse){
+                orte.add(daten.ort);
 
-adressen.add(daten.adresse);
+            }
 
-}
+            if(daten.adresse){
 
-});
+                adressen.add(
+                    daten.adresse
+                );
 
-}
+            }
 
-orte.forEach((ort) => {
+        });
 
-const option = document.createElement("option");
+    }
 
-option.value = ort;
+    orte.forEach((ort)=>{
 
-ortListe.appendChild(option);
+        const option =
+            document.createElement(
+                "option"
+            );
 
-});
+        option.value = ort;
 
-adressen.forEach((adresse) => {
+        ortListe.appendChild(option);
 
-const option = document.createElement("option");
+    });
 
-option.value = adresse;
+    adressen.forEach((adresse)=>{
 
-adressListe.appendChild(option);
+        const option =
+            document.createElement(
+                "option"
+            );
 
-});
+        option.value = adresse;
+
+        adressListe.appendChild(option);
+
+    });
 
 }
 
@@ -412,70 +656,6 @@ ladeVorschlaege();
 
 </script>
 
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="topbar">
-
-<h1>Neues Fahrzeug</h1>
-
-<button class="btn-red logout-btn" onclick="logout()">
-Logout
-</button>
-
-</div>
-
-
-<div class="card">
-
-<form id="formular">
-
-<label>Fahrzeug</label>
-<input type="text" id="fahrzeug" placeholder="z.B. Hilfeleistungslöschgruppenfahrzeug (HLF) 10">
-
-
-<label>Ort</label>
-<input list="orte" id="ort" placeholder="Ort eingeben">
-<datalist id="orte"></datalist>
-
-
-<label>Adresse</label>
-<input list="adressen" id="adresse" placeholder="Straße eingeben">
-<datalist id="adressen"></datalist>
-
-
-<label>Telefonnummer</label>
-<input type="text" id="telefon" placeholder="Telefonnummer">
-
-
-<label>E-Mail Adresse</label>
-<input type="email" id="email" placeholder="mail@beispiel.de">
-
-
-<label>Funkrufname</label>
-<input type="text" id="funk" placeholder="z.B. Florian Crimmitschau 11/44/1">
-
-
-<label>Stärke</label>
-<input type="text" id="staerke" placeholder="z.B. 1/8">
-
-
-<label>Beladung</label>
-<textarea id="beladung" rows="10" placeholder="Beladung eingeben"></textarea>
-
-
-<button type="button" class="btn-green" onclick="speichern()">
-Fahrzeug speichern
-</button>
-
-</form>
-
-</div>
-
-</div>
-
 </body>
 </html>
+```
