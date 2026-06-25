@@ -323,6 +323,7 @@ import {
 getDatabase,
 ref,
 push,
+set,
 get,
 child
 
@@ -509,19 +510,19 @@ new Date().toLocaleString()
 
 if(document.getElementById("einsatz").checked){
 
-await push(
-ref(db,"geraete"),
-data
-);
+const newRef =
+push(ref(db,"geraete"));
+
+await set(newRef,data);
 
 }
 
 if(document.getElementById("fahrzeuge").checked){
 
-await push(
-ref(db,"fahrzeuge"),
-data
-);
+const newRef =
+push(ref(db,"fahrzeuge"));
+
+await set(newRef,data);
 
 }
 
