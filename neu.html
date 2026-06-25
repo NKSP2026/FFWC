@@ -1,160 +1,661 @@
+```html
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Neu Anlegen</title>
 
+<link rel="stylesheet" href="style.css">
+
 <style>
-body {
-    margin: 0;
-    font-family: "Segoe UI";
-    background: #0f1117;
-    color: white;
+
+.page{
+    max-width:1100px;
+    margin:40px auto;
+    background:#1c1f26;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.4);
 }
 
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-    background: #1c1f26;
-    padding: 30px;
-    border-radius: 15px;
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+    gap:20px;
+    flex-wrap:wrap;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+.topbar h1{
+    margin:0;
+    color:white;
 }
 
-input, textarea {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    background: #111318;
-    color: white;
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
 }
 
-.full {
-    grid-column: span 2;
+input,
+textarea{
+    width:100%;
+    box-sizing:border-box;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#111318;
+    color:white;
+    font-size:15px;
+    outline:none;
 }
 
-button {
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
+textarea{
+    min-height:120px;
+    resize:vertical;
 }
 
-.save { background:#3b82f6; }
-.cancel { background:#ef4444; }
-
-.bottom {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
+input::placeholder,
+textarea::placeholder{
+    color:#9ca3af;
 }
+
+.full{
+    grid-column:span 2;
+}
+
+.previewBox{
+    margin-top:10px;
+    text-align:center;
+}
+
+#preview{
+    max-width:100%;
+    max-height:260px;
+    border-radius:12px;
+    display:none;
+}
+
+.bottom{
+    margin-top:30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.types{
+    display:flex;
+    gap:25px;
+    flex-wrap:wrap;
+}
+
+.types label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:white;
+}
+
+.buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+button{
+    padding:14px 20px;
+    border:none;
+    border-radius:12px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+.save{
+    background:#2563eb;
+}
+
+.save:hover{
+    background:#1d4ed8;
+}
+
+.back{
+    background:#6b7280;
+}
+
+.back:hover{
+    background:#4b5563;
+}
+
+.logout{
+    background:#dc2626;
+}
+
+.logout:hover{
+    background:#b91c1c;
+}
+
+.status{
+    margin-top:20px;
+    font-weight:bold;
+    text-align:center;
+    color:#10b981;
+}
+
+@media(max-width:850px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:span 1;
+    }
+
+    .bottom{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
 
-<h2>Neu Anlegen</h2>
+<div class="topbar">
+
+    <h1>Neu Anlegen</h1>
+
+    <button
+    class="logout"
+    onclick="logout()">
+
+        Logout
+
+    </button>
+
+</div>
 
 <div class="grid">
 
-<input id="ort" placeholder="Ort">
-<input id="adresse" placeholder="Adresse">
+<input
+id="ort"
+list="orte"
+placeholder="Ort">
 
-<input id="telefon" placeholder="Telefon">
-<input id="fahrzeug" placeholder="Fahrzeug">
+<datalist id="orte"></datalist>
 
-<input id="funk" placeholder="Funkkenner">
-<input id="staerke" placeholder="Stärke">
+<input
+id="adresse"
+list="adressen"
+placeholder="Adresse">
 
-<input id="geraete" placeholder="Gerät">
-<input id="lagerort" placeholder="Lagerort (z.B. HLF G3 / Regal A)">
+<datalist id="adressen"></datalist>
 
-<textarea id="beladung" class="full" placeholder="Beladung (wichtig für Suche!)"></textarea>
-<textarea id="bemerkung" class="full" placeholder="Bemerkung (Zusatzinformation!)"></textarea>
+<input
+id="telefon"
+placeholder="Telefonnummer">
 
-<input type="file" id="bild" class="full">
-<img id="preview" style="max-height:120px">
+<input
+id="email"
+type="email"
+placeholder="E-Mail Adresse">
+
+<input
+id="fahrzeug"
+placeholder="Fahrzeug">
+
+<input
+id="funk"
+placeholder="Funkkenner">
+
+<input
+id="staerke"
+placeholder="Stärke">
+
+<input
+id="geraete"
+placeholder="Gerät">
+
+<input
+id="lagerort"
+placeholder="Lagerort (z.B. HLF G3 / Regal A)">
+
+<textarea
+id="beladung"
+class="full"
+placeholder="Beladung / wichtige Suchbegriffe">
+</textarea>
+
+<textarea
+id="bemerkung"
+class="full"
+placeholder="Bemerkung / Zusatzinformationen">
+</textarea>
+
+<input
+type="file"
+id="bild"
+class="full"
+accept="image/*">
+
+<div class="previewBox full">
+
+    <img id="preview">
+
+</div>
 
 </div>
 
 <div class="bottom">
 
-<div>
-<label><input type="checkbox" id="einsatz"> Geräte</label><br>
-<label><input type="checkbox" id="fahrzeuge"> Fahrzeuge</label>
+<div class="types">
+
+<label>
+<input type="checkbox" id="einsatz">
+Geräte
+</label>
+
+<label>
+<input type="checkbox" id="fahrzeuge">
+Fahrzeuge
+</label>
+
 </div>
 
-<div>
-<button class="save" onclick="save()">Speichern</button>
-<button class="cancel" onclick="back()">Abbrechen</button>
+<div class="buttons">
+
+<button
+class="save"
+onclick="save()">
+
+    Speichern
+
+</button>
+
+<button
+class="back"
+onclick="back()">
+
+    Zurück
+
+</button>
+
 </div>
 
 </div>
+
+<div id="status" class="status"></div>
 
 </div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import {
+initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-const app = initializeApp({
-  apiKey: "AIzaSy...",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
-});
+import {
+
+getDatabase,
+ref,
+push,
+set,
+get,
+child
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import {
+
+getAuth,
+onAuthStateChanged,
+signOut
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+
+getStorage,
+ref as storageRef,
+uploadBytes,
+getDownloadURL
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
+
+  authDomain: "ffwc-d3994.firebaseapp.com",
+
+  databaseURL:
+  "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+
+  projectId: "ffwc-d3994",
+
+  storageBucket: "ffwc-d3994.firebasestorage.app",
+
+  messagingSenderId: "591233232022",
+
+  appId:
+  "1:591233232022:web:66ce4e0349d426e94ae6b7",
+
+  measurementId: "G-BG75M1KXHL"
+
+};
+
+const app = initializeApp(firebaseConfig);
 
 const db = getDatabase(app);
+
+const auth = getAuth(app);
+
 const storage = getStorage(app);
 
-bild.onchange = e=>{
-    preview.src = URL.createObjectURL(e.target.files[0]);
+/* LOGIN */
+
+onAuthStateChanged(auth, (user)=>{
+
+    if(!user){
+
+        window.location.href =
+            "login.html";
+
+    }
+
+});
+
+/* LOGOUT */
+
+window.logout = async function(){
+
+    await signOut(auth);
+
+    window.location.href =
+        "login.html";
+
 };
+
+/* BILD VORSCHAU */
+
+bild.onchange = e=>{
+
+    let file =
+        e.target.files[0];
+
+    if(!file) return;
+
+    preview.src =
+        URL.createObjectURL(file);
+
+    preview.style.display =
+        "block";
+
+};
+
+/* SPEICHERN */
 
 window.save = async function(){
 
-    let img="";
-    if(bild.files[0]){
-        let r = sRef(storage,"bilder/"+Date.now());
-        await uploadBytes(r,bild.files[0]);
-        img = await getDownloadURL(r);
+    try{
+
+        status.innerHTML =
+            "Speichere...";
+
+        let imageUrl = "";
+
+        /* Bild Upload */
+
+        if(bild.files[0]){
+
+            status.innerHTML =
+                "Bild wird hochgeladen...";
+
+            let file =
+                bild.files[0];
+
+            let path =
+
+                "bilder/" +
+
+                Date.now() +
+
+                "_" +
+
+                file.name;
+
+            let imgRef =
+                storageRef(storage,path);
+
+            await uploadBytes(
+                imgRef,
+                file
+            );
+
+            imageUrl =
+                await getDownloadURL(
+                    imgRef
+                );
+
+        }
+
+        let data = {
+
+            ort:
+                ort.value || "",
+
+            adresse:
+                adresse.value || "",
+
+            telefon:
+                telefon.value || "",
+
+            email:
+                email.value || "",
+
+            fahrzeug:
+                fahrzeug.value || "",
+
+            funk:
+                funk.value || "",
+
+            staerke:
+                staerke.value || "",
+
+            geraete:
+                geraete.value || "",
+
+            lagerort:
+                lagerort.value || "",
+
+            beladung:
+                beladung.value || "",
+
+            bemerkung:
+                bemerkung.value || "",
+
+            bild:
+                imageUrl,
+
+            erstelltAm:
+                new Date().toLocaleString()
+
+        };
+
+        if(einsatz.checked){
+
+            await push(
+                ref(db,"geraete"),
+                data
+            );
+
+        }
+
+        if(fahrzeuge.checked){
+
+            await push(
+                ref(db,"fahrzeuge"),
+                data
+            );
+
+        }
+
+        status.innerHTML =
+            "✅ Erfolgreich gespeichert";
+
+        clearForm();
+
+    }catch(e){
+
+        console.error(e);
+
+        status.innerHTML =
+            "❌ Fehler beim Speichern";
+
     }
 
-    let data = {
-        ort: ort.value,
-        adresse: adresse.value,
-        telefon: telefon.value,
-        fahrzeug: fahrzeug.value,
-        funk: funk.value,
-        staerke: staerke.value,
-        geraete: geraete.value,
-        lagerort: lagerort.value,
-        beladung: beladung.value,
-        bild: img
-    };
-
-    if(einsatz.checked){
-        push(ref(db,"geraete"), data);
-    }
-
-    if(fahrzeuge.checked){
-        push(ref(db,"fahrzeuge"), data);
-    }
-
-    alert("Gespeichert!");
 };
 
-window.back = ()=> location.href="index.html";
+/* FORMULAR LEEREN */
+
+function clearForm(){
+
+    [
+
+        ort,
+        adresse,
+        telefon,
+        email,
+        fahrzeug,
+        funk,
+        staerke,
+        geraete,
+        lagerort,
+        beladung,
+        bemerkung
+
+    ].forEach(f=>{
+
+        f.value = "";
+
+    });
+
+    bild.value = "";
+
+    einsatz.checked = false;
+
+    fahrzeuge.checked = false;
+
+    preview.style.display = "none";
+
+}
+
+/* ZURÜCK */
+
+window.back = function(){
+
+    window.location.href =
+        "index.html";
+
+};
+
+/* VORSCHLÄGE LADEN */
+
+async function ladeVorschlaege(){
+
+    const dbRef = ref(db);
+
+    const snapshot =
+        await get(
+            child(dbRef,"fahrzeuge")
+        );
+
+    const ortListe =
+        document.getElementById("orte");
+
+    const adressListe =
+        document.getElementById("adressen");
+
+    const orte = new Set();
+
+    const adressen = new Set();
+
+    if(snapshot.exists()){
+
+        snapshot.forEach((child)=>{
+
+            const daten =
+                child.val();
+
+            if(daten.ort){
+
+                orte.add(daten.ort);
+
+            }
+
+            if(daten.adresse){
+
+                adressen.add(
+                    daten.adresse
+                );
+
+            }
+
+        });
+
+    }
+
+    orte.forEach((ort)=>{
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = ort;
+
+        ortListe.appendChild(option);
+
+    });
+
+    adressen.forEach((adresse)=>{
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value = adresse;
+
+        adressListe.appendChild(option);
+
+    });
+
+}
+
+ladeVorschlaege();
 
 </script>
 
 </body>
 </html>
+```
