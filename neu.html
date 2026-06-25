@@ -1,630 +1,160 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Neu Anlegen</title>
 
-<link rel="stylesheet" href="style.css">
-
 <style>
-
-.container{
-    max-width:1000px;
-    margin:40px auto;
-    background:#1c1f26;
-    padding:30px;
-    border-radius:20px;
+body {
+    margin: 0;
+    font-family: "Segoe UI";
+    background: #0f1117;
+    color: white;
 }
 
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:30px;
-    gap:20px;
-    flex-wrap:wrap;
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #1c1f26;
+    padding: 30px;
+    border-radius: 15px;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
-input,
-textarea{
-    width:100%;
-    box-sizing:border-box;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    background:#111318;
-    color:white;
-    font-size:15px;
+input, textarea {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #111318;
+    color: white;
 }
 
-textarea{
-    min-height:140px;
-    resize:vertical;
+.full {
+    grid-column: span 2;
 }
 
-.full{
-    grid-column:span 2;
+button {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.bottom{
-    margin-top:25px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-    flex-wrap:wrap;
+.save { background:#3b82f6; }
+.cancel { background:#ef4444; }
+
+.bottom {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
 }
-
-.buttons{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-button{
-    padding:14px 20px;
-    border:none;
-    border-radius:12px;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.save{
-    background:#2563eb;
-}
-
-.back{
-    background:#6b7280;
-}
-
-.logout{
-    background:#dc2626;
-}
-
-#preview{
-    max-height:160px;
-    border-radius:12px;
-    margin-top:10px;
-    display:none;
-}
-
-.status{
-    margin-top:20px;
-    text-align:center;
-    font-weight:bold;
-}
-
-@media(max-width:850px){
-
-    .grid{
-        grid-template-columns:1fr;
-    }
-
-    .full{
-        grid-column:span 1;
-    }
-
-}
-
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-<div class="topbar">
-
 <h2>Neu Anlegen</h2>
-
-<button
-class="logout"
-onclick="logout()">
-
-Logout
-
-</button>
-
-</div>
 
 <div class="grid">
 
-<input
-id="ort"
-list="orte"
-placeholder="Ort">
+<input id="ort" placeholder="Ort">
+<input id="adresse" placeholder="Adresse">
 
-<datalist id="orte"></datalist>
+<input id="telefon" placeholder="Telefon">
+<input id="fahrzeug" placeholder="Fahrzeug">
 
-<input
-id="adresse"
-list="adressen"
-placeholder="Adresse">
+<input id="funk" placeholder="Funkkenner">
+<input id="staerke" placeholder="Stärke">
 
-<datalist id="adressen"></datalist>
+<input id="geraete" placeholder="Gerät">
+<input id="lagerort" placeholder="Lagerort (z.B. HLF G3 / Regal A)">
 
-<input
-id="telefon"
-list="telefone"
-placeholder="Telefon">
+<textarea id="beladung" class="full" placeholder="Beladung (wichtig für Suche!)"></textarea>
+<textarea id="bemerkung" class="full" placeholder="Bemerkung (Zusatzinformation!)"></textarea>
 
-<datalist id="telefone"></datalist>
-
-<input
-id="email"
-list="emails"
-type="email"
-placeholder="E-Mail Adresse">
-
-<datalist id="emails"></datalist>
-
-<input
-id="fahrzeug"
-placeholder="Fahrzeug">
-
-<input
-id="funk"
-list="funkliste"
-placeholder="Funkkenner">
-
-<datalist id="funkliste"></datalist>
-
-<input
-id="staerke"
-placeholder="Stärke">
-
-<input
-id="geraete"
-placeholder="Gerät">
-
-<input
-id="lagerort"
-list="lagerliste"
-placeholder="Lagerort">
-
-<datalist id="lagerliste"></datalist>
-
-<textarea
-id="beladung"
-class="full"
-placeholder="Beladung (wichtig für Suche!)">
-</textarea>
-
-<textarea
-id="bemerkung"
-class="full"
-placeholder="Bemerkung">
-</textarea>
-
-<input
-type="file"
-id="bild"
-class="full"
-accept="image/*">
-
-<div class="full">
-
-<img id="preview">
-
-</div>
+<input type="file" id="bild" class="full">
+<img id="preview" style="max-height:120px">
 
 </div>
 
 <div class="bottom">
 
 <div>
-
-<label>
-<input type="checkbox" id="einsatz">
-Geräte
-</label>
-
-<br><br>
-
-<label>
-<input type="checkbox" id="fahrzeuge">
-Fahrzeuge
-</label>
-
+<label><input type="checkbox" id="einsatz"> Geräte</label><br>
+<label><input type="checkbox" id="fahrzeuge"> Fahrzeuge</label>
 </div>
 
-<div class="buttons">
-
-<button
-class="save"
-onclick="save()">
-
-Speichern
-
-</button>
-
-<button
-class="back"
-onclick="back()">
-
-Zurück
-
-</button>
-
+<div>
+<button class="save" onclick="save()">Speichern</button>
+<button class="cancel" onclick="back()">Abbrechen</button>
 </div>
 
 </div>
-
-<div id="status" class="status"></div>
 
 </div>
 
 <script type="module">
 
-import {
-initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-
-import {
-
-getDatabase,
-ref,
-push,
-set,
-get,
-child
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-import {
-
-getStorage,
-ref as sRef,
-uploadBytes,
-getDownloadURL
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-import {
-
-getAuth,
-signOut
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-/* FIREBASE */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const app = initializeApp({
-
-apiKey:
-"AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
-
-authDomain:
-"ffwc-d3994.firebaseapp.com",
-
-databaseURL:
-"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
-
-projectId:
-"ffwc-d3994",
-
-storageBucket:
-"ffwc-d3994.firebasestorage.app",
-
-messagingSenderId:
-"591233232022",
-
-appId:
-"1:591233232022:web:66ce4e0349d426e94ae6b7"
-
+  apiKey: "AIzaSy...",
+  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
 });
 
 const db = getDatabase(app);
-
 const storage = getStorage(app);
 
-const auth = getAuth(app);
-
-/* LOGOUT */
-
-window.logout = async function(){
-
-await signOut(auth);
-
-location.href = "login.html";
-
-};
-
-/* BILD VORSCHAU */
-
-const bild =
-document.getElementById("bild");
-
-const preview =
-document.getElementById("preview");
-
 bild.onchange = e=>{
-
-if(!e.target.files[0]) return;
-
-preview.src =
-URL.createObjectURL(
-e.target.files[0]
-);
-
-preview.style.display =
-"block";
-
+    preview.src = URL.createObjectURL(e.target.files[0]);
 };
-
-/* SPEICHERN */
 
 window.save = async function(){
 
-try{
+    let img="";
+    if(bild.files[0]){
+        let r = sRef(storage,"bilder/"+Date.now());
+        await uploadBytes(r,bild.files[0]);
+        img = await getDownloadURL(r);
+    }
 
-status.innerHTML = "Speichere...";
+    let data = {
+        ort: ort.value,
+        adresse: adresse.value,
+        telefon: telefon.value,
+        fahrzeug: fahrzeug.value,
+        funk: funk.value,
+        staerke: staerke.value,
+        geraete: geraete.value,
+        lagerort: lagerort.value,
+        beladung: beladung.value,
+        bild: img
+    };
 
-let img = "";
+    if(einsatz.checked){
+        push(ref(db,"geraete"), data);
+    }
 
-if(bild.files[0]){
+    if(fahrzeuge.checked){
+        push(ref(db,"fahrzeuge"), data);
+    }
 
-let r = sRef(
-storage,
-"bilder/" + Date.now()
-);
-
-await uploadBytes(
-r,
-bild.files[0]
-);
-
-img =
-await getDownloadURL(r);
-
-}
-
-let data = {
-
-ort: ort.value || "",
-
-adresse: adresse.value || "",
-
-telefon: telefon.value || "",
-
-email: email.value || "",
-
-fahrzeug: fahrzeug.value || "",
-
-funk: funk.value || "",
-
-staerke: staerke.value || "",
-
-geraete: geraete.value || "",
-
-lagerort: lagerort.value || "",
-
-beladung: beladung.value || "",
-
-bemerkung: bemerkung.value || "",
-
-bild: img || "",
-
-erstelltAm:
-new Date().toISOString()
-
+    alert("Gespeichert!");
 };
 
-/* GERÄTE */
-
-if(einsatz.checked){
-
-const neueGeraeteRef =
-push(ref(db,"geraete"));
-
-await set(
-neueGeraeteRef,
-data
-);
-
-}
-
-/* FAHRZEUGE */
-
-if(fahrzeuge.checked){
-
-const neueFahrzeugRef =
-push(ref(db,"fahrzeuge"));
-
-await set(
-neueFahrzeugRef,
-data
-);
-
-}
-
-status.innerHTML =
-"✅ Erfolgreich gespeichert";
-
-alert("Gespeichert!");
-
-}catch(error){
-
-console.error(error);
-
-alert(
-"Fehler: " + error.message
-);
-
-status.innerHTML =
-"❌ Fehler beim Speichern";
-
-}
-
-};
-
-/* LEEREN */
-
-[
-ort,
-adresse,
-telefon,
-email,
-fahrzeug,
-funk,
-staerke,
-geraete,
-lagerort,
-beladung,
-bemerkung
-
-].forEach(x=>{
-
-x.value = "";
-
-});
-
-bild.value = "";
-
-preview.style.display =
-"none";
-
-einsatz.checked = false;
-
-fahrzeuge.checked = false;
-
-};
-
-/* ZURÜCK */
-
-window.back = ()=>{
-
-location.href =
-"index.html";
-
-};
-
-/* VORSCHLÄGE */
-
-async function ladeVorschlaege(){
-
-const dbRef = ref(db);
-
-const snapshot =
-await get(
-child(dbRef,"fahrzeuge")
-);
-
-if(!snapshot.exists()) return;
-
-const ortSet = new Set();
-
-const adrSet = new Set();
-
-const telSet = new Set();
-
-const mailSet = new Set();
-
-const funkSet = new Set();
-
-const lagerSet = new Set();
-
-snapshot.forEach((c)=>{
-
-const d = c.val();
-
-if(d.ort){
-
-ortSet.add(d.ort);
-
-}
-
-if(d.adresse){
-
-adrSet.add(d.adresse);
-
-}
-
-if(d.telefon){
-
-telSet.add(d.telefon);
-
-}
-
-if(d.email){
-
-mailSet.add(d.email);
-
-}
-
-if(d.funk){
-
-funkSet.add(d.funk);
-
-}
-
-if(d.lagerort){
-
-lagerSet.add(d.lagerort);
-
-}
-
-});
-
-ortSet.forEach(o=>{
-
-orte.innerHTML +=
-`<option value="${o}">`;
-
-});
-
-adrSet.forEach(a=>{
-
-adressen.innerHTML +=
-`<option value="${a}">`;
-
-});
-
-telSet.forEach(t=>{
-
-telefone.innerHTML +=
-`<option value="${t}">`;
-
-});
-
-mailSet.forEach(m=>{
-
-emails.innerHTML +=
-`<option value="${m}">`;
-
-});
-
-funkSet.forEach(f=>{
-
-funkliste.innerHTML +=
-`<option value="${f}">`;
-
-});
-
-lagerSet.forEach(l=>{
-
-lagerliste.innerHTML +=
-`<option value="${l}">`;
-
-});
-
-}
-
-ladeVorschlaege();
+window.back = ()=> location.href="index.html";
 
 </script>
 
 </body>
 </html>
-
