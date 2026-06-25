@@ -385,6 +385,22 @@ window.doSearch = function(){
                 <div class="line">
                     <b>Telefon:</b>
 
+                <div class="line">
+                    <b>E-Mail:</b>
+                    
+                    ${
+                        f.email
+                        ? `
+                        <a
+                        class="phone"
+                        href="mailto:${f.email}">
+                            ${f.email}
+                        </a>
+                        `
+                        : "-"
+                     }
+                 </div>
+
                     ${
                         f.telefon
                         ? `
