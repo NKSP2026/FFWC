@@ -8,7 +8,8 @@ import {
     update,
     remove,
     onValue,
-    get
+    get,
+    child
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 import {
@@ -160,6 +161,7 @@ window.update = update;
 window.remove = remove;
 window.onValue = onValue;
 window.get = get;
+window.child = child;
 
 /* Storage */
 window.storageRef = storageRef;
