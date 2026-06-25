@@ -171,21 +171,31 @@ button:hover{
 
     <div class="box">
 
-        <label>Ort</label>
+    <label>Ort</label>
 
-        <select id="ort" onchange="nextStep()">
-        </select>
+    <input
+    id="ort"
+    list="ortListe"
+    placeholder="Ort wählen"
+    onchange="nextStep()">
 
-    </div>
+    <datalist id="ortListe"></datalist>
 
-    <div class="box" id="lagerBox">
+</div>
 
-        <label>Lagerort</label>
+   <div class="box" id="lagerBox">
 
-        <select id="lager" onchange="loadItems()">
-        </select>
+    <label>Lagerort</label>
 
-    </div>
+    <input
+    id="lager"
+    list="lagerListe"
+    placeholder="Lagerort wählen"
+    onchange="loadItems()">
+
+    <datalist id="lagerListe"></datalist>
+
+</div>
 
 </div>
 
@@ -252,22 +262,21 @@ window.loadData = function(){
 
         });
 
-        ort.innerHTML =
-            "<option value=''>Ort wählen</option>";
+        ortListe.innerHTML = "";
 
         [...orte]
-        .sort()
-        .forEach(o=>{
+.sort()
+.forEach(o=>{
 
-            ort.innerHTML += `
-                <option>${o}</option>
-            `;
+    ortListe.innerHTML += `
+        <option value="${o}">
+    `;
 
-        });
+});
 
         liste.innerHTML = "";
 
-        lager.innerHTML = "";
+        lagerListe.innerHTML = "";
 
         status.innerHTML =
             "✅ Daten geladen";
@@ -319,14 +328,14 @@ window.loadLagerorte = function(){
         "<option value=''>Lagerort wählen</option>";
 
     [...set]
-    .sort()
-    .forEach(l=>{
+.sort()
+.forEach(l=>{
 
-        lager.innerHTML += `
-            <option>${l}</option>
-        `;
+    lagerListe.innerHTML += `
+        <option value="${l}">
+    `;
 
-    });
+});
 
 };
 
