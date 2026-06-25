@@ -1,226 +1,232 @@
-body{
+*{
     margin:0;
-    font-family:Arial,sans-serif;
-    overflow:hidden;
-    background:black;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
-/* Hauptbereich */
-.container{
-    position:relative;
-    width:100vw;
-    height:100vh;
-    overflow:hidden;
-}
-
-/* Hintergrund */
-.background{
-    position:absolute;
-    inset:0;
-
-    background-image:url("feuerwehr.jpg");
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-
-    filter:brightness(0.55);
-
-    z-index:1;
-}
-
-/* dunkler Overlay */
-.background::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.25);
-}
-
-/* Titel */
-.title{
-    position:absolute;
-    top:10%;
-    left:5%;
-
-    color:#ff6b6b;
-
-    font-size:clamp(32px,4vw,80px);
-    font-weight:bold;
-    line-height:1.1;
-
-    z-index:3;
-
-    text-shadow:
-        0 0 10px rgba(255,0,0,0.5),
-        0 0 20px rgba(255,0,0,0.3);
-}
-
-/* Wappen */
-.wappen{
-    position:absolute;
-    top:3%;
-    right:4%;
-
-    width:16vw;
-    max-width:260px;
-    min-width:110px;
-
-    z-index:3;
-}
-
-/* Menü */
-.menu{
-    position:absolute;
-
-    right:4%;
-    top:35%;
-
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-
-    width:26vw;
-    max-width:320px;
-    min-width:220px;
-
-    z-index:3;
-}
-
-/* Buttons */
-.menu button{
-    padding:18px;
-
-    border:none;
-    border-radius:16px;
-
-    font-size:clamp(16px,1vw,24px);
-    font-weight:bold;
-
+body{
+    background:#050816;
     color:white;
-
-    cursor:pointer;
-
-    transition:0.2s;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #9dc2db 0%,
-            #6d92ad 50%,
-            #48657d 100%
-        );
-
-    box-shadow:
-        inset 0 2px 3px rgba(255,255,255,0.5),
-        inset 0 -4px 6px rgba(0,0,0,0.5),
-        0 6px 12px rgba(0,0,0,0.5);
+    overflow-y:auto;
+    min-height:100vh;
 }
 
-/* Hover */
-.menu button:hover{
+/* SCROLLEN */
+html{
+    scroll-behavior:smooth;
+}
+
+::-webkit-scrollbar{
+    width:10px;
+}
+
+::-webkit-scrollbar-track{
+    background:#111827;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#2563eb;
+    border-radius:10px;
+}
+
+/* CONTAINER */
+.container{
+    width:95%;
+    max-width:1400px;
+    margin:30px auto;
+    background:#111827;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 0 30px rgba(0,0,0,0.4);
+}
+
+/* TITEL */
+h1,h2,h3,h4{
+    color:white;
+    margin-bottom:15px;
+}
+
+/* TEXT */
+p,
+label,
+span,
+td,
+th{
+    color:white;
+}
+
+/* INPUTS */
+input,
+textarea,
+select{
+    width:100%;
+    padding:14px;
+    margin-top:8px;
+    margin-bottom:18px;
+    border:none;
+    border-radius:10px;
+    background:#060b16;
+    color:white;
+    font-size:15px;
+    outline:none;
+}
+
+input::placeholder,
+textarea::placeholder{
+    color:#9ca3af;
+}
+
+/* BUTTONS */
+button{
+    border:none;
+    border-radius:10px;
+    padding:12px 20px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.2s;
+    color:white;
+}
+
+button:hover{
     transform:translateY(-2px);
 }
 
-/* Klick */
-.menu button:active{
-    transform:translateY(2px);
-
-    box-shadow:
-        inset 0 4px 6px rgba(0,0,0,0.6),
-        0 2px 4px rgba(0,0,0,0.4);
+/* BUTTON FARBEN */
+.btn-blue{
+    background:#2563eb;
 }
 
-/* Löschen */
-.menu .delete{
-    background:
-        linear-gradient(
-            to bottom,
-            #ff7b7b 0%,
-            #ff0000 45%,
-            #a00000 100%
-        );
+.btn-blue:hover{
+    background:#1d4ed8;
 }
 
-/* Logout */
-.menu .logout{
-    margin-top:25px;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #80889b 0%,
-            #586276 45%,
-            #3f4757 100%
-        );
+.btn-gray{
+    background:#4b5563;
 }
 
-/* ================================= */
-/* TABLET + HANDY */
-/* ================================= */
-
-@media(max-width:1000px){
-
-    .container{
-        height:100dvh;
-    }
-
-    .background{
-        background-position:center;
-    }
-
-    .title{
-        top:7%;
-        left:5%;
-        right:5%;
-
-        font-size:clamp(28px,7vw,55px);
-
-        width:90%;
-    }
-
-    .wappen{
-        width:22vw;
-        top:2%;
-        right:4%;
-    }
-
-    .menu{
-        left:50%;
-        transform:translateX(-50%);
-
-        top:auto;
-        bottom:4%;
-
-        width:90%;
-        max-width:none;
-        min-width:unset;
-    }
-
-    .menu button{
-        padding:16px;
-        font-size:20px;
-    }
+.btn-gray:hover{
+    background:#374151;
 }
 
-/* kleine Handys */
-@media(max-width:600px){
+.btn-orange{
+    background:#f59e0b;
+}
 
-    .title{
-        top:6%;
-        font-size:clamp(24px,8vw,42px);
+.btn-orange:hover{
+    background:#d97706;
+}
+
+.btn-red{
+    background:#dc2626;
+}
+
+.btn-red:hover{
+    background:#b91c1c;
+}
+
+.btn-green{
+    background:#16a34a;
+}
+
+.btn-green:hover{
+    background:#15803d;
+}
+
+/* GRID */
+.grid{
+    display:grid;
+    gap:20px;
+}
+
+.grid-2{
+    grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+}
+
+.grid-3{
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+}
+
+/* KARTEN */
+.card{
+    background:#0b1220;
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
+    overflow:hidden;
+}
+
+.card *{
+    color:white;
+}
+
+/* EMAIL */
+.email{
+    color:#60a5fa !important;
+}
+
+/* TELEFON */
+.telefon{
+    color:#34d399 !important;
+}
+
+/* TABELLEN */
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+table th{
+    background:#1f2937;
+    padding:12px;
+    text-align:left;
+}
+
+table td{
+    background:#111827;
+    padding:12px;
+    border-bottom:1px solid #1f2937;
+}
+
+/* SUCHLISTE */
+.liste{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.liste button{
+    width:100%;
+    text-align:left;
+    background:#0b1220;
+}
+
+/* NAVBAR */
+.topbar{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.logout-btn{
+    background:#dc2626;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+
+    .grid-2,
+    .grid-3{
+        grid-template-columns:1fr;
     }
 
-    .wappen{
-        width:28vw;
+    .topbar{
+        flex-direction:column;
+        gap:15px;
+        align-items:flex-start;
     }
 
-    .menu{
-        gap:10px;
-    }
-
-    .menu button{
-        padding:14px;
-        font-size:18px;
-        border-radius:14px;
-    }
 }
