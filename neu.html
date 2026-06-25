@@ -1,391 +1,244 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Neu Anlegen</title>
+<title>Neues Fahrzeug</title>
 
 <link rel="stylesheet" href="style.css">
 
-<style>
+<script type="module">
 
-.page{
-    max-width:1000px;
-    margin:40px auto;
-    background:#1c1f26;
-    padding:30px;
-    border-radius:20px;
-    box-shadow:0 0 20px rgba(0,0,0,0.4);
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getDatabase,
+ref,
+push,
+set,
+get,
+child
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-h2{
-    margin-top:0;
-    margin-bottom:30px;
-    text-align:center;
-}
+import {
+getAuth,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-}
 
-input,
-textarea{
-    width:100%;
-    box-sizing:border-box;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    background:#111318;
-    color:white;
-    font-size:15px;
-}
+const firebaseConfig = {
 
-textarea{
-    min-height:120px;
-    resize:vertical;
-}
+apiKey: "DEIN_API_KEY",
+authDomain: "DEIN_PROJECT.firebaseapp.com",
+databaseURL: "https://DEIN_PROJECT-default-rtdb.europe-west1.firebasedatabase.app",
+projectId: "DEIN_PROJECT",
+storageBucket: "DEIN_PROJECT.appspot.com",
+messagingSenderId: "XXXXXXXX",
+appId: "XXXXXXXX"
 
-.full{
-    grid-column:span 2;
-}
+};
 
-.previewBox{
-    margin-top:10px;
-    text-align:center;
-}
+const app = initializeApp(firebaseConfig);
 
-#preview{
-    max-width:100%;
-    max-height:250px;
-    border-radius:12px;
-    display:none;
-}
+const db = getDatabase(app);
 
-.bottom{
-    margin-top:30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-    flex-wrap:wrap;
-}
+const auth = getAuth(app);
 
-.types{
-    display:flex;
-    gap:25px;
-    flex-wrap:wrap;
-}
 
-.types label{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
+/* LOGIN PRÜFUNG */
 
-.buttons{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
+onAuthStateChanged(auth, (user) => {
 
-button{
-    padding:14px 20px;
-    border:none;
-    border-radius:12px;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.2s;
-}
+if(!user){
 
-button:hover{
-    transform:translateY(-2px);
-}
-
-.save{
-    background:#2563eb;
-}
-
-.cancel{
-    background:#ef4444;
-}
-
-.logout{
-    background:#f59e0b;
-}
-
-.status{
-    margin-top:20px;
-    font-weight:bold;
-    text-align:center;
-}
-
-@media(max-width:800px){
-
-    .grid{
-        grid-template-columns:1fr;
-    }
-
-    .full{
-        grid-column:span 1;
-    }
-
-    .bottom{
-        flex-direction:column;
-        align-items:flex-start;
-    }
+window.location.href = "login.html";
 
 }
 
-</style>
+});
+
+
+/* LOGOUT */
+
+window.logout = async function(){
+
+await signOut(auth);
+
+window.location.href = "login.html";
+
+};
+
+
+/* SPEICHERN */
+
+window.speichern = async function(){
+
+const fahrzeug = document.getElementById("fahrzeug").value;
+const ort = document.getElementById("ort").value;
+const adresse = document.getElementById("adresse").value;
+const telefon = document.getElementById("telefon").value;
+const email = document.getElementById("email").value;
+const funk = document.getElementById("funk").value;
+const staerke = document.getElementById("staerke").value;
+const beladung = document.getElementById("beladung").value;
+
+if(fahrzeug === ""){
+
+alert("Bitte Fahrzeug eingeben");
+return;
+
+}
+
+const neueRef = push(ref(db, "fahrzeuge"));
+
+await set(neueRef, {
+
+fahrzeug,
+ort,
+adresse,
+telefon,
+email,
+funk,
+staerke,
+beladung,
+erstelltAm: new Date().toISOString()
+
+});
+
+alert("Fahrzeug gespeichert");
+
+document.getElementById("formular").reset();
+
+};
+
+
+/* ORTSVORSCHLÄGE */
+
+async function ladeVorschlaege(){
+
+const dbRef = ref(db);
+
+const snapshot = await get(child(dbRef, "fahrzeuge"));
+
+const ortListe = document.getElementById("orte");
+const adressListe = document.getElementById("adressen");
+
+const orte = new Set();
+const adressen = new Set();
+
+if(snapshot.exists()){
+
+snapshot.forEach((child) => {
+
+const daten = child.val();
+
+if(daten.ort){
+
+orte.add(daten.ort);
+
+}
+
+if(daten.adresse){
+
+adressen.add(daten.adresse);
+
+}
+
+});
+
+}
+
+orte.forEach((ort) => {
+
+const option = document.createElement("option");
+
+option.value = ort;
+
+ortListe.appendChild(option);
+
+});
+
+adressen.forEach((adresse) => {
+
+const option = document.createElement("option");
+
+option.value = adresse;
+
+adressListe.appendChild(option);
+
+});
+
+}
+
+ladeVorschlaege();
+
+</script>
 
 </head>
 
 <body>
 
-<div class="page">
+<div class="container">
 
-<h2>Neu Anlegen</h2>
+<div class="topbar">
 
-<div class="grid">
+<h1>Neues Fahrzeug</h1>
 
-<input id="ort" placeholder="Ort">
-
-<input id="adresse" placeholder="Adresse">
-
-<input id="telefon" placeholder="Telefon">
-
-<input id="fahrzeug" placeholder="Fahrzeug">
-
-<input id="funk" placeholder="Funkkenner">
-
-<input id="staerke" placeholder="Stärke">
-
-<input id="geraete" placeholder="Gerät">
-
-<input id="lagerort" placeholder="Lagerort (z.B. HLF G3 / Regal A)">
-
-<textarea
-id="beladung"
-class="full"
-placeholder="Beladung (für Suche wichtig)">
-</textarea>
-
-<textarea
-id="bemerkung"
-class="full"
-placeholder="Bemerkung / Zusatzinformationen">
-</textarea>
-
-<input
-type="file"
-id="bild"
-class="full"
-accept="image/*">
-
-<div class="previewBox full">
-    <img id="preview">
-</div>
-
-</div>
-
-<div class="bottom">
-
-<div class="types">
-
-<label>
-<input type="checkbox" id="einsatz">
-Geräte
-</label>
-
-<label>
-<input type="checkbox" id="fahrzeuge">
-Fahrzeuge
-</label>
-
-</div>
-
-<div class="buttons">
-
-<button class="save" onclick="save()">
-Speichern
-</button>
-
-<button class="cancel" onclick="back()">
-Zurück
-</button>
-
-<button class="logout" onclick="logout()">
+<button class="btn-red logout-btn" onclick="logout()">
 Logout
 </button>
 
 </div>
 
+
+<div class="card">
+
+<form id="formular">
+
+<label>Fahrzeug</label>
+<input type="text" id="fahrzeug" placeholder="z.B. Hilfeleistungslöschgruppenfahrzeug (HLF) 10">
+
+
+<label>Ort</label>
+<input list="orte" id="ort" placeholder="Ort eingeben">
+<datalist id="orte"></datalist>
+
+
+<label>Adresse</label>
+<input list="adressen" id="adresse" placeholder="Straße eingeben">
+<datalist id="adressen"></datalist>
+
+
+<label>Telefonnummer</label>
+<input type="text" id="telefon" placeholder="Telefonnummer">
+
+
+<label>E-Mail Adresse</label>
+<input type="email" id="email" placeholder="mail@beispiel.de">
+
+
+<label>Funkrufname</label>
+<input type="text" id="funk" placeholder="z.B. Florian Crimmitschau 11/44/1">
+
+
+<label>Stärke</label>
+<input type="text" id="staerke" placeholder="z.B. 1/8">
+
+
+<label>Beladung</label>
+<textarea id="beladung" rows="10" placeholder="Beladung eingeben"></textarea>
+
+
+<button type="button" class="btn-green" onclick="speichern()">
+Fahrzeug speichern
+</button>
+
+</form>
+
 </div>
 
-<div id="status" class="status"></div>
-
 </div>
-
-<script type="module">
-
-/* ZENTRALES FIREBASE */
-import "./firebase.js";
-
-/* Bild Vorschau */
-bild.onchange = e=>{
-
-    let file = e.target.files[0];
-
-    if(!file) return;
-
-    preview.src = URL.createObjectURL(file);
-
-    preview.style.display = "block";
-};
-
-/* Speichern */
-window.save = async function(){
-
-    try{
-
-        status.innerHTML = "Speichere...";
-
-        let imageUrl = "";
-
-        /* Bild Upload */
-        if(bild.files[0]){
-
-            status.innerHTML = "Lade Bild hoch...";
-
-            let file = bild.files[0];
-
-            let path =
-                "bilder/" +
-                Date.now() +
-                "_" +
-                file.name;
-
-            let imgRef =
-                storageRef(storage,path);
-
-            await uploadBytes(
-                imgRef,
-                file
-            );
-
-            imageUrl =
-                await getDownloadURL(imgRef);
-        }
-
-        /* Daten */
-        let data = {
-
-            ort: ort.value || "",
-
-            adresse: adresse.value || "",
-
-            telefon: telefon.value || "",
-
-            fahrzeug: fahrzeug.value || "",
-
-            funk: funk.value || "",
-
-            staerke: staerke.value || "",
-
-            geraete: geraete.value || "",
-
-            lagerort: lagerort.value || "",
-
-            beladung: beladung.value || "",
-
-            bemerkung: bemerkung.value || "",
-
-            bild: imageUrl,
-
-            erstelltAm:
-                nowDate() + " " + nowTime(),
-
-            timestamp: Date.now()
-        };
-
-        /* Geräte */
-        if(einsatz.checked){
-
-            await push(
-                ref(db,"geraete"),
-                data
-            );
-        }
-
-        /* Fahrzeuge */
-        if(fahrzeuge.checked){
-
-            await push(
-                ref(db,"fahrzeuge"),
-                data
-            );
-        }
-
-        status.innerHTML =
-            "✅ Erfolgreich gespeichert";
-
-        /* Formular leeren */
-        clearForm();
-
-    }catch(e){
-
-        console.error(e);
-
-        status.innerHTML =
-            "❌ Fehler beim Speichern";
-
-        alert(
-            "Fehler beim Speichern:\n" +
-            e.message
-        );
-    }
-
-};
-
-/* Formular leeren */
-function clearForm(){
-
-    [
-        ort,
-        adresse,
-        telefon,
-        fahrzeug,
-        funk,
-        staerke,
-        geraete,
-        lagerort,
-        beladung,
-        bemerkung
-    ].forEach(f=>{
-        f.value="";
-    });
-
-    einsatz.checked = false;
-    fahrzeuge.checked = false;
-
-    bild.value = "";
-
-    preview.style.display = "none";
-}
-
-/* Zurück */
-window.back = function(){
-
-    location.href = "index.html";
-
-};
-
-</script>
 
 </body>
 </html>
