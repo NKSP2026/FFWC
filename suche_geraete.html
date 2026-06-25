@@ -129,11 +129,13 @@ button:hover{
     font-size:22px;
     font-weight:bold;
     margin-bottom:15px;
+    color:#f8fafc;
 }
 
 .line{
     margin-bottom:10px;
-    line-height:1.5;
+    line-height:1.6;
+    color:#e2e8f0;
 }
 
 .phone{
@@ -152,11 +154,6 @@ button:hover{
     border-radius:14px;
     white-space:pre-wrap;
     line-height:1.6;
-}
-
-.highlight{
-    color:#60a5fa;
-    font-weight:bold;
 }
 
 .empty{
@@ -493,11 +490,8 @@ function showGeraet(g){
 /* Fahrzeugkarte */
 function showFahrzeug(f,q){
 
-    let beladung =
-        highlight(
-            f.beladung || "",
-            q
-        );
+   let beladung =
+    f.beladung || "";
 
     let card =
         document.createElement("div");
@@ -561,19 +555,6 @@ function showFahrzeug(f,q){
 
 }
 
-/* Highlight */
-function highlight(text,q){
-
-    return text.replace(
-        new RegExp(q,"gi"),
-        match => `
-            <span class="highlight">
-                ${match}
-            </span>
-        `
-    );
-
-}
 
 /* ENTER */
 search.addEventListener("keypress", e=>{
