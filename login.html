@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -8,78 +9,124 @@
 
 <style>
 
-body{
+*{
     margin:0;
-    font-family:"Segoe UI";
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+body{
     background:#0f1117;
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
+    min-height:100vh;
     color:white;
+    overflow:hidden;
 }
 
 .box{
-    width:350px;
+    width:380px;
     background:#1c1f26;
     padding:40px;
     border-radius:20px;
-    box-shadow:0 0 20px rgba(0,0,0,0.5);
-    text-align:center;
+    box-shadow:0 0 25px rgba(0,0,0,0.5);
 }
 
 h1{
+    text-align:center;
     margin-bottom:30px;
-    color:#ff6b6b;
+    color:#60a5fa;
+    font-size:32px;
+}
+
+.subtitle{
+    text-align:center;
+    margin-bottom:30px;
+    color:#9ca3af;
+    font-size:15px;
 }
 
 input{
     width:100%;
-    padding:14px;
+    padding:15px;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     background:#111318;
     color:white;
     margin-bottom:20px;
-    box-sizing:border-box;
     font-size:16px;
+    outline:none;
+}
+
+input::placeholder{
+    color:#6b7280;
 }
 
 button{
     width:100%;
-    padding:14px;
+    padding:15px;
     border:none;
-    border-radius:10px;
-    background:#3b82f6;
+    border-radius:12px;
+    background:#2563eb;
     color:white;
     font-size:16px;
     font-weight:bold;
     cursor:pointer;
+    transition:0.2s;
 }
 
 button:hover{
-    background:#2563eb;
+    background:#1d4ed8;
+    transform:translateY(-2px);
 }
 
 #error{
-    margin-top:15px;
-    color:#ff4d4d;
+    margin-top:20px;
+    text-align:center;
+    color:#ef4444;
+    font-weight:bold;
+}
+
+#status{
+    margin-top:20px;
+    text-align:center;
+    color:#10b981;
+    font-weight:bold;
+}
+
+.loading{
+    opacity:0.7;
+    pointer-events:none;
 }
 
 </style>
+
 </head>
 
 <body>
 
 <div class="box">
 
-<h1>Landfunkstelle</h1>
+    <h1>Landfunkstelle</h1>
 
-<input type="password" id="password" placeholder="Passwort">
+    <div class="subtitle">
+        Anmeldung Feuerwehrsystem
+    </div>
 
-<button onclick="login()">Anmelden</button>
+    <input
+    type="password"
+    id="password"
+    placeholder="Passwort eingeben">
 
-<div id="error"></div>
+    <button id="loginBtn" onclick="login()">
+        Anmelden
+    </button>
+
+    <div id="status"></div>
+
+    <div id="error"></div>
 
 </div>
 
@@ -90,47 +137,157 @@ initializeApp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
+
 getAuth,
-signInWithEmailAndPassword
+
+signInWithEmailAndPassword,
+
+setPersistence,
+
+browserLocalPersistence,
+
+onAuthStateChanged
+
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+/* FIREBASE */
+
 const firebaseConfig = {
+
   apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
+
   authDomain: "ffwc-d3994.firebaseapp.com",
-  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+
+  databaseURL:
+  "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+
   projectId: "ffwc-d3994",
+
   storageBucket: "ffwc-d3994.firebasestorage.app",
+
   messagingSenderId: "591233232022",
-  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7",
+
+  appId:
+  "1:591233232022:web:66ce4e0349d426e94ae6b7",
+
   measurementId: "G-BG75M1KXHL"
+
 };
 
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
+/* LOGIN STATUS PRÜFEN */
+
+onAuthStateChanged(auth, (user)=>{
+
+    if(user){
+
+        console.log("✅ Bereits eingeloggt");
+
+        window.location.href = "index.html";
+
+    }
+
+});
+
+/* LOGIN */
 
 window.login = async function(){
 
     error.innerHTML = "";
+    status.innerHTML = "";
 
-    try{
+    let pw = password.value.trim();
 
-        await signInWithEmailAndPassword(
-            auth,
-            "winklerronny10@gmail.com",
-            password.value
-        );
+    if(pw === ""){
 
-        localStorage.setItem("login","ok");
+        error.innerHTML =
+            "Bitte Passwort eingeben";
 
-        window.location.href = "index.html";
-
-    }catch(e){
-
-        error.innerHTML = "Falsches Passwort";
+        return;
 
     }
 
-}
+    try{
+
+        document.body.classList.add(
+            "loading"
+        );
+
+        loginBtn.innerHTML =
+            "Anmeldung läuft...";
+
+        status.innerHTML =
+            "Verbinde mit Firebase...";
+
+        /* LOGIN DAUERHAFT SPEICHERN */
+
+        await setPersistence(
+
+            auth,
+
+            browserLocalPersistence
+
+        );
+
+        /* LOGIN */
+
+        await signInWithEmailAndPassword(
+
+            auth,
+
+            "winklerronny10@gmail.com",
+
+            pw
+
+        );
+
+        status.innerHTML =
+            "✅ Anmeldung erfolgreich";
+
+        setTimeout(()=>{
+
+            window.location.href =
+                "index.html";
+
+        },800);
+
+    }catch(e){
+
+        console.error(e);
+
+        error.innerHTML =
+            "❌ Falsches Passwort";
+
+        status.innerHTML = "";
+
+        document.body.classList.remove(
+            "loading"
+        );
+
+        loginBtn.innerHTML =
+            "Anmelden";
+
+    }
+
+};
+
+/* ENTER TASTE */
+
+password.addEventListener(
+    "keypress",
+    e=>{
+
+        if(e.key === "Enter"){
+
+            login();
+
+        }
+
+    }
+);
 
 </script>
 
