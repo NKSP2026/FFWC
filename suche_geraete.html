@@ -451,6 +451,21 @@ function showGeraet(g){
 
             <div class="line">
                 <b>Telefon:</b>
+                <div class="line">
+    <b>E-Mail:</b>
+
+    ${
+        g.email
+        ? `
+        <a
+        class="phone"
+        href="mailto:${g.email}">
+            ${g.email}
+        </a>
+        `
+        : "-"
+    }
+</div>
 
                 ${
                     g.telefon
