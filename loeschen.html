@@ -313,14 +313,15 @@ window.loadLagerorte = function(){
 
     Object.values(rawData).forEach(d=>{
 
-        if(
-            d.ort === ort.value &&
-            d.lagerort
-        ){
+       if(
+    d.ort?.trim().toLowerCase() ===
+    ort.value.trim().toLowerCase()
 
-            set.add(d.lagerort);
+    &&
 
-        }
+    d.lagerort?.trim().toLowerCase() ===
+    lager.value.trim().toLowerCase()
+)
 
     });
 
@@ -348,7 +349,10 @@ window.loadItems = function(){
 
         if(typ.value === "fahrzeuge"){
 
-            if(d.ort === ort.value){
+            if(
+    d.ort?.trim().toLowerCase() ===
+    ort.value.trim().toLowerCase()
+){
 
                 currentItems.push({
                     key,
