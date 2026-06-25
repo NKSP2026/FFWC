@@ -1,165 +1,526 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
-<title>Protokolle</title> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Protokolle</title>
+
+<link rel="stylesheet" href="style.css">
 
 <style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:#0f1117;
-    color:white;
-}
 
-.container {
-    max-width:900px;
+.page{
+    max-width:1400px;
     margin:40px auto;
     background:#1c1f26;
     padding:30px;
-    border-radius:15px;
+    border-radius:20px;
 }
 
-input {
+.top{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:20px;
+    align-items:end;
+}
+
+.uploadBox{
+    background:#111318;
+    padding:20px;
+    border-radius:18px;
+}
+
+.uploadBox input{
     width:100%;
-    padding:10px;
-    border-radius:8px;
+    box-sizing:border-box;
+    padding:14px;
     border:none;
+    border-radius:12px;
+    background:#1c1f26;
+    color:white;
+}
+
+.search{
+    margin-top:20px;
+}
+
+.search input{
+    width:100%;
+    box-sizing:border-box;
+    padding:14px;
+    border:none;
+    border-radius:12px;
     background:#111318;
     color:white;
 }
 
-button {
-    margin-top:10px;
-    padding:10px;
-    border-radius:8px;
+.buttons{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+button{
     border:none;
+    border-radius:12px;
+    padding:14px 20px;
+    color:white;
     font-weight:bold;
     cursor:pointer;
+    transition:0.2s;
 }
 
-.upload { background:#3b82f6; }
-.back { background:#6b7280; }
+button:hover{
+    transform:translateY(-2px);
+}
 
-.file {
+.upload{
+    background:#2563eb;
+}
+
+.back{
+    background:#6b7280;
+}
+
+.logout{
+    background:#f59e0b;
+}
+
+.delete{
+    background:#dc2626;
+}
+
+.open{
+    background:#10b981;
+}
+
+.status{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.list{
+    margin-top:35px;
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fill,minmax(340px,1fr));
+    gap:25px;
+}
+
+.card{
     background:#111318;
-    padding:12px;
-    margin-top:10px;
-    border-radius:8px;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
 }
+
+.pdfTop{
+    background:#dc2626;
+    height:140px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:60px;
+}
+
+.content{
+    padding:20px;
+}
+
+.title{
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:15px;
+    word-break:break-word;
+}
+
+.info{
+    margin-bottom:10px;
+    line-height:1.5;
+}
+
+.actions{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.empty{
+    text-align:center;
+    padding:50px;
+    font-size:20px;
+}
+
+@media(max-width:900px){
+
+    .top{
+        grid-template-columns:1fr;
+    }
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
 
 <h2>📄 Protokolle</h2>
 
-<input type="file" id="file" accept="application/pdf">
-<button class="upload" onclick="upload()">PDF hochladen</button>
+<div class="top">
 
-<div id="list">Lade Daten...</div>
+    <div class="uploadBox">
 
-<button class="back" onclick="back()">Zurück</button>
+        <input
+        type="file"
+        id="file"
+        accept="application/pdf">
+
+        <div class="search">
+
+            <input
+            id="search"
+            placeholder="Protokoll suchen..."
+            oninput="renderList()">
+
+        </div>
+
+    </div>
+
+    <div class="buttons">
+
+        <button
+        class="upload"
+        onclick="uploadPDF()">
+
+            PDF hochladen
+
+        </button>
+
+        <button
+        class="back"
+        onclick="back()">
+
+            Zurück
+
+        </button>
+
+        <button
+        class="logout"
+        onclick="logout()">
+
+            Logout
+
+        </button>
+
+    </div>
+
+</div>
+
+<div id="status" class="status"></div>
+
+<div id="list" class="list"></div>
 
 </div>
 
 <script type="module">
 
-/* 🔒 LOGIN */
-if(localStorage.getItem("login") !== "ok"){
-    window.location.href = "login.html";
-}
+/* ZENTRALES FIREBASE */
+import "./firebase.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+let pdfData = {};
 
-const app = initializeApp({
-  apiKey:"AIzaSy...",
-  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/",
-  storageBucket:"ffwc-d3994.appspot.com"
-});
-
-const db = getDatabase(app);
-const storage = getStorage(app);
-
-/* 🔥 UPLOAD */
-window.upload = async function(){
-
-    let f = file.files[0];
-
-    if(!f){
-        alert("Bitte Datei auswählen!");
-        return;
-    }
-
-    if(!f.name.endsWith(".pdf")){
-        alert("Nur PDF erlaubt!");
-        return;
-    }
+/* Upload */
+window.uploadPDF = async function(){
 
     try{
 
-        let path = "pdfs/" + Date.now() + "_" + f.name;
+        let f = file.files[0];
 
-        let storageRef = sRef(storage, path);
+        if(!f){
 
-        await uploadBytes(storageRef, f);
+            alert(
+                "Bitte PDF auswählen"
+            );
 
-        let url = await getDownloadURL(storageRef);
+            return;
 
-        await push(ref(db,"pdfs"), {
-            name: f.name,
-            url: url,
-            time: new Date().toLocaleString()
-        });
+        }
 
-        alert("Upload erfolgreich!");
+        if(
+            !f.name
+            .toLowerCase()
+            .endsWith(".pdf")
+        ){
 
-        file.value = ""; // reset
+            alert(
+                "Nur PDF erlaubt"
+            );
+
+            return;
+
+        }
+
+        status.innerHTML =
+            "PDF wird hochgeladen...";
+
+        let path =
+
+            "pdfs/" +
+
+            Date.now() +
+
+            "_" +
+
+            f.name;
+
+        let pdfRef =
+            storageRef(storage,path);
+
+        await uploadBytes(
+            pdfRef,
+            f
+        );
+
+        let url =
+            await getDownloadURL(pdfRef);
+
+        await push(
+            ref(db,"pdfs"),
+            {
+
+                name: f.name,
+
+                url: url,
+
+                path: path,
+
+                size:
+                    (
+                        f.size /
+                        1024 /
+                        1024
+                    )
+                    .toFixed(2),
+
+                erstelltAm:
+                    nowDate() +
+                    " " +
+                    nowTime(),
+
+                timestamp:
+                    Date.now()
+
+            }
+        );
+
+        status.innerHTML =
+            "✅ Upload erfolgreich";
+
+        file.value = "";
 
     }catch(e){
-        alert("Fehler beim Upload!");
+
         console.error(e);
+
+        status.innerHTML =
+            "❌ Upload Fehler";
+
     }
+
 };
 
-/* 🔥 LISTE */
+/* Daten laden */
 onValue(ref(db,"pdfs"), snap=>{
 
-    list.innerHTML="";
+    pdfData = snap.val() || {};
 
-    let data = snap.val() || {};
+    renderList();
 
-    let arr = Object.values(data);
+});
 
-    /* 🔥 NEU: sortiert nach neuestem */
-    arr.sort((a,b)=> new Date(b.time) - new Date(a.time));
+/* Liste rendern */
+window.renderList = function(){
 
-    if(arr.length === 0){
-        list.innerHTML = "Keine Protokolle vorhanden";
-        return;
-    }
+    list.innerHTML = "";
 
-    arr.forEach(f=>{
+    let q =
+        search.value
+        .toLowerCase();
 
-        let div = document.createElement("div");
-        div.className="file";
+    let arr =
+        Object.entries(pdfData);
+
+    arr.sort(
+        (a,b)=>
+
+        (b[1].timestamp || 0) -
+
+        (a[1].timestamp || 0)
+    );
+
+    let found = 0;
+
+    arr.forEach(([key,p])=>{
+
+        let text =
+            JSON.stringify(p)
+            .toLowerCase();
+
+        if(q && !text.includes(q)) return;
+
+        found++;
+
+        let div =
+            document.createElement("div");
+
+        div.className = "card";
 
         div.innerHTML = `
-            <b>${f.name}</b><br>
-            <a href="${f.url}" target="_blank" style="color:#3b82f6">Öffnen / Download</a><br>
-            <small>${f.time}</small>
+
+            <div class="pdfTop">
+                📄
+            </div>
+
+            <div class="content">
+
+                <div class="title">
+                    ${p.name || "-"}
+                </div>
+
+                <div class="info">
+
+                    <b>Datum:</b><br>
+
+                    ${
+                        p.erstelltAm ||
+                        "-"
+                    }
+
+                </div>
+
+                <div class="info">
+
+                    <b>Größe:</b><br>
+
+                    ${
+                        p.size || "-"
+                    } MB
+
+                </div>
+
+                <div class="actions">
+
+                    <button
+                    class="open"
+                    onclick="openPDF(
+                        '${p.url}'
+                    )">
+
+                        Öffnen
+
+                    </button>
+
+                    <button
+                    class="delete"
+                    onclick="deletePDF(
+                        '${key}',
+                        '${p.path}'
+                    )">
+
+                        Löschen
+
+                    </button>
+
+                </div>
+
+            </div>
+
         `;
 
         list.appendChild(div);
-    });
-});
 
-/* 🔙 */
-window.back = ()=> location.href="index.html";
+    });
+
+    if(found === 0){
+
+        list.innerHTML = `
+            <div class="empty">
+                Keine Protokolle gefunden
+            </div>
+        `;
+
+    }
+
+};
+
+/* Öffnen */
+window.openPDF = function(url){
+
+    window.open(url,"_blank");
+
+};
+
+/* Löschen */
+window.deletePDF = async function(
+    key,
+    path
+){
+
+    if(
+        !confirm(
+            "PDF wirklich löschen?"
+        )
+    ) return;
+
+    try{
+
+        status.innerHTML =
+            "Lösche PDF...";
+
+        /* Storage löschen */
+        if(path){
+
+            await deleteObject(
+                storageRef(
+                    storage,
+                    path
+                )
+            );
+
+        }
+
+        /* Datenbank löschen */
+        await remove(
+            ref(db,"pdfs/" + key)
+        );
+
+        status.innerHTML =
+            "🗑️ PDF gelöscht";
+
+    }catch(e){
+
+        console.error(e);
+
+        status.innerHTML =
+            "❌ Fehler beim Löschen";
+
+    }
+
+};
+
+/* Zurück */
+window.back = function(){
+
+    location.href = "index.html";
+
+};
 
 </script>
 
