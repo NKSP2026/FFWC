@@ -1,228 +1,554 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Einsatz Mail</title>
+
+<link rel="stylesheet" href="style.css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:#0f1117;
-    color:white;
-}
 
-.container {
-    max-width:900px;
+.page{
+    max-width:1200px;
     margin:40px auto;
     background:#1c1f26;
     padding:30px;
-    border-radius:15px;
+    border-radius:20px;
 }
 
-input, textarea {
+h2{
+    margin-top:0;
+    margin-bottom:30px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.full{
+    grid-column:span 2;
+}
+
+input,
+textarea{
     width:100%;
-    padding:10px;
-    border-radius:8px;
+    box-sizing:border-box;
+    padding:14px;
     border:none;
-    margin-top:5px;
+    border-radius:12px;
     background:#111318;
     color:white;
+    font-size:15px;
 }
 
-button {
-    margin-top:10px;
-    padding:10px;
-    border-radius:8px;
+textarea{
+    min-height:140px;
+    resize:vertical;
+}
+
+.fahrzeugeBox{
+    margin-top:25px;
+    background:#111318;
+    padding:20px;
+    border-radius:18px;
+}
+
+.fahrzeugeGrid{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fill,minmax(260px,1fr));
+    gap:15px;
+}
+
+.vehicle{
+    background:#1c1f26;
+    border-radius:14px;
+    padding:15px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    transition:0.2s;
+}
+
+.vehicle:hover{
+    transform:translateY(-2px);
+}
+
+.vehicle input{
+    width:auto;
+}
+
+.vehicle label{
+    cursor:pointer;
+    width:100%;
+}
+
+.buttons{
+    margin-top:30px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+button{
     border:none;
+    border-radius:12px;
+    padding:14px 20px;
+    color:white;
     font-weight:bold;
     cursor:pointer;
+    transition:0.2s;
 }
 
-.mail { background:#10b981; }
-.pdf { background:#f59e0b; }
-.back { background:#6b7280; }
+button:hover{
+    transform:translateY(-2px);
+}
+
+.mail{
+    background:#10b981;
+}
+
+.pdf{
+    background:#f59e0b;
+}
+
+.back{
+    background:#6b7280;
+}
+
+.logout{
+    background:#ef4444;
+}
+
+.status{
+    margin-top:20px;
+    text-align:center;
+    font-weight:bold;
+}
+
+@media(max-width:900px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .full{
+        grid-column:span 1;
+    }
+
+}
 
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="page">
 
 <h2>✉ Einsatz Mail</h2>
 
-<input id="mail_to" placeholder="Empfänger">
+<div class="grid">
 
-<input id="mail_subject" placeholder="Betreff wird automatisch erstellt">
+<input
+id="mail_to"
+class="full"
+placeholder="Empfänger">
 
-<input id="einsatz_art" placeholder="Einsatzart">
-<input id="einsatz_ort" placeholder="Ort">
-<input id="einsatz_adresse" placeholder="Adresse">
+<input
+id="mail_subject"
+class="full"
+placeholder="Betreff wird automatisch erstellt">
 
-<textarea id="einsatz_info" placeholder="Infos"></textarea>
+<input
+id="einsatz_art"
+placeholder="Einsatzart">
 
-<h3>🚗 Fahrzeuge</h3>
-<div id="fahrzeuge"></div>
+<input
+id="einsatz_ort"
+placeholder="Ort">
 
-<button class="mail" onclick="sendMail()">Mail senden</button>
-<button class="pdf" onclick="createPDF()">PDF erstellen</button>
-<button class="back" onclick="back()">Zurück</button>
+<input
+id="einsatz_adresse"
+class="full"
+placeholder="Adresse">
+
+<textarea
+id="einsatz_info"
+class="full"
+placeholder="Einsatzinformationen">
+</textarea>
+
+</div>
+
+<div class="fahrzeugeBox">
+
+<h3>🚒 Fahrzeuge auswählen</h3>
+
+<div
+id="fahrzeuge"
+class="fahrzeugeGrid">
+</div>
+
+</div>
+
+<div class="buttons">
+
+<button
+class="mail"
+onclick="sendMail()">
+
+    Mail senden
+
+</button>
+
+<button
+class="pdf"
+onclick="createPDF()">
+
+    PDF erstellen
+
+</button>
+
+<button
+class="back"
+onclick="back()">
+
+    Zurück
+
+</button>
+
+<button
+class="logout"
+onclick="logout()">
+
+    Logout
+
+</button>
+
+</div>
+
+<div id="status" class="status"></div>
 
 </div>
 
 <script type="module">
 
-/* 🔒 LOGIN */
-if(localStorage.getItem("login") !== "ok"){
-    window.location.href = "login.html";
-}
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const app = initializeApp({
-  apiKey:"AIzaSy...",
-  databaseURL:"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app/"
-});
-
-const db = getDatabase(app);
+/* ZENTRALES FIREBASE */
+import "./firebase.js";
 
 let fahrzeugeData = [];
 
-/* 🔥 Fahrzeuge laden */
+/* Fahrzeuge laden */
 onValue(ref(db,"fahrzeuge"), snap=>{
 
-    fahrzeuge.innerHTML="";
-    fahrzeugeData = Object.values(snap.val()||{});
+    fahrzeuge.innerHTML = "";
+
+    fahrzeugeData =
+        Object.values(
+            snap.val() || {}
+        );
 
     fahrzeugeData.forEach((f,i)=>{
 
-        let div=document.createElement("div");
+        let div =
+            document.createElement("div");
 
-        div.innerHTML=`
-        <label>
-        <input type="checkbox" value="${i}">
-        ${f.fahrzeug} (${f.funk||"-"})
-        </label>`;
+        div.className = "vehicle";
+
+        div.innerHTML = `
+
+            <input
+            type="checkbox"
+            value="${i}"
+            id="f_${i}">
+
+            <label for="f_${i}">
+
+                <b>
+                    ${f.fahrzeug || "-"}
+                </b>
+
+                <br>
+
+                ${f.funk || "-"}
+
+            </label>
+
+        `;
 
         fahrzeuge.appendChild(div);
+
     });
+
+    status.innerHTML =
+        "✅ Fahrzeuge geladen";
+
 });
 
-/* Fahrzeuge auswählen */
-function getF(){
+/* Fahrzeuge sammeln */
+function getFahrzeuge(){
 
-    let c=document.querySelectorAll("#fahrzeuge input:checked");
-    let list=[];
+    let checked =
+        document.querySelectorAll(
+            "#fahrzeuge input:checked"
+        );
 
-    c.forEach(e=>{
-        let f=fahrzeugeData[e.value];
-        list.push(`${f.fahrzeug} (${f.funk||"-"})`);
+    let list = [];
+
+    checked.forEach(c=>{
+
+        let f =
+            fahrzeugeData[c.value];
+
+        list.push(
+            `${f.fahrzeug} (${f.funk || "-"})`
+        );
+
     });
 
     return list;
+
 }
 
-/* 🔥 AUTO BETREFF */
+/* Betreff automatisch */
 function updateSubject(){
 
-    if(mail_subject.dataset.manual === "true") return;
+    if(
+        mail_subject.dataset.manual === "true"
+    ) return;
 
-    let now=new Date();
+    let datum = nowDate();
 
-    let datum=now.toLocaleDateString("de-DE");
-    let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+    let zeit = nowTime();
 
-    mail_subject.value = `${einsatz_art.value || "Einsatz"} - ${einsatz_ort.value || "-"} - ${datum} ${uhrzeit}`;
+    mail_subject.value = `
+
+${einsatz_art.value || "Einsatz"}
+
+- ${einsatz_ort.value || "-"}
+
+- ${datum} ${zeit}
+
+`.replace(/\n/g,"").trim();
+
 }
 
-/* 🔥 MANUELL ÄNDERBAR */
-mail_subject.addEventListener("input", ()=>{
-    mail_subject.dataset.manual = "true";
-});
+/* manuell */
+mail_subject.addEventListener(
+    "input",
+    ()=>{
 
-/* Events */
-einsatz_art.addEventListener("input", updateSubject);
-einsatz_ort.addEventListener("input", updateSubject);
+        mail_subject.dataset.manual = "true";
 
-/* 🔥 MAIL */
-window.sendMail=function(){
+    }
+);
 
-    let now=new Date();
-    let datum=now.toLocaleDateString("de-DE");
-    let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+einsatz_art.addEventListener(
+    "input",
+    updateSubject
+);
 
-    let betreff = mail_subject.value;
+einsatz_ort.addEventListener(
+    "input",
+    updateSubject
+);
 
-    let body=`Einsatzbericht
+/* Mail */
+window.sendMail = function(){
 
-Art: ${einsatz_art.value}
-Ort: ${einsatz_ort.value}
-Adresse: ${einsatz_adresse.value}
+    try{
+
+        let datum = nowDate();
+
+        let zeit = nowTime();
+
+        let body = `
+
+Einsatzbericht
+
+Art:
+${einsatz_art.value}
+
+Ort:
+${einsatz_ort.value}
+
+Adresse:
+${einsatz_adresse.value}
+
+--------------------------------
 
 Fahrzeuge:
-${getF().join("\n")}
 
-Info:
+${getFahrzeuge().join("\n")}
+
+--------------------------------
+
+Informationen:
+
 ${einsatz_info.value}
 
-Zeit: ${datum} ${uhrzeit}`;
+--------------------------------
 
-    location.href=`mailto:${mail_to.value}?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(body)}`;
-};
+Zeit:
+${datum} ${zeit}
 
-/* 🔥 PDF */
-window.createPDF=function(){
+        `;
 
-    const { jsPDF } = window.jspdf;
-    const doc=new jsPDF();
+        location.href = `
 
-    let y=10;
+mailto:${mail_to.value}
 
-    function l(t){
-        if(y > 270){
-            doc.addPage();
-            y = 10;
-        }
-        doc.text(t,10,y);
-        y+=8;
+?subject=${encodeURIComponent(
+    mail_subject.value
+)}
+
+&body=${encodeURIComponent(body)}
+
+        `.replace(/\n/g,"");
+
+    }catch(e){
+
+        console.error(e);
+
+        alert("Fehler beim Mailversand");
+
     }
 
-    let now=new Date();
-    let datum=now.toLocaleDateString("de-DE");
-    let uhrzeit=now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
-
-    l("Einsatzbericht");
-    l("----------------");
-    l("Art: "+einsatz_art.value);
-    l("Ort: "+einsatz_ort.value);
-    l("Adresse: "+einsatz_adresse.value);
-
-    l("");
-    l("Fahrzeuge:");
-
-    getF().forEach(f=>l("- "+f));
-
-    l("");
-    l("Info:");
-
-    einsatz_info.value.split("\n").forEach(line=>l(line));
-
-    l("");
-    l("Zeit: "+datum+" "+uhrzeit);
-
-    let safeOrt=(einsatz_ort.value||"X").replace(/\s+/g,"_");
-    let safeDatum=datum.replace(/\./g,"-");
-    let safeUhrzeit=uhrzeit.replace(":","-");
-
-    doc.save(`Einsatz_${safeOrt}_${safeDatum}_${safeUhrzeit}.pdf`);
 };
 
-/* 🔙 */
-window.back=()=>location.href="index.html";
+/* PDF */
+window.createPDF = function(){
+
+    try{
+
+        status.innerHTML =
+            "PDF wird erstellt...";
+
+        const { jsPDF } =
+            window.jspdf;
+
+        const doc =
+            new jsPDF();
+
+        let y = 15;
+
+        function line(text){
+
+            if(y > 270){
+
+                doc.addPage();
+
+                y = 15;
+
+            }
+
+            let split =
+                doc.splitTextToSize(
+                    text,
+                    180
+                );
+
+            doc.text(split,15,y);
+
+            y += split.length * 8;
+
+        }
+
+        line("Einsatzbericht");
+
+        line("---------------------------");
+
+        line(
+            "Art: " +
+            einsatz_art.value
+        );
+
+        line(
+            "Ort: " +
+            einsatz_ort.value
+        );
+
+        line(
+            "Adresse: " +
+            einsatz_adresse.value
+        );
+
+        line("");
+
+        line("Fahrzeuge:");
+
+        getFahrzeuge()
+        .forEach(f=>{
+
+            line("- " + f);
+
+        });
+
+        line("");
+
+        line("Informationen:");
+
+        line(einsatz_info.value);
+
+        line("");
+
+        line(
+            "Zeit: " +
+            nowDate() +
+            " " +
+            nowTime()
+        );
+
+        let ort =
+            (
+                einsatz_ort.value ||
+                "Einsatz"
+            )
+            .replace(/\s+/g,"_");
+
+        let datum =
+            nowDate()
+            .replace(/\./g,"-");
+
+        let zeit =
+            nowTime()
+            .replace(":","-");
+
+        doc.save(`
+
+Einsatz_${ort}_${datum}_${zeit}.pdf
+
+        `.replace(/\n/g,""));
+
+        status.innerHTML =
+            "✅ PDF erstellt";
+
+    }catch(e){
+
+        console.error(e);
+
+        status.innerHTML =
+            "❌ PDF Fehler";
+
+    }
+
+};
+
+/* Zurück */
+window.back = function(){
+
+    location.href = "index.html";
+
+};
 
 /* initial */
 updateSubject();
