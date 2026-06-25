@@ -1,255 +1,85 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Neu Anlegen</title>
-
-<link rel="stylesheet" href="style.css">
+<title>Login</title>
 
 <style>
 
-.container{
-    max-width:1000px;
-    margin:40px auto;
-    background:#1c1f26;
-    padding:30px;
-    border-radius:20px;
-}
-
-.topbar{
+body{
+    margin:0;
+    font-family:"Segoe UI";
+    background:#0f1117;
     display:flex;
-    justify-content:space-between;
+    justify-content:center;
     align-items:center;
+    height:100vh;
+    color:white;
+}
+
+.box{
+    width:350px;
+    background:#1c1f26;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    text-align:center;
+}
+
+h1{
     margin-bottom:30px;
-    gap:20px;
-    flex-wrap:wrap;
+    color:#ff6b6b;
 }
 
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:20px;
-}
-
-input,
-textarea{
+input{
     width:100%;
-    box-sizing:border-box;
     padding:14px;
     border:none;
-    border-radius:12px;
+    border-radius:10px;
     background:#111318;
     color:white;
-    font-size:15px;
-}
-
-textarea{
-    min-height:140px;
-    resize:vertical;
-}
-
-.full{
-    grid-column:span 2;
-}
-
-.bottom{
-    margin-top:25px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-.buttons{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
+    margin-bottom:20px;
+    box-sizing:border-box;
+    font-size:16px;
 }
 
 button{
-    padding:14px 20px;
+    width:100%;
+    padding:14px;
     border:none;
-    border-radius:12px;
+    border-radius:10px;
+    background:#3b82f6;
     color:white;
+    font-size:16px;
     font-weight:bold;
     cursor:pointer;
 }
 
-.save{
+button:hover{
     background:#2563eb;
 }
 
-.back{
-    background:#6b7280;
-}
-
-.logout{
-    background:#dc2626;
-}
-
-#preview{
-    max-height:160px;
-    border-radius:12px;
-    margin-top:10px;
-    display:none;
-}
-
-.status{
-    margin-top:20px;
-    text-align:center;
-    font-weight:bold;
-}
-
-@media(max-width:850px){
-
-    .grid{
-        grid-template-columns:1fr;
-    }
-
-    .full{
-        grid-column:span 1;
-    }
-
+#error{
+    margin-top:15px;
+    color:#ff4d4d;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
 
-<div class="topbar">
+<h1>Landfunkstelle</h1>
 
-<h2>Neu Anlegen</h2>
+<input type="password" id="password" placeholder="Passwort">
 
-<button
-class="logout"
-onclick="logout()">
+<button onclick="login()">Anmelden</button>
 
-Logout
-
-</button>
-
-</div>
-
-<div class="grid">
-
-<input
-id="ort"
-list="orte"
-placeholder="Ort">
-
-<datalist id="orte"></datalist>
-
-<input
-id="adresse"
-list="adressen"
-placeholder="Adresse">
-
-<datalist id="adressen"></datalist>
-
-<input
-id="telefon"
-placeholder="Telefon">
-
-<input
-id="email"
-type="email"
-placeholder="E-Mail Adresse">
-
-<input
-id="fahrzeug"
-placeholder="Fahrzeug">
-
-<input
-id="funk"
-placeholder="Funkkenner">
-
-<input
-id="staerke"
-placeholder="Stärke">
-
-<input
-id="geraete"
-placeholder="Gerät">
-
-<input
-id="lagerort"
-placeholder="Lagerort">
-
-<textarea
-id="beladung"
-class="full"
-placeholder="Beladung (wichtig für Suche!)">
-</textarea>
-
-<textarea
-id="bemerkung"
-class="full"
-placeholder="Bemerkung">
-</textarea>
-
-<input
-type="file"
-id="bild"
-class="full"
-accept="image/*">
-
-<div class="full">
-
-<img id="preview">
-
-</div>
-
-</div>
-
-<div class="bottom">
-
-<div>
-
-<label>
-<input type="checkbox" id="einsatz">
-Geräte
-</label>
-
-<br><br>
-
-<label>
-<input type="checkbox" id="fahrzeuge">
-Fahrzeuge
-</label>
-
-</div>
-
-<div class="buttons">
-
-<button
-class="save"
-onclick="save()">
-
-Speichern
-
-</button>
-
-<button
-class="back"
-onclick="back()">
-
-Zurück
-
-</button>
-
-</div>
-
-</div>
-
-<div id="status" class="status"></div>
+<div id="error"></div>
 
 </div>
 
@@ -257,286 +87,50 @@ Zurück
 
 import {
 initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-
-getDatabase,
-ref,
-push,
-get,
-child
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-import {
-
-getStorage,
-ref as sRef,
-uploadBytes,
-getDownloadURL
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-import {
-
 getAuth,
-signOut
+signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
+  authDomain: "ffwc-d3994.firebaseapp.com",
+  databaseURL: "https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "ffwc-d3994",
+  storageBucket: "ffwc-d3994.firebasestorage.app",
+  messagingSenderId: "591233232022",
+  appId: "1:591233232022:web:66ce4e0349d426e94ae6b7",
+  measurementId: "G-BG75M1KXHL"
+};
 
-/* FIREBASE */
-
-const app = initializeApp({
-
-apiKey:
-"AIzaSyDSYQZGiKbXjy9142dKq_4Upc9zfvekOHE",
-
-authDomain:
-"ffwc-d3994.firebaseapp.com",
-
-databaseURL:
-"https://ffwc-d3994-default-rtdb.europe-west1.firebasedatabase.app",
-
-projectId:
-"ffwc-d3994",
-
-storageBucket:
-"ffwc-d3994.firebasestorage.app",
-
-messagingSenderId:
-"591233232022",
-
-appId:
-"1:591233232022:web:66ce4e0349d426e94ae6b7"
-
-});
-
-const db = getDatabase(app);
-
-const storage = getStorage(app);
-
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* LOGOUT */
+window.login = async function(){
 
-window.logout = async function(){
+    error.innerHTML = "";
 
-await signOut(auth);
+    try{
 
-location.href = "login.html";
+        await signInWithEmailAndPassword(
+            auth,
+            "winklerronny10@gmail.com",
+            password.value
+        );
 
-};
+        localStorage.setItem("login","ok");
 
-/* BILD VORSCHAU */
+        window.location.href = "index.html";
 
-const bild =
-document.getElementById("bild");
+    }catch(e){
 
-const preview =
-document.getElementById("preview");
+        error.innerHTML = "Falsches Passwort";
 
-bild.onchange = e=>{
-
-if(!e.target.files[0]) return;
-
-preview.src =
-URL.createObjectURL(
-e.target.files[0]
-);
-
-preview.style.display =
-"block";
-
-};
-
-/* SPEICHERN */
-
-window.save = async function(){
-
-try{
-
-status.innerHTML =
-"Speichere...";
-
-let img = "";
-
-if(bild.files[0]){
-
-let r = sRef(
-
-storage,
-
-"bilder/" +
-Date.now()
-
-);
-
-await uploadBytes(
-r,
-bild.files[0]
-);
-
-img =
-await getDownloadURL(r);
+    }
 
 }
-
-let data = {
-
-ort: ort.value,
-
-adresse: adresse.value,
-
-telefon: telefon.value,
-
-email: email.value,
-
-fahrzeug: fahrzeug.value,
-
-funk: funk.value,
-
-staerke: staerke.value,
-
-geraete: geraete.value,
-
-lagerort: lagerort.value,
-
-beladung: beladung.value,
-
-bemerkung: bemerkung.value,
-
-bild: img
-
-};
-
-if(einsatz.checked){
-
-await push(
-ref(db,"geraete"),
-data
-);
-
-}
-
-if(fahrzeuge.checked){
-
-await push(
-ref(db,"fahrzeuge"),
-data
-);
-
-}
-
-status.innerHTML =
-"✅ Gespeichert!";
-
-alert("Gespeichert!");
-
-}catch(e){
-
-console.error(e);
-
-status.innerHTML =
-"❌ Fehler beim Speichern";
-
-}
-
-/* LEEREN */
-
-[
-ort,
-adresse,
-telefon,
-email,
-fahrzeug,
-funk,
-staerke,
-geraete,
-lagerort,
-beladung,
-bemerkung
-
-].forEach(x=>{
-
-x.value = "";
-
-});
-
-bild.value = "";
-
-preview.style.display =
-"none";
-
-einsatz.checked = false;
-
-fahrzeuge.checked = false;
-
-};
-
-/* ZURÜCK */
-
-window.back = ()=>{
-
-location.href =
-"index.html";
-
-};
-
-/* VORSCHLÄGE */
-
-async function ladeVorschlaege(){
-
-const dbRef = ref(db);
-
-const snapshot =
-await get(
-child(dbRef,"fahrzeuge")
-);
-
-if(!snapshot.exists()) return;
-
-const ortSet =
-new Set();
-
-const adrSet =
-new Set();
-
-snapshot.forEach((c)=>{
-
-const d = c.val();
-
-if(d.ort){
-
-ortSet.add(d.ort);
-
-}
-
-if(d.adresse){
-
-adrSet.add(d.adresse);
-
-}
-
-});
-
-ortSet.forEach(o=>{
-
-orte.innerHTML +=
-`<option value="${o}">`;
-
-});
-
-adrSet.forEach(a=>{
-
-adressen.innerHTML +=
-`<option value="${a}">`;
-
-});
-
-}
-
-ladeVorschlaege();
 
 </script>
 
