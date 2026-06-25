@@ -305,9 +305,6 @@ function renderSection(
                 id="${type}_adresse_${key}"
                 value="${d.adresse || ""}">
             </div>
-
-            <div class="field">
-                <label>Telefon</label>
                 
                 <div class="field">
     <label>E-Mail</label>
@@ -317,6 +314,9 @@ function renderSection(
     value="${d.email || ""}">
 </div>
 
+ <div class="field">
+                <label>Telefon</label>
+                
                 <input
                 id="${type}_telefon_${key}"
                 value="${d.telefon || ""}">
