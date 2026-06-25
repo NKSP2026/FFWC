@@ -83,11 +83,12 @@ button:hover{
     margin-top:40px;
     margin-bottom:20px;
     font-size:28px;
+    color:white;
 }
 
 .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(400px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
     gap:20px;
 }
 
@@ -95,6 +96,11 @@ button:hover{
     background:#111318;
     border-radius:18px;
     padding:20px;
+    transition:0.2s;
+}
+
+.card:hover{
+    transform:translateY(-2px);
 }
 
 .card img{
@@ -105,6 +111,21 @@ button:hover{
     margin-bottom:15px;
 }
 
+.title{
+    font-size:22px;
+    font-weight:bold;
+    color:white;
+    cursor:pointer;
+    user-select:none;
+    padding:10px;
+    border-radius:10px;
+    background:#1c1f26;
+}
+
+.title:hover{
+    background:#2563eb;
+}
+
 .field{
     margin-bottom:14px;
 }
@@ -113,6 +134,7 @@ button:hover{
     display:block;
     margin-bottom:5px;
     font-weight:bold;
+    color:white;
 }
 
 .field input,
@@ -142,6 +164,7 @@ button:hover{
     margin-top:20px;
     font-weight:bold;
     text-align:center;
+    color:white;
 }
 
 @media(max-width:700px){
@@ -163,10 +186,12 @@ button:hover{
 <div class="top">
 
     <div class="search">
+
         <input
         id="search"
-        placeholder="Suche nach Fahrzeug, Gerät, Ort..."
+        placeholder="Suche..."
         oninput="renderAll()">
+
     </div>
 
     <div class="buttons">
@@ -197,13 +222,25 @@ button:hover{
 
 <script type="module">
 
-/* ZENTRALES FIREBASE */
+/* FIREBASE */
 import "./firebase.js";
+
+/* FIREBASE FUNKTIONEN */
+import {
+
+onValue,
+ref,
+update,
+remove
+
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
 
 let geraeteData = {};
 let fahrzeugeData = {};
 
-/* Geräte laden */
+
+/* GERÄTE LADEN */
 onValue(ref(db,"geraete"), snap=>{
 
     geraeteData = snap.val() || {};
@@ -212,7 +249,8 @@ onValue(ref(db,"geraete"), snap=>{
 
 });
 
-/* Fahrzeuge laden */
+
+/* FAHRZEUGE LADEN */
 onValue(ref(db,"fahrzeuge"), snap=>{
 
     fahrzeugeData = snap.val() || {};
@@ -221,7 +259,8 @@ onValue(ref(db,"fahrzeuge"), snap=>{
 
 });
 
-/* Alles rendern */
+
+/* ALLES RENDERN */
 window.renderAll = function(){
 
     let q =
@@ -240,9 +279,11 @@ window.renderAll = function(){
         "fahrzeuge",
         q
     );
+
 };
 
-/* Bereich rendern */
+
+/* BEREICH */
 function renderSection(
     target,
     data,
@@ -260,6 +301,11 @@ function renderSection(
 
         if(q && !text.includes(q)) return;
 
+        let name =
+            d.geraete ||
+            d.fahrzeug ||
+            "-";
+
         let card =
             document.createElement("div");
 
@@ -267,122 +313,167 @@ function renderSection(
 
         card.innerHTML = `
 
-            ${d.bild
-                ? `<img src="${d.bild}">`
-                : ""
-            }
+            <div
+            class="title"
+            ondblclick="
+                toggleEdit(
+                    '${type}',
+                    '${key}'
+                )
+            ">
 
-            <div class="field">
-                <label>
-                    ${
-                        type==="geraete"
-                        ? "Gerät"
-                        : "Fahrzeug"
-                    }
-                </label>
+                ${name}
 
-                <input
-                id="${type}_name_${key}"
-                value="${
-                    d.geraete ||
-                    d.fahrzeug ||
-                    ""
-                }">
             </div>
 
-            <div class="field">
-                <label>Ort</label>
+            <div
+            id="edit_${type}_${key}"
+            style="display:none;">
 
-                <input
-                id="${type}_ort_${key}"
-                value="${d.ort || ""}">
-            </div>
+                ${d.bild
+                    ? `
+                    <img src="${d.bild}">
+                    `
+                    : ""
+                }
 
-            <div class="field">
-                <label>Adresse</label>
-
-                <input
-                id="${type}_adresse_${key}"
-                value="${d.adresse || ""}">
-            </div>
-                
                 <div class="field">
-    <label>E-Mail</label>
 
-    <input
-    id="${type}_email_${key}"
-    value="${d.email || ""}">
-</div>
+                    <label>
+                        ${
+                            type==="geraete"
+                            ? "Gerät"
+                            : "Fahrzeug"
+                        }
+                    </label>
 
- <div class="field">
-                <label>Telefon</label>
-                
-                <input
-                id="${type}_telefon_${key}"
-                value="${d.telefon || ""}">
-            </div>
+                    <input
+                    id="${type}_name_${key}"
+                    value="${
+                        d.geraete ||
+                        d.fahrzeug ||
+                        ""
+                    }">
 
-            <div class="field">
-                <label>Funk</label>
+                </div>
 
-                <input
-                id="${type}_funk_${key}"
-                value="${d.funk || ""}">
-            </div>
+                <div class="field">
 
-            <div class="field">
-                <label>Stärke</label>
+                    <label>Ort</label>
 
-                <input
-                id="${type}_staerke_${key}"
-                value="${d.staerke || ""}">
-            </div>
+                    <input
+                    id="${type}_ort_${key}"
+                    value="${d.ort || ""}">
 
-            <div class="field">
-                <label>Lagerort</label>
+                </div>
 
-                <input
-                id="${type}_lager_${key}"
-                value="${d.lagerort || ""}">
-            </div>
+                <div class="field">
 
-            <div class="field">
-                <label>Beladung</label>
+                    <label>Adresse</label>
 
-                <textarea
-                id="${type}_beladung_${key}">${
-                    d.beladung || ""
-                }</textarea>
-            </div>
+                    <input
+                    id="${type}_adresse_${key}"
+                    value="${d.adresse || ""}">
 
-            <div class="field">
-                <label>Bemerkung</label>
+                </div>
 
-                <textarea
-                id="${type}_bemerkung_${key}">${
-                    d.bemerkung || ""
-                }</textarea>
-            </div>
+                <div class="field">
 
-            <div class="actions">
+                    <label>E-Mail</label>
 
-                <button
-                class="save"
-                onclick="saveEntry(
-                    '${type}',
-                    '${key}'
-                )">
-                    Speichern
-                </button>
+                    <input
+                    id="${type}_email_${key}"
+                    value="${d.email || ""}">
 
-                <button
-                class="delete"
-                onclick="deleteEntry(
-                    '${type}',
-                    '${key}'
-                )">
-                    Löschen
-                </button>
+                </div>
+
+                <div class="field">
+
+                    <label>Telefon</label>
+
+                    <input
+                    id="${type}_telefon_${key}"
+                    value="${d.telefon || ""}">
+
+                </div>
+
+                <div class="field">
+
+                    <label>Funk</label>
+
+                    <input
+                    id="${type}_funk_${key}"
+                    value="${d.funk || ""}">
+
+                </div>
+
+                <div class="field">
+
+                    <label>Stärke</label>
+
+                    <input
+                    id="${type}_staerke_${key}"
+                    value="${d.staerke || ""}">
+
+                </div>
+
+                <div class="field">
+
+                    <label>Lagerort</label>
+
+                    <input
+                    id="${type}_lager_${key}"
+                    value="${d.lagerort || ""}">
+
+                </div>
+
+                <div class="field">
+
+                    <label>Beladung</label>
+
+                    <textarea
+                    id="${type}_beladung_${key}">${
+                        d.beladung || ""
+                    }</textarea>
+
+                </div>
+
+                <div class="field">
+
+                    <label>Bemerkung</label>
+
+                    <textarea
+                    id="${type}_bemerkung_${key}">${
+                        d.bemerkung || ""
+                    }</textarea>
+
+                </div>
+
+                <div class="actions">
+
+                    <button
+                    class="save"
+                    onclick="saveEntry(
+                        '${type}',
+                        '${key}'
+                    )">
+
+                        Speichern
+
+                    </button>
+
+                    <button
+                    class="delete"
+                    onclick="deleteEntry(
+                        '${type}',
+                        '${key}'
+                    )">
+
+                        Löschen
+
+                    </button>
+
+                </div>
 
             </div>
 
@@ -394,7 +485,37 @@ function renderSection(
 
 }
 
-/* Speichern */
+
+/* ÖFFNEN */
+window.toggleEdit = function(
+    type,
+    key
+){
+
+    let el =
+        document.getElementById(
+            `edit_${type}_${key}`
+        );
+
+    if(
+        el.style.display ===
+        "none"
+    ){
+
+        el.style.display =
+            "block";
+
+    }else{
+
+        el.style.display =
+            "none";
+
+    }
+
+};
+
+
+/* SPEICHERN */
 window.saveEntry = async function(
     type,
     key
@@ -417,15 +538,15 @@ window.saveEntry = async function(
                     `${type}_adresse_${key}`
                 ).value,
 
+            email:
+                document.getElementById(
+                    `${type}_email_${key}`
+                ).value,
+
             telefon:
                 document.getElementById(
                     `${type}_telefon_${key}`
                 ).value,
-
-            email:
-    document.getElementById(
-        `${type}_email_${key}`
-    ).value,
 
             funk:
                 document.getElementById(
@@ -451,6 +572,7 @@ window.saveEntry = async function(
                 document.getElementById(
                     `${type}_bemerkung_${key}`
                 ).value
+
         };
 
         if(type==="geraete"){
@@ -466,6 +588,7 @@ window.saveEntry = async function(
                 document.getElementById(
                     `${type}_name_${key}`
                 ).value;
+
         }
 
         await update(
@@ -487,7 +610,8 @@ window.saveEntry = async function(
 
 };
 
-/* Löschen */
+
+/* LÖSCHEN */
 window.deleteEntry = async function(
     type,
     key
@@ -519,7 +643,8 @@ window.deleteEntry = async function(
 
 };
 
-/* Zurück */
+
+/* ZURÜCK */
 window.back = function(){
 
     location.href = "index.html";
