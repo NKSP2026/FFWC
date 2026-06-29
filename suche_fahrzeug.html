@@ -34,7 +34,6 @@
     background:#111318;
     color:white;
     font-size:16px;
-    outline:none;
 }
 
 .buttons{
@@ -84,7 +83,6 @@ button:hover{
     border-radius:10px;
     cursor:pointer;
     transition:0.2s;
-    color:white;
 }
 
 .suggest:hover{
@@ -95,7 +93,6 @@ button:hover{
     margin-top:20px;
     text-align:center;
     font-weight:bold;
-    color:white;
 }
 
 .results{
@@ -126,20 +123,17 @@ button:hover{
 
 .content{
     padding:20px;
-    color:white;
 }
 
 .title{
     font-size:24px;
     font-weight:bold;
     margin-bottom:15px;
-    color:white;
 }
 
 .line{
     margin-bottom:10px;
     line-height:1.5;
-    color:white;
 }
 
 .phone{
@@ -158,7 +152,6 @@ button:hover{
     border-radius:14px;
     white-space:pre-wrap;
     line-height:1.6;
-    color:white;
 }
 
 .toggle{
@@ -171,14 +164,6 @@ button:hover{
     text-align:center;
     padding:40px;
     font-size:18px;
-    color:white;
-}
-
-.highlight{
-    background:#2563eb;
-    color:white;
-    padding:2px 4px;
-    border-radius:4px;
 }
 
 @media(max-width:950px){
@@ -197,9 +182,7 @@ button:hover{
 
 <div class="page">
 
-<h2 style="color:white;">
-    Fahrzeug Suche
-</h2>
+<h2>Fahrzeug Suche</h2>
 
 <div class="top">
 
@@ -207,8 +190,6 @@ button:hover{
 
         <input
         id="search"
-        autocomplete="off"
-        spellcheck="false"
         placeholder="Fahrzeug, Funkrufname oder Gerät suchen..."
         oninput="suggest()">
 
@@ -257,21 +238,12 @@ button:hover{
 
 <script type="module">
 
-/* FIREBASE */
+/* ZENTRALES FIREBASE */
 import "./firebase.js";
-
-import {
-    getDatabase,
-    ref,
-    onValue
-}
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const db = getDatabase();
 
 let fahrzeuge = [];
 
-/* FAHRZEUGE LADEN */
+/* Fahrzeuge laden */
 onValue(ref(db,"fahrzeuge"), snap=>{
 
     fahrzeuge =
@@ -279,12 +251,12 @@ onValue(ref(db,"fahrzeuge"), snap=>{
             snap.val() || {}
         );
 
-    status.textContent =
+    status.innerHTML =
         "✅ Fahrzeuge geladen";
 
 });
 
-/* VORSCHLÄGE */
+/* Vorschläge */
 window.suggest = function(){
 
     let q =
@@ -306,33 +278,25 @@ window.suggest = function(){
 
         if(text.includes(q)){
 
-            if(f.fahrzeug){
-
-                found.add(
-                    f.fahrzeug
-                );
-
-            }
+            found.add(
+                f.fahrzeug
+            );
 
         }
 
-        /* ABKÜRZUNGEN */
+        /* Abkürzungen */
         if(
             q.includes("hlf") &&
             text.includes("hilfeleistung")
         ){
-
             found.add(f.fahrzeug);
-
         }
 
         if(
             q.includes("dl") &&
             text.includes("drehleiter")
         ){
-
             found.add(f.fahrzeug);
-
         }
 
     });
@@ -350,8 +314,7 @@ window.suggest = function(){
 
         div.className = "suggest";
 
-        /* WICHTIG */
-        div.textContent = name;
+        div.innerHTML = name;
 
         div.onclick = ()=>{
 
@@ -369,23 +332,7 @@ window.suggest = function(){
 
 };
 
-/* HIGHLIGHT */
-function highlight(text,q){
-
-    if(!q) return text;
-
-    return text.replace(
-        new RegExp(q,"gi"),
-        match => `
-            <span class="highlight">
-                ${match}
-            </span>
-        `
-    );
-
-}
-
-/* SUCHE */
+/* Suche */
 window.doSearch = function(){
 
     let q =
@@ -414,98 +361,93 @@ window.doSearch = function(){
 
         card.innerHTML = `
 
-            ${
-                f.bild
+            ${f.bild
                 ? `<img src="${f.bild}">`
                 : ""
             }
 
-            <div class="content">
+          <div class="content">
 
-                <div class="title">
-                    ${f.fahrzeug || "-"}
-                </div>
+    <div class="title">
+        ${f.fahrzeug || "-"}
+    </div>
 
-                <div class="line">
-                    <b>Ort:</b>
-                    ${f.ort || "-"}
-                </div>
+    <div class="line">
+        <b>Ort:</b>
+        ${f.ort || "-"}
+    </div>
 
-                <div class="line">
-                    <b>Adresse:</b>
-                    ${f.adresse || "-"}
-                </div>
+    <div class="line">
+        <b>Adresse:</b>
+        ${f.adresse || "-"}
+    </div>
 
-                <div class="line">
-                    <b>Telefon:</b>
+    <div class="line">
+        <b>Telefon:</b>
 
-                    ${
-                        f.telefon
-                        ? `
-                        <a
-                        class="phone"
-                        href="tel:${f.telefon}">
-                            ${f.telefon}
-                        </a>
-                        `
-                        : "-"
-                    }
+        ${
+            f.telefon
+            ? `
+            <a
+            class="phone"
+            href="tel:${f.telefon}">
+                ${f.telefon}
+            </a>
+            `
+            : "-"
+        }
 
-                </div>
+    </div>
 
-                <div class="line">
-                    <b>E-Mail:</b>
+    <div class="line">
+        <b>E-Mail:</b>
 
-                    ${
-                        f.email
-                        ? `
-                        <a
-                        class="phone"
-                        href="mailto:${f.email}">
-                            ${f.email}
-                        </a>
-                        `
-                        : "-"
-                    }
+        ${
+            f.email
+            ? `
+            <a
+            class="phone"
+            href="mailto:${f.email}">
+                ${f.email}
+            </a>
+            `
+            : "-"
+        }
 
-                </div>
+    </div>
 
-                <div class="line">
-                    <b>Funk:</b>
-                    ${f.funk || "-"}
-                </div>
+    <div class="line">
+        <b>Funk:</b>
+        ${f.funk || "-"}
+    </div>
 
-                <div class="line">
-                    <b>Stärke:</b>
-                    ${f.staerke || "-"}
-                </div>
+    <div class="line">
+        <b>Stärke:</b>
+        ${f.staerke || "-"}
+    </div>
 
-                <button
-                class="toggle"
-                onclick="toggleDetail(this)">
+  <button
+class="toggle"
+onclick="toggleDetail(this)">
 
-                    Beladung anzeigen
+    Beladung anzeigen
 
-                </button>
+</button>
 
-                <div
-                class="detail"
-                style="display:none;">
+<div
+class="detail"
+style="display:none;">
 
-                    ${
-                        highlight(
-                            f.beladung ||
-                            "Keine Beladung vorhanden",
-                            q
-                        )
-                    }
+    ${
+        f.beladung ||
+        "Keine Beladung vorhanden"
+    }
 
-                </div>
+</div>
 
-            </div>
+</div>
 
-        `;
-
+`;
         results.appendChild(card);
 
     });
@@ -513,18 +455,16 @@ window.doSearch = function(){
     if(found === 0){
 
         results.innerHTML = `
-
             <div class="empty">
                 Keine Fahrzeuge gefunden
             </div>
-
         `;
 
     }
 
 };
 
-/* DETAILS */
+/* Details */
 window.toggleDetail = function(btn){
 
     let detail =
@@ -535,14 +475,14 @@ window.toggleDetail = function(btn){
 
         detail.style.display = "block";
 
-        btn.textContent =
+        btn.innerHTML =
             "Beladung ausblenden";
 
     }else{
 
         detail.style.display = "none";
 
-        btn.textContent =
+        btn.innerHTML =
             "Beladung anzeigen";
 
     }
@@ -560,7 +500,7 @@ search.addEventListener("keypress", e=>{
 
 });
 
-/* ZURÜCK */
+/* Zurück */
 window.back = function(){
 
     location.href = "index.html";
