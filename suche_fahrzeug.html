@@ -426,30 +426,24 @@ window.doSearch = function(){
         ${f.staerke || "-"}
     </div>
 
-    <button
-    class="toggle"
-    onclick="toggleDetail(this)">
+  <button
+class="toggle"
+onclick="toggleDetail(this)">
 
-        Beladung anzeigen
+    Beladung anzeigen
 
-    </button>
+</button>
 
-                    Beladung anzeigen
+<div
+class="detail"
+style="display:none;">
 
-                </button>
+    ${
+        f.beladung ||
+        "Keine Beladung vorhanden"
+    }
 
-                <div
-                class="detail"
-                style="display:none;">
-
-                    ${
-                        f.beladung ||
-                        "Keine Beladung vorhanden"
-                    }
-
-                </div>
-
-            </div>
+</div>
 
         `;
 
