@@ -11,8 +11,10 @@
 
 <style>
 
-/* GEGEN DOPPELTEN / GHOST TEXT */
+/* ALLES */
 *{
+    box-sizing:border-box;
+
     -webkit-user-select:none;
     -ms-user-select:none;
     user-select:none;
@@ -28,15 +30,24 @@ textarea{
     user-select:text;
 }
 
+/* BODY */
 body{
-    background:black;
+    margin:0;
+    padding:20px;
+    background:#000;
     overflow-x:hidden;
+
+    color:white;
+
+    font-family:Arial,Helvetica,sans-serif;
 
     -webkit-font-smoothing:antialiased;
     text-rendering:optimizeLegibility;
 }
 
+/* CONTAINER */
 .page{
+    width:100%;
     max-width:1400px;
     margin:40px auto;
     background:#1c1f26;
@@ -44,15 +55,23 @@ body{
     border-radius:20px;
 }
 
+/* TITEL */
+h2{
+    color:white;
+    margin-top:0;
+    margin-bottom:25px;
+}
+
+/* TOP */
 .top{
     display:grid;
     grid-template-columns:2fr 1fr;
     gap:25px;
 }
 
+/* SUCHFELD */
 .searchBox input{
     width:100%;
-    box-sizing:border-box;
     padding:16px;
     border:none;
     border-radius:14px;
@@ -62,6 +81,7 @@ body{
     outline:none;
 }
 
+/* BUTTONS */
 .buttons{
     margin-top:15px;
     display:flex;
@@ -79,10 +99,6 @@ button{
     transition:0.2s;
 }
 
-button:hover{
-    transform:translateY(-2px);
-}
-
 .searchBtn{
     background:#2563eb;
 }
@@ -95,6 +111,7 @@ button:hover{
     background:#f59e0b;
 }
 
+/* VORSCHLÄGE */
 .suggestions{
     background:#111318;
     border-radius:16px;
@@ -102,6 +119,11 @@ button:hover{
     max-height:300px;
     overflow:auto;
     padding:10px;
+    color:white;
+}
+
+.suggestions *{
+    color:white !important;
 }
 
 .suggest{
@@ -116,6 +138,7 @@ button:hover{
     background:#1c1f26;
 }
 
+/* STATUS */
 .status{
     margin-top:20px;
     text-align:center;
@@ -123,56 +146,67 @@ button:hover{
     color:white;
 }
 
+/* ERGEBNISSE */
 .results{
     margin-top:35px;
+
     display:grid;
+
     grid-template-columns:
     repeat(auto-fill,minmax(350px,1fr));
+
     gap:25px;
 }
 
+/* KARTEN */
 .card{
     background:#111318;
     border-radius:20px;
-    overflow:hidden;
+
+    overflow:visible;
+
     box-shadow:0 0 15px rgba(0,0,0,0.3);
+
     transition:0.2s;
 
     position:relative;
-    z-index:1;
 }
 
+/* WICHTIG -> KEIN transform mehr */
 .card:hover{
-    transform:translateY(-4px);
+    box-shadow:0 0 25px rgba(0,0,0,0.5);
 }
 
+/* BILD */
 .card img{
     width:100%;
     height:220px;
     object-fit:cover;
+    display:block;
 }
 
+/* CONTENT */
 .content{
     padding:20px;
     color:white;
 }
 
+/* TITEL */
 .title{
     font-size:22px;
     font-weight:bold;
     margin-bottom:15px;
     color:white;
-
-    position:relative;
-    z-index:2;
 }
 
+/* ZEILEN */
 .line{
     margin-bottom:10px;
     line-height:1.6;
     color:#e2e8f0;
 }
 
+/* LINKS */
 .phone{
     color:#60a5fa;
     text-decoration:none;
@@ -182,6 +216,7 @@ button:hover{
     text-decoration:underline;
 }
 
+/* DETAIL */
 .detail{
     margin-top:18px;
     background:#1c1f26;
@@ -192,6 +227,7 @@ button:hover{
     color:white;
 }
 
+/* LEER */
 .empty{
     text-align:center;
     padding:40px;
@@ -199,6 +235,7 @@ button:hover{
     color:white;
 }
 
+/* MOBILE */
 @media(max-width:950px){
 
     .top{
@@ -215,7 +252,7 @@ button:hover{
 
 <div class="page">
 
-<h2 style="color:white;">
+<h2>
     Geräte Suche
 </h2>
 
@@ -226,6 +263,8 @@ button:hover{
         <input
         id="search"
         autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
         spellcheck="false"
         placeholder="Gerät oder Beladung suchen..."
         oninput="suggest()">
@@ -280,7 +319,7 @@ import "./firebase.js";
 let geraete = [];
 let fahrzeuge = [];
 
-/* Geräte laden */
+/* GERÄTE LADEN */
 onValue(ref(db,"geraete"), snap=>{
 
     geraete =
@@ -290,7 +329,7 @@ onValue(ref(db,"geraete"), snap=>{
 
 });
 
-/* Fahrzeuge laden */
+/* FAHRZEUGE LADEN */
 onValue(ref(db,"fahrzeuge"), snap=>{
 
     fahrzeuge =
@@ -303,7 +342,7 @@ onValue(ref(db,"fahrzeuge"), snap=>{
 
 });
 
-/* Vorschläge */
+/* VORSCHLÄGE */
 window.suggest = function(){
 
     let q =
@@ -317,7 +356,7 @@ window.suggest = function(){
 
     let found = new Set();
 
-    /* Geräte */
+    /* GERÄTE */
     geraete.forEach(g=>{
 
         if(
@@ -333,7 +372,7 @@ window.suggest = function(){
 
     });
 
-    /* Fahrzeuge */
+    /* FAHRZEUGE */
     fahrzeuge.forEach(f=>{
 
         if(!f.beladung) return;
@@ -391,7 +430,7 @@ window.suggest = function(){
 
 };
 
-/* Suche */
+/* SUCHE */
 window.doSearch = function(){
 
     let q =
@@ -403,7 +442,7 @@ window.doSearch = function(){
 
     let found = 0;
 
-    /* Geräte */
+    /* GERÄTE */
     geraete.forEach(g=>{
 
         if(
@@ -421,7 +460,7 @@ window.doSearch = function(){
 
     });
 
-    /* Fahrzeuge */
+    /* FAHRZEUGE */
     fahrzeuge.forEach(f=>{
 
         if(
@@ -451,7 +490,7 @@ window.doSearch = function(){
 
 };
 
-/* Gerätekarte */
+/* GERÄTEKARTE */
 function showGeraet(g){
 
     let card =
@@ -530,7 +569,7 @@ function showGeraet(g){
 
 }
 
-/* Fahrzeugkarte */
+/* FAHRZEUGKARTE */
 function showFahrzeug(f){
 
     let beladung =
@@ -610,7 +649,7 @@ search.addEventListener("keypress", e=>{
 
 });
 
-/* Zurück */
+/* ZURÜCK */
 window.back = function(){
 
     location.href = "index.html";
