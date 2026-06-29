@@ -163,7 +163,7 @@ button{
     background:#111318;
     border-radius:20px;
 
-    overflow:visible;
+    overflow:hidden;
 
     box-shadow:0 0 15px rgba(0,0,0,0.3);
 
@@ -193,10 +193,20 @@ button{
 
 /* TITEL */
 .title{
+    display:block;
+    position:relative;
+
     font-size:22px;
     font-weight:bold;
+
     margin-bottom:15px;
+
     color:white;
+
+    z-index:5;
+
+    overflow:hidden;
+    word-break:break-word;
 }
 
 /* ZEILEN */
