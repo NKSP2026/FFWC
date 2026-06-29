@@ -309,11 +309,10 @@ class="grid">
 
 import "./firebase.js";
 
-/* FIREBASE GLOBAL */
+/* FIREBASE */
 const db = window.db;
-
-const onValue = window.onValue;
 const ref = window.ref;
+const onValue = window.onValue;
 const set = window.set;
 const remove = window.remove;
 
@@ -472,43 +471,68 @@ function renderSection(
             </div>
 
             <div class="field">
-
                 <label>Ort</label>
 
                 <input
                 id="${type}_ort_${key}"
                 value="${d.ort || ""}">
-
             </div>
 
             <div class="field">
-
                 <label>Adresse</label>
 
                 <input
                 id="${type}_adresse_${key}"
                 value="${d.adresse || ""}">
-
             </div>
 
             <div class="field">
-
                 <label>E-Mail</label>
 
                 <input
                 id="${type}_email_${key}"
                 value="${d.email || ""}">
-
             </div>
 
             <div class="field">
-
                 <label>Telefon</label>
 
                 <input
                 id="${type}_telefon_${key}"
                 value="${d.telefon || ""}">
+            </div>
 
+            <div class="field">
+                <label>Funk</label>
+
+                <input
+                id="${type}_funk_${key}"
+                value="${d.funk || ""}">
+            </div>
+
+            <div class="field">
+                <label>Stärke</label>
+
+                <input
+                id="${type}_staerke_${key}"
+                value="${d.staerke || ""}">
+            </div>
+
+            <div class="field">
+                <label>Lagerort</label>
+
+                <input
+                id="${type}_lagerort_${key}"
+                value="${d.lagerort || ""}">
+            </div>
+
+            <div class="field">
+                <label>Beladung</label>
+
+                <textarea
+                id="${type}_beladung_${key}">${
+                    d.beladung || ""
+                }</textarea>
             </div>
 
             <div class="actions">
@@ -595,7 +619,7 @@ window.saveEntry = async function(
 
     try{
 
-        status.innerHTML =
+        document.getElementById("status").innerHTML =
             "💾 Speichere...";
 
         let daten = {
@@ -618,7 +642,27 @@ window.saveEntry = async function(
             telefon:
                 document.getElementById(
                     `${type}_telefon_${key}`
-                ).value
+                ).value,
+
+            funk:
+                document.getElementById(
+                    `${type}_funk_${key}`
+                )?.value || "",
+
+            staerke:
+                document.getElementById(
+                    `${type}_staerke_${key}`
+                )?.value || "",
+
+            lagerort:
+                document.getElementById(
+                    `${type}_lagerort_${key}`
+                )?.value || "",
+
+            beladung:
+                document.getElementById(
+                    `${type}_beladung_${key}`
+                )?.value || ""
 
         };
 
@@ -639,12 +683,26 @@ window.saveEntry = async function(
 
         }
 
+        /* ALTE DATEN BEHALTEN */
+        let alteDaten =
+            type === "geraete"
+            ? geraeteData[key]
+            : fahrzeugeData[key];
+
+        daten = {
+            ...alteDaten,
+            ...daten
+        };
+
         await set(
-            ref(db,`${type}/${key}`),
+            ref(
+                db,
+                `${type}/${key}`
+            ),
             daten
         );
 
-        status.innerHTML =
+        document.getElementById("status").innerHTML =
             "✅ Gespeichert";
 
         document.getElementById(
@@ -657,7 +715,7 @@ window.saveEntry = async function(
 
         alert(e);
 
-        status.innerHTML =
+        document.getElementById("status").innerHTML =
             "❌ Fehler";
 
     }
@@ -685,7 +743,7 @@ window.deleteEntry = async function(
             )
         );
 
-        status.innerHTML =
+        document.getElementById("status").innerHTML =
             "🗑️ Gelöscht";
 
     }catch(e){
@@ -694,7 +752,7 @@ window.deleteEntry = async function(
 
         alert(e);
 
-        status.innerHTML =
+        document.getElementById("status").innerHTML =
             "❌ Fehler";
 
     }
@@ -709,5 +767,6 @@ window.back = function(){
 };
 
 </script>
+
 </body>
 </html>
