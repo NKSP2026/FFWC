@@ -25,7 +25,6 @@ body{
     overflow-x:hidden;
 }
 
-/* SEITE */
 .page{
     width:95%;
     max-width:1500px;
@@ -36,7 +35,6 @@ body{
     box-shadow:0 0 30px rgba(0,0,0,0.4);
 }
 
-/* TOP */
 .top{
     display:flex;
     gap:20px;
@@ -309,7 +307,9 @@ class="grid">
 
 <script type="module">
 
-import "./firebase.js";
+import {
+    db
+} from "./firebase.js";
 
 import {
 
@@ -644,101 +644,103 @@ window.saveEntry = async function(
         status.innerHTML =
             "💾 Speichere...";
 
-        let data = {
+        let neuerName =
+            document.getElementById(
+                `${type}_name_${key}`
+            ).value.trim();
+
+        let neueDaten = {
 
             ort:
                 document.getElementById(
                     `${type}_ort_${key}`
-                ).value,
+                ).value.trim(),
 
             adresse:
                 document.getElementById(
                     `${type}_adresse_${key}`
-                ).value,
+                ).value.trim(),
 
             email:
                 document.getElementById(
                     `${type}_email_${key}`
-                ).value,
+                ).value.trim(),
 
             telefon:
                 document.getElementById(
                     `${type}_telefon_${key}`
-                ).value,
+                ).value.trim(),
 
             funk:
                 document.getElementById(
                     `${type}_funk_${key}`
-                ).value,
+                ).value.trim(),
 
             staerke:
                 document.getElementById(
                     `${type}_staerke_${key}`
-                ).value,
+                ).value.trim(),
 
             lagerort:
                 document.getElementById(
                     `${type}_lager_${key}`
-                ).value,
+                ).value.trim(),
 
             beladung:
                 document.getElementById(
                     `${type}_beladung_${key}`
-                ).value,
+                ).value.trim(),
 
             bemerkung:
                 document.getElementById(
                     `${type}_bemerkung_${key}`
-                ).value
+                ).value.trim()
 
         };
 
-        /* NAME */
-        if(type==="geraete"){
+        if(type === "geraete"){
 
-            data.geraete =
-                document.getElementById(
-                    `${type}_name_${key}`
-                ).value;
+            neueDaten.geraete =
+                neuerName;
 
         }else{
 
-            data.fahrzeug =
-                document.getElementById(
-                    `${type}_name_${key}`
-                ).value;
+            neueDaten.fahrzeug =
+                neuerName;
 
         }
 
-        /* FIREBASE */
+        let komplett = {
+
+            ...(type === "geraete"
+                ? geraeteData[key]
+                : fahrzeugeData[key]),
+
+            ...neueDaten
+
+        };
+
         await update(
             ref(db,`${type}/${key}`),
-            data
+            komplett
         );
 
-        /* LOKALE DATEN */
-        if(type==="geraete"){
+        if(type === "geraete"){
 
-            geraeteData[key] = {
-                ...geraeteData[key],
-                ...data
-            };
+            geraeteData[key] =
+                komplett;
 
         }else{
 
-            fahrzeugeData[key] = {
-                ...fahrzeugeData[key],
-                ...data
-            };
+            fahrzeugeData[key] =
+                komplett;
 
         }
 
-        /* EDIT SCHLIESSEN */
         document.getElementById(
             `edit_${type}_${key}`
         ).style.display = "none";
 
-        /* NEU LADEN */
         renderAll();
 
         status.innerHTML =
