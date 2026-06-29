@@ -11,17 +11,15 @@
 
 <style>
 
-/* ALLES SAUBER */
 *{
     box-sizing:border-box;
     margin:0;
     padding:0;
-
     -webkit-tap-highlight-color:transparent;
 }
 
 body{
-    background:black;
+    background:#050505;
     font-family:Arial,sans-serif;
     color:white;
     overflow-x:hidden;
@@ -30,11 +28,12 @@ body{
 /* SEITE */
 .page{
     width:95%;
-    max-width:1400px;
-    margin:40px auto;
+    max-width:1500px;
+    margin:35px auto;
     background:#1c1f26;
     padding:30px;
-    border-radius:20px;
+    border-radius:24px;
+    box-shadow:0 0 30px rgba(0,0,0,0.4);
 }
 
 /* TOP */
@@ -54,9 +53,9 @@ body{
 
 .search input{
     width:100%;
-    padding:16px;
+    padding:18px;
     border:none;
-    border-radius:14px;
+    border-radius:16px;
     background:#111318;
     color:white;
     font-size:16px;
@@ -72,12 +71,13 @@ body{
 
 button{
     border:none;
-    border-radius:12px;
-    padding:12px 18px;
+    border-radius:14px;
+    padding:13px 20px;
     color:white;
     font-weight:bold;
     cursor:pointer;
     transition:0.2s;
+    font-size:15px;
 }
 
 button:hover{
@@ -102,9 +102,9 @@ button:hover{
 
 /* TITEL */
 .sectionTitle{
-    margin-top:40px;
-    margin-bottom:20px;
-    font-size:30px;
+    margin-top:45px;
+    margin-bottom:22px;
+    font-size:34px;
     color:white;
 }
 
@@ -112,75 +112,75 @@ button:hover{
 .grid{
     display:grid;
     grid-template-columns:
-    repeat(auto-fit,minmax(340px,1fr));
-    gap:20px;
+    repeat(auto-fit,minmax(360px,1fr));
+    gap:24px;
 }
 
 /* CARD */
 .card{
     background:#111318;
-    border-radius:18px;
+    border-radius:22px;
     overflow:hidden;
-    padding:20px;
-    box-shadow:0 0 15px rgba(0,0,0,0.3);
-    transition:0.2s;
+    box-shadow:0 0 18px rgba(0,0,0,0.35);
+    transition:0.25s;
 }
 
 .card:hover{
-    transform:translateY(-3px);
+    transform:translateY(-4px);
 }
 
-.card img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
-    border-radius:14px;
-    margin-bottom:15px;
-}
-
-/* TITEL IN KARTE */
-.title{
-    display:block;
-    width:100%;
-
-    background:#1c1f26;
-
-    color:white;
-
-    padding:14px;
-
-    border-radius:12px;
-
-    font-size:22px;
-    font-weight:bold;
-
-    margin-bottom:18px;
-
-    overflow:hidden;
-    word-break:break-word;
-
-    position:relative;
-    z-index:5;
-
+/* VORSCHAU */
+.preview{
     cursor:pointer;
-
-    border:2px solid transparent;
-
-    transition:0.2s;
 }
 
-.title:hover{
-    border-color:#2563eb;
+.previewImg{
+    width:100%;
+    height:230px;
+    object-fit:cover;
 }
 
-/* FELDER */
+/* INHALT */
+.previewContent{
+    padding:22px;
+}
+
+.previewTitle{
+    font-size:28px;
+    font-weight:bold;
+    margin-bottom:12px;
+    color:white;
+    word-break:break-word;
+}
+
+.previewSub{
+    color:#cbd5e1;
+    margin-bottom:10px;
+    font-size:16px;
+}
+
+.previewInfo{
+    color:#60a5fa;
+    font-size:15px;
+    margin-top:8px;
+    line-height:1.5;
+}
+
+/* EDIT */
+.editBox{
+    display:none;
+    background:#0f1117;
+    padding:22px;
+    border-top:1px solid #1f2937;
+}
+
 .field{
-    margin-bottom:15px;
+    margin-bottom:18px;
 }
 
 .field label{
     display:block;
-    margin-bottom:6px;
+    margin-bottom:7px;
     font-weight:bold;
     color:white;
 }
@@ -188,9 +188,9 @@ button:hover{
 .field input,
 .field textarea{
     width:100%;
-    padding:12px;
+    padding:14px;
     border:none;
-    border-radius:12px;
+    border-radius:14px;
     background:#1c1f26;
     color:white;
     outline:none;
@@ -198,16 +198,15 @@ button:hover{
 }
 
 .field textarea{
-    min-height:100px;
+    min-height:120px;
     resize:vertical;
 }
 
-/* BUTTON LEISTE */
 .actions{
     display:flex;
-    gap:10px;
+    gap:12px;
     flex-wrap:wrap;
-    margin-top:15px;
+    margin-top:10px;
 }
 
 /* STATUS */
@@ -216,10 +215,15 @@ button:hover{
     text-align:center;
     font-weight:bold;
     color:white;
+    font-size:16px;
 }
 
 /* MOBILE */
-@media(max-width:900px){
+@media(max-width:950px){
+
+    .page{
+        padding:20px;
+    }
 
     .top{
         flex-direction:column;
@@ -232,6 +236,14 @@ button:hover{
 
     .buttons button{
         flex:1;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .previewTitle{
+        font-size:24px;
     }
 
 }
@@ -316,32 +328,25 @@ remove
 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-
 let geraeteData = {};
 let fahrzeugeData = {};
 
-
-/* GERÄTE LADEN */
+/* LADEN */
 onValue(ref(db,"geraete"), snap=>{
 
     geraeteData = snap.val() || {};
-
     renderAll();
 
 });
 
-
-/* FAHRZEUGE LADEN */
 onValue(ref(db,"fahrzeuge"), snap=>{
 
     fahrzeugeData = snap.val() || {};
-
     renderAll();
 
 });
 
-
-/* ALLES RENDERN */
+/* RENDERN */
 window.renderAll = function(){
 
     let q =
@@ -366,8 +371,7 @@ window.renderAll = function(){
 
 };
 
-
-/* BEREICH */
+/* SEKTION */
 function renderSection(
     target,
     data,
@@ -390,6 +394,11 @@ function renderSection(
             d.fahrzeug ||
             "-";
 
+        let subtitle =
+            d.ort ||
+            d.lagerort ||
+            "Kein Ort";
+
         let card =
             document.createElement("div");
 
@@ -398,27 +407,57 @@ function renderSection(
         card.innerHTML = `
 
             <div
-            class="title"
+            class="preview"
             ondblclick="
                 toggleEdit(
                     '${type}',
                     '${key}'
                 )
             ">
-                ${name}
-            </div>
-
-            <div
-            id="edit_${type}_${key}"
-            style="display:none;">
 
                 ${
                     d.bild
                     ? `
-                    <img src="${d.bild}">
+                    <img
+                    src="${d.bild}"
+                    class="previewImg">
                     `
                     : ""
                 }
+
+                <div class="previewContent">
+
+                    <div class="previewTitle">
+                        ${name}
+                    </div>
+
+                    <div class="previewSub">
+                        ${subtitle}
+                    </div>
+
+                    <div class="previewInfo">
+
+                        ${
+                            d.telefon
+                            ? `📞 ${d.telefon}<br>`
+                            : ""
+                        }
+
+                        ${
+                            d.email
+                            ? `✉️ ${d.email}`
+                            : ""
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div
+            id="edit_${type}_${key}"
+            class="editBox">
 
                 <div class="field">
 
@@ -568,8 +607,7 @@ function renderSection(
 
 }
 
-
-/* ÖFFNEN */
+/* EDIT ÖFFNEN */
 window.toggleEdit = function(
     type,
     key
@@ -580,18 +618,17 @@ window.toggleEdit = function(
             `edit_${type}_${key}`
         );
 
-    if(el.style.display === "none"){
+    if(el.style.display === "block"){
 
-        el.style.display = "block";
+        el.style.display = "none";
 
     }else{
 
-        el.style.display = "none";
+        el.style.display = "block";
 
     }
 
 };
-
 
 /* SPEICHERN */
 window.saveEntry = async function(
@@ -688,7 +725,6 @@ window.saveEntry = async function(
 
 };
 
-
 /* LÖSCHEN */
 window.deleteEntry = async function(
     type,
@@ -720,7 +756,6 @@ window.deleteEntry = async function(
     }
 
 };
-
 
 /* ZURÜCK */
 window.back = function(){
