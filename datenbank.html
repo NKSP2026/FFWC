@@ -307,21 +307,17 @@ class="grid">
 
 <script type="module">
 
-/* FIREBASE */
 import "./firebase.js";
 
+/* FIREBASE GLOBAL */
 const db = window.db;
 
-import {
+const onValue = window.onValue;
+const ref = window.ref;
+const set = window.set;
+const remove = window.remove;
 
-onValue,
-ref,
-update,
-remove,
-set
-
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+/* DATEN */
 let geraeteData = {};
 let fahrzeugeData = {};
 
@@ -329,6 +325,7 @@ let fahrzeugeData = {};
 onValue(ref(db,"geraete"), snap=>{
 
     geraeteData = snap.val() || {};
+
     renderAll();
 
 });
@@ -336,11 +333,12 @@ onValue(ref(db,"geraete"), snap=>{
 onValue(ref(db,"fahrzeuge"), snap=>{
 
     fahrzeugeData = snap.val() || {};
+
     renderAll();
 
 });
 
-/* RENDERN */
+/* RENDER */
 window.renderAll = function(){
 
     let q =
@@ -400,209 +398,163 @@ function renderSection(
 
         card.innerHTML = `
 
-            <div
-            class="preview"
-            ondblclick="
-                toggleEdit(
-                    '${type}',
-                    '${key}'
-                )
-            ">
+        <div
+        class="preview"
+        ondblclick="
+            toggleEdit(
+                '${type}',
+                '${key}'
+            )
+        ">
 
-                ${
-                    d.bild
-                    ? `
-                    <img
-                    src="${d.bild}"
-                    class="previewImg">
-                    `
-                    : ""
-                }
+            ${
+                d.bild
+                ? `
+                <img
+                src="${d.bild}"
+                class="previewImg">
+                `
+                : ""
+            }
 
-                <div class="previewContent">
+            <div class="previewContent">
 
-                    <div class="previewTitle">
-                        ${name}
-                    </div>
+                <div class="previewTitle">
+                    ${name}
+                </div>
 
-                    <div class="previewSub">
-                        ${subtitle}
-                    </div>
+                <div class="previewSub">
+                    ${subtitle}
+                </div>
 
-                    <div class="previewInfo">
+                <div class="previewInfo">
 
-                        ${
-                            d.telefon
-                            ? `📞 ${d.telefon}<br>`
-                            : ""
-                        }
+                    ${
+                        d.telefon
+                        ? `📞 ${d.telefon}<br>`
+                        : ""
+                    }
 
-                        ${
-                            d.email
-                            ? `✉️ ${d.email}`
-                            : ""
-                        }
-
-                    </div>
+                    ${
+                        d.email
+                        ? `✉️ ${d.email}`
+                        : ""
+                    }
 
                 </div>
 
             </div>
 
-            <div
-            id="edit_${type}_${key}"
-            class="editBox">
+        </div>
 
-                <div class="field">
+        <div
+        id="edit_${type}_${key}"
+        class="editBox">
 
-                    <label>
-                        ${
-                            type==="geraete"
-                            ? "Gerät"
-                            : "Fahrzeug"
-                        }
-                    </label>
+            <div class="field">
 
-                    <input
-                    id="${type}_name_${key}"
-                    value="${
-                        d.geraete ||
-                        d.fahrzeug ||
-                        ""
-                    }">
+                <label>
+                    ${
+                        type==="geraete"
+                        ? "Gerät"
+                        : "Fahrzeug"
+                    }
+                </label>
 
-                </div>
-
-                <div class="field">
-
-                    <label>Ort</label>
-
-                    <input
-                    id="${type}_ort_${key}"
-                    value="${d.ort || ""}">
-
-                </div>
-
-                <div class="field">
-
-                    <label>Adresse</label>
-
-                    <input
-                    id="${type}_adresse_${key}"
-                    value="${d.adresse || ""}">
-
-                </div>
-
-                <div class="field">
-
-                    <label>E-Mail</label>
-
-                    <input
-                    id="${type}_email_${key}"
-                    value="${d.email || ""}">
-
-                </div>
-
-                <div class="field">
-
-                    <label>Telefon</label>
-
-                    <input
-                    id="${type}_telefon_${key}"
-                    value="${d.telefon || ""}">
-
-                </div>
-
-                <div class="field">
-
-                    <label>Funk</label>
-
-                    <input
-                    id="${type}_funk_${key}"
-                    value="${d.funk || ""}">
-
-                </div>
-
-                <div class="field">
-
-                    <label>Stärke</label>
-
-                    <input
-                    id="${type}_staerke_${key}"
-                    value="${d.staerke || ""}">
-
-                </div>
-
-                <div class="field">
-
-                    <label>Lagerort</label>
-
-                    <input
-                    id="${type}_lager_${key}"
-                    value="${d.lagerort || ""}">
-
-                </div>
-
-                <div class="field">
-
-                    <label>Beladung</label>
-
-                    <textarea
-                    id="${type}_beladung_${key}">${
-                        d.beladung || ""
-                    }</textarea>
-
-                </div>
-
-                <div class="field">
-
-                    <label>Bemerkung</label>
-
-                    <textarea
-                    id="${type}_bemerkung_${key}">${
-                        d.bemerkung || ""
-                    }</textarea>
-
-                </div>
-
-                <div class="actions">
-
-                    <button
-                    class="save"
-                    onclick="saveEntry(
-                        '${type}',
-                        '${key}'
-                    )">
-
-                        Speichern
-
-                    </button>
-
-                    <button
-                    class="cancel"
-                    onclick="toggleEdit(
-                        '${type}',
-                        '${key}'
-                    )">
-
-                        Schließen
-
-                    </button>
-
-                    <button
-                    class="delete"
-                    onclick="deleteEntry(
-                        '${type}',
-                        '${key}'
-                    )">
-
-                        Löschen
-
-                    </button>
-
-                </div>
+                <input
+                id="${type}_name_${key}"
+                value="${
+                    d.geraete ||
+                    d.fahrzeug ||
+                    ""
+                }">
 
             </div>
+
+            <div class="field">
+
+                <label>Ort</label>
+
+                <input
+                id="${type}_ort_${key}"
+                value="${d.ort || ""}">
+
+            </div>
+
+            <div class="field">
+
+                <label>Adresse</label>
+
+                <input
+                id="${type}_adresse_${key}"
+                value="${d.adresse || ""}">
+
+            </div>
+
+            <div class="field">
+
+                <label>E-Mail</label>
+
+                <input
+                id="${type}_email_${key}"
+                value="${d.email || ""}">
+
+            </div>
+
+            <div class="field">
+
+                <label>Telefon</label>
+
+                <input
+                id="${type}_telefon_${key}"
+                value="${d.telefon || ""}">
+
+            </div>
+
+            <div class="actions">
+
+                <button
+                class="save"
+                onclick="
+                    saveEntry(
+                        '${type}',
+                        '${key}'
+                    )
+                ">
+
+                    Speichern
+
+                </button>
+
+                <button
+                class="cancel"
+                onclick="
+                    toggleEdit(
+                        '${type}',
+                        '${key}'
+                    )
+                ">
+
+                    Schließen
+
+                </button>
+
+                <button
+                class="delete"
+                onclick="
+                    deleteEntry(
+                        '${type}',
+                        '${key}'
+                    )
+                ">
+
+                    Löschen
+
+                </button>
+
+            </div>
+
+        </div>
 
         `;
 
@@ -651,54 +603,29 @@ window.saveEntry = async function(
             ort:
                 document.getElementById(
                     `${type}_ort_${key}`
-                ).value.trim(),
+                ).value,
 
             adresse:
                 document.getElementById(
                     `${type}_adresse_${key}`
-                ).value.trim(),
+                ).value,
 
             email:
                 document.getElementById(
                     `${type}_email_${key}`
-                ).value.trim(),
+                ).value,
 
             telefon:
                 document.getElementById(
                     `${type}_telefon_${key}`
-                ).value.trim(),
-
-            funk:
-                document.getElementById(
-                    `${type}_funk_${key}`
-                ).value.trim(),
-
-            staerke:
-                document.getElementById(
-                    `${type}_staerke_${key}`
-                ).value.trim(),
-
-            lagerort:
-                document.getElementById(
-                    `${type}_lager_${key}`
-                ).value.trim(),
-
-            beladung:
-                document.getElementById(
-                    `${type}_beladung_${key}`
-                ).value.trim(),
-
-            bemerkung:
-                document.getElementById(
-                    `${type}_bemerkung_${key}`
-                ).value.trim()
+                ).value
 
         };
 
         let neuerName =
             document.getElementById(
                 `${type}_name_${key}`
-            ).value.trim();
+            ).value;
 
         if(type === "geraete"){
 
@@ -712,44 +639,26 @@ window.saveEntry = async function(
 
         }
 
-        /* KOMPLETT ÜBERSCHREIBEN */
         await set(
             ref(db,`${type}/${key}`),
             daten
         );
 
-        /* LOKAL AKTUALISIEREN */
-        if(type === "geraete"){
+        status.innerHTML =
+            "✅ Gespeichert";
 
-            geraeteData[key] =
-                daten;
-
-        }else{
-
-            fahrzeugeData[key] =
-                daten;
-
-        }
-
-        /* SCHLIESSEN */
         document.getElementById(
             `edit_${type}_${key}`
         ).style.display = "none";
-
-        /* NEU LADEN */
-        renderAll();
-
-        status.innerHTML =
-            "✅ Gespeichert";
 
     }catch(e){
 
         console.error(e);
 
-        status.innerHTML =
-            "❌ Fehler beim Speichern";
-
         alert(e);
+
+        status.innerHTML =
+            "❌ Fehler";
 
     }
 
@@ -770,7 +679,10 @@ window.deleteEntry = async function(
     try{
 
         await remove(
-            ref(db,`${type}/${key}`)
+            ref(
+                db,
+                `${type}/${key}`
+            )
         );
 
         status.innerHTML =
@@ -780,8 +692,10 @@ window.deleteEntry = async function(
 
         console.error(e);
 
+        alert(e);
+
         status.innerHTML =
-            "❌ Fehler beim Löschen";
+            "❌ Fehler";
 
     }
 
