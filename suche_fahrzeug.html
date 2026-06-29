@@ -11,6 +11,31 @@
 
 <style>
 
+/* WICHTIG GEGEN GHOST-TEXT */
+*{
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+
+    -webkit-touch-callout:none;
+    -webkit-tap-highlight-color:transparent;
+}
+
+input,
+textarea{
+    -webkit-user-select:text;
+    -ms-user-select:text;
+    user-select:text;
+}
+
+body{
+    background:black;
+    overflow-x:hidden;
+
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
+
 .page{
     max-width:1400px;
     margin:40px auto;
@@ -34,6 +59,7 @@
     background:#111318;
     color:white;
     font-size:16px;
+    outline:none;
 }
 
 .buttons{
@@ -83,6 +109,7 @@ button:hover{
     border-radius:10px;
     cursor:pointer;
     transition:0.2s;
+    color:white;
 }
 
 .suggest:hover{
@@ -93,6 +120,7 @@ button:hover{
     margin-top:20px;
     text-align:center;
     font-weight:bold;
+    color:white;
 }
 
 .results{
@@ -109,6 +137,9 @@ button:hover{
     overflow:hidden;
     transition:0.2s;
     box-shadow:0 0 15px rgba(0,0,0,0.3);
+
+    position:relative;
+    z-index:1;
 }
 
 .card:hover{
@@ -123,17 +154,23 @@ button:hover{
 
 .content{
     padding:20px;
+    color:white;
 }
 
 .title{
     font-size:24px;
     font-weight:bold;
     margin-bottom:15px;
+    color:white;
+
+    position:relative;
+    z-index:2;
 }
 
 .line{
     margin-bottom:10px;
     line-height:1.5;
+    color:white;
 }
 
 .phone{
@@ -152,6 +189,7 @@ button:hover{
     border-radius:14px;
     white-space:pre-wrap;
     line-height:1.6;
+    color:white;
 }
 
 .toggle{
@@ -164,6 +202,7 @@ button:hover{
     text-align:center;
     padding:40px;
     font-size:18px;
+    color:white;
 }
 
 @media(max-width:950px){
@@ -182,7 +221,9 @@ button:hover{
 
 <div class="page">
 
-<h2>Fahrzeug Suche</h2>
+<h2 style="color:white;">
+    Fahrzeug Suche
+</h2>
 
 <div class="top">
 
@@ -190,6 +231,8 @@ button:hover{
 
         <input
         id="search"
+        autocomplete="off"
+        spellcheck="false"
         placeholder="Fahrzeug, Funkrufname oder Gerät suchen..."
         oninput="suggest()">
 
@@ -238,7 +281,6 @@ button:hover{
 
 <script type="module">
 
-/* ZENTRALES FIREBASE */
 import "./firebase.js";
 
 let fahrzeuge = [];
@@ -284,21 +326,6 @@ window.suggest = function(){
 
         }
 
-        /* Abkürzungen */
-        if(
-            q.includes("hlf") &&
-            text.includes("hilfeleistung")
-        ){
-            found.add(f.fahrzeug);
-        }
-
-        if(
-            q.includes("dl") &&
-            text.includes("drehleiter")
-        ){
-            found.add(f.fahrzeug);
-        }
-
     });
 
     let count = 0;
@@ -314,7 +341,8 @@ window.suggest = function(){
 
         div.className = "suggest";
 
-        div.innerHTML = name;
+        /* WICHTIG */
+        div.textContent = name;
 
         div.onclick = ()=>{
 
@@ -361,93 +389,95 @@ window.doSearch = function(){
 
         card.innerHTML = `
 
-            ${f.bild
+            ${
+                f.bild
                 ? `<img src="${f.bild}">`
                 : ""
             }
 
-          <div class="content">
+            <div class="content">
 
-    <div class="title">
-        ${f.fahrzeug || "-"}
-    </div>
+                <div class="title">
+                    ${f.fahrzeug || "-"}
+                </div>
 
-    <div class="line">
-        <b>Ort:</b>
-        ${f.ort || "-"}
-    </div>
+                <div class="line">
+                    <b>Ort:</b>
+                    ${f.ort || "-"}
+                </div>
 
-    <div class="line">
-        <b>Adresse:</b>
-        ${f.adresse || "-"}
-    </div>
+                <div class="line">
+                    <b>Adresse:</b>
+                    ${f.adresse || "-"}
+                </div>
 
-    <div class="line">
-        <b>Telefon:</b>
+                <div class="line">
+                    <b>Telefon:</b>
 
-        ${
-            f.telefon
-            ? `
-            <a
-            class="phone"
-            href="tel:${f.telefon}">
-                ${f.telefon}
-            </a>
-            `
-            : "-"
-        }
+                    ${
+                        f.telefon
+                        ? `
+                        <a
+                        class="phone"
+                        href="tel:${f.telefon}">
+                            ${f.telefon}
+                        </a>
+                        `
+                        : "-"
+                    }
 
-    </div>
+                </div>
 
-    <div class="line">
-        <b>E-Mail:</b>
+                <div class="line">
+                    <b>E-Mail:</b>
 
-        ${
-            f.email
-            ? `
-            <a
-            class="phone"
-            href="mailto:${f.email}">
-                ${f.email}
-            </a>
-            `
-            : "-"
-        }
+                    ${
+                        f.email
+                        ? `
+                        <a
+                        class="phone"
+                        href="mailto:${f.email}">
+                            ${f.email}
+                        </a>
+                        `
+                        : "-"
+                    }
 
-    </div>
+                </div>
 
-    <div class="line">
-        <b>Funk:</b>
-        ${f.funk || "-"}
-    </div>
+                <div class="line">
+                    <b>Funk:</b>
+                    ${f.funk || "-"}
+                </div>
 
-    <div class="line">
-        <b>Stärke:</b>
-        ${f.staerke || "-"}
-    </div>
+                <div class="line">
+                    <b>Stärke:</b>
+                    ${f.staerke || "-"}
+                </div>
 
-  <button
-class="toggle"
-onclick="toggleDetail(this)">
+                <button
+                class="toggle"
+                onclick="toggleDetail(this)">
 
-    Beladung anzeigen
+                    Beladung anzeigen
 
-</button>
+                </button>
 
-<div
-class="detail"
-style="display:none;">
+                <div
+                class="detail"
+                style="display:none;">
 
-    ${
-        f.beladung ||
-        "Keine Beladung vorhanden"
-    }
+                    ${
+                        f.beladung ||
+                        "Keine Beladung vorhanden"
+                    }
 
-</div>
+                </div>
 
-</div>
+            </div>
 
-`;
+        `;
+
         results.appendChild(card);
 
     });
