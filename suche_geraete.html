@@ -352,7 +352,29 @@ onValue(ref(db,"fahrzeuge"), snap=>{
 
 });
 
-/* VORSCHLÄGE */
+/* =========================================
+   WORT BEGINNT MIT SUCHTEXT?
+========================================= */
+
+function startsLike(text,q){
+
+    if(!text) return false;
+
+    let woerter =
+        text
+        .toLowerCase()
+        .split(/[\s,;:.()\n\-\/]+/);
+
+    return woerter.some(w=>
+        w.startsWith(q)
+    );
+
+}
+
+/* =========================================
+   VORSCHLÄGE
+========================================= */
+
 window.suggest = function(){
 
     let q =
@@ -371,9 +393,7 @@ window.suggest = function(){
 
         if(
             g.geraete &&
-            g.geraete
-            .toLowerCase()
-            .includes(q)
+            startsLike(g.geraete,q)
         ){
 
             found.add(g.geraete);
@@ -387,17 +407,16 @@ window.suggest = function(){
 
         if(!f.beladung) return;
 
-        f.beladung
-        .split(",")
+        let teile =
+            f.beladung.split(",");
 
-        .forEach(t=>{
+        teile.forEach(t=>{
 
-            let name = t.trim();
+            let name =
+                t.trim();
 
             if(
-                name
-                .toLowerCase()
-                .includes(q)
+                startsLike(name,q)
             ){
 
                 found.add(name);
@@ -412,6 +431,7 @@ window.suggest = function(){
 
     [...found]
     .sort()
+
     .forEach(name=>{
 
         if(count >= 15) return;
@@ -421,7 +441,6 @@ window.suggest = function(){
 
         div.className = "suggest";
 
-        /* WICHTIG */
         div.textContent = name;
 
         div.onclick = ()=>{
@@ -440,7 +459,10 @@ window.suggest = function(){
 
 };
 
-/* SUCHE */
+/* =========================================
+   SUCHE
+========================================= */
+
 window.doSearch = function(){
 
     let q =
@@ -450,6 +472,17 @@ window.doSearch = function(){
 
     results.innerHTML = "";
 
+    if(!q){
+
+        results.innerHTML = `
+            <div class="empty">
+                Bitte Suchbegriff eingeben
+            </div>
+        `;
+
+        return;
+    }
+
     let found = 0;
 
     /* GERÄTE */
@@ -457,9 +490,7 @@ window.doSearch = function(){
 
         if(
             g.geraete &&
-            g.geraete
-            .toLowerCase()
-            .includes(q)
+            startsLike(g.geraete,q)
         ){
 
             found++;
@@ -475,9 +506,7 @@ window.doSearch = function(){
 
         if(
             f.beladung &&
-            f.beladung
-            .toLowerCase()
-            .includes(q)
+            startsLike(f.beladung,q)
         ){
 
             found++;
@@ -500,7 +529,10 @@ window.doSearch = function(){
 
 };
 
-/* GERÄTEKARTE */
+/* =========================================
+   GERÄTEKARTE
+========================================= */
+
 function showGeraet(g){
 
     let card =
@@ -579,7 +611,10 @@ function showGeraet(g){
 
 }
 
-/* FAHRZEUGKARTE */
+/* =========================================
+   FAHRZEUGKARTE
+========================================= */
+
 function showFahrzeug(f){
 
     let beladung =
