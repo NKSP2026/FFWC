@@ -11,22 +11,42 @@
 
 <style>
 
+/* ALLES SAUBER */
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    background:black;
+    font-family:Arial,sans-serif;
+    color:white;
+    overflow-x:hidden;
+}
+
+/* SEITE */
 .page{
-    max-width:1300px;
+    width:95%;
+    max-width:1400px;
     margin:40px auto;
     background:#1c1f26;
     padding:30px;
     border-radius:20px;
 }
 
+/* TOP */
 .top{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
     gap:20px;
+    align-items:center;
+    justify-content:space-between;
     flex-wrap:wrap;
 }
 
+/* SUCHE */
 .search{
     flex:1;
     min-width:250px;
@@ -34,15 +54,16 @@
 
 .search input{
     width:100%;
-    box-sizing:border-box;
-    padding:14px;
+    padding:16px;
     border:none;
-    border-radius:12px;
+    border-radius:14px;
     background:#111318;
     color:white;
-    font-size:15px;
+    font-size:16px;
+    outline:none;
 }
 
+/* BUTTONS */
 .buttons{
     display:flex;
     gap:10px;
@@ -79,60 +100,87 @@ button:hover{
     background:#dc2626;
 }
 
+/* TITEL */
 .sectionTitle{
     margin-top:40px;
     margin-bottom:20px;
-    font-size:28px;
+    font-size:30px;
     color:white;
 }
 
+/* GRID */
 .grid{
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    grid-template-columns:
+    repeat(auto-fit,minmax(340px,1fr));
     gap:20px;
 }
 
+/* CARD */
 .card{
     background:#111318;
     border-radius:18px;
+    overflow:hidden;
     padding:20px;
+    box-shadow:0 0 15px rgba(0,0,0,0.3);
     transition:0.2s;
 }
 
 .card:hover{
-    transform:translateY(-2px);
+    transform:translateY(-3px);
 }
 
 .card img{
     width:100%;
     height:220px;
     object-fit:cover;
-    border-radius:12px;
+    border-radius:14px;
     margin-bottom:15px;
 }
 
+/* TITEL IN KARTE */
 .title{
+    display:block;
+    width:100%;
+
+    background:#1c1f26;
+
+    color:white;
+
+    padding:14px;
+
+    border-radius:12px;
+
     font-size:22px;
     font-weight:bold;
-    color:white;
+
+    margin-bottom:18px;
+
+    overflow:hidden;
+    word-break:break-word;
+
+    position:relative;
+    z-index:5;
+
     cursor:pointer;
-    user-select:none;
-    padding:10px;
-    border-radius:10px;
-    background:#1c1f26;
+
+    border:2px solid transparent;
+
+    transition:0.2s;
 }
 
 .title:hover{
-    background:#2563eb;
+    border-color:#2563eb;
 }
 
+/* FELDER */
 .field{
-    margin-bottom:14px;
+    margin-bottom:15px;
 }
 
 .field label{
     display:block;
-    margin-bottom:5px;
+    margin-bottom:6px;
     font-weight:bold;
     color:white;
 }
@@ -140,12 +188,13 @@ button:hover{
 .field input,
 .field textarea{
     width:100%;
-    box-sizing:border-box;
     padding:12px;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     background:#1c1f26;
     color:white;
+    outline:none;
+    font-size:15px;
 }
 
 .field textarea{
@@ -153,24 +202,36 @@ button:hover{
     resize:vertical;
 }
 
+/* BUTTON LEISTE */
 .actions{
     display:flex;
     gap:10px;
-    margin-top:15px;
     flex-wrap:wrap;
+    margin-top:15px;
 }
 
+/* STATUS */
 .status{
     margin-top:20px;
-    font-weight:bold;
     text-align:center;
+    font-weight:bold;
     color:white;
 }
 
-@media(max-width:700px){
+/* MOBILE */
+@media(max-width:900px){
 
-    .grid{
-        grid-template-columns:1fr;
+    .top{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .buttons{
+        width:100%;
+    }
+
+    .buttons button{
+        flex:1;
     }
 
 }
@@ -189,6 +250,8 @@ button:hover{
 
         <input
         id="search"
+        autocomplete="off"
+        spellcheck="false"
         placeholder="Suche..."
         oninput="renderAll()">
 
@@ -196,12 +259,20 @@ button:hover{
 
     <div class="buttons">
 
-        <button class="back" onclick="back()">
+        <button
+        class="back"
+        onclick="back()">
+
             Zurück
+
         </button>
 
-        <button class="logout" onclick="logout()">
+        <button
+        class="logout"
+        onclick="logout()">
+
             Logout
+
         </button>
 
     </div>
@@ -210,13 +281,23 @@ button:hover{
 
 <div id="status" class="status"></div>
 
-<h2 class="sectionTitle">Geräte</h2>
+<h2 class="sectionTitle">
+    Geräte
+</h2>
 
-<div id="geraeteList" class="grid"></div>
+<div
+id="geraeteList"
+class="grid">
+</div>
 
-<h2 class="sectionTitle">Fahrzeuge</h2>
+<h2 class="sectionTitle">
+    Fahrzeuge
+</h2>
 
-<div id="fahrzeugeList" class="grid"></div>
+<div
+id="fahrzeugeList"
+class="grid">
+</div>
 
 </div>
 
@@ -264,17 +345,20 @@ onValue(ref(db,"fahrzeuge"), snap=>{
 window.renderAll = function(){
 
     let q =
-        search.value.toLowerCase();
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase();
 
     renderSection(
-        geraeteList,
+        document.getElementById("geraeteList"),
         geraeteData,
         "geraete",
         q
     );
 
     renderSection(
-        fahrzeugeList,
+        document.getElementById("fahrzeugeList"),
         fahrzeugeData,
         "fahrzeuge",
         q
@@ -321,16 +405,15 @@ function renderSection(
                     '${key}'
                 )
             ">
-
                 ${name}
-
             </div>
 
             <div
             id="edit_${type}_${key}"
             style="display:none;">
 
-                ${d.bild
+                ${
+                    d.bild
                     ? `
                     <img src="${d.bild}">
                     `
@@ -497,18 +580,13 @@ window.toggleEdit = function(
             `edit_${type}_${key}`
         );
 
-    if(
-        el.style.display ===
-        "none"
-    ){
+    if(el.style.display === "none"){
 
-        el.style.display =
-            "block";
+        el.style.display = "block";
 
     }else{
 
-        el.style.display =
-            "none";
+        el.style.display = "none";
 
     }
 
