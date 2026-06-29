@@ -11,6 +11,31 @@
 
 <style>
 
+/* GEGEN DOPPELTEN / GHOST TEXT */
+*{
+    -webkit-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+
+    -webkit-touch-callout:none;
+    -webkit-tap-highlight-color:transparent;
+}
+
+input,
+textarea{
+    -webkit-user-select:text;
+    -ms-user-select:text;
+    user-select:text;
+}
+
+body{
+    background:black;
+    overflow-x:hidden;
+
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+}
+
 .page{
     max-width:1400px;
     margin:40px auto;
@@ -34,6 +59,7 @@
     background:#111318;
     color:white;
     font-size:16px;
+    outline:none;
 }
 
 .buttons{
@@ -83,6 +109,7 @@ button:hover{
     border-radius:10px;
     cursor:pointer;
     transition:0.2s;
+    color:white;
 }
 
 .suggest:hover{
@@ -93,6 +120,7 @@ button:hover{
     margin-top:20px;
     text-align:center;
     font-weight:bold;
+    color:white;
 }
 
 .results{
@@ -109,6 +137,9 @@ button:hover{
     overflow:hidden;
     box-shadow:0 0 15px rgba(0,0,0,0.3);
     transition:0.2s;
+
+    position:relative;
+    z-index:1;
 }
 
 .card:hover{
@@ -123,13 +154,17 @@ button:hover{
 
 .content{
     padding:20px;
+    color:white;
 }
 
 .title{
     font-size:22px;
     font-weight:bold;
     margin-bottom:15px;
-    color:#f8fafc;
+    color:white;
+
+    position:relative;
+    z-index:2;
 }
 
 .line{
@@ -154,12 +189,14 @@ button:hover{
     border-radius:14px;
     white-space:pre-wrap;
     line-height:1.6;
+    color:white;
 }
 
 .empty{
     text-align:center;
     padding:40px;
     font-size:18px;
+    color:white;
 }
 
 @media(max-width:950px){
@@ -178,7 +215,9 @@ button:hover{
 
 <div class="page">
 
-<h2>Geräte Suche</h2>
+<h2 style="color:white;">
+    Geräte Suche
+</h2>
 
 <div class="top">
 
@@ -186,6 +225,8 @@ button:hover{
 
         <input
         id="search"
+        autocomplete="off"
+        spellcheck="false"
         placeholder="Gerät oder Beladung suchen..."
         oninput="suggest()">
 
@@ -234,7 +275,6 @@ button:hover{
 
 <script type="module">
 
-/* ZENTRALES FIREBASE */
 import "./firebase.js";
 
 let geraete = [];
@@ -332,7 +372,8 @@ window.suggest = function(){
 
         div.className = "suggest";
 
-        div.innerHTML = name;
+        /* WICHTIG */
+        div.textContent = name;
 
         div.onclick = ()=>{
 
@@ -392,7 +433,7 @@ window.doSearch = function(){
 
             found++;
 
-            showFahrzeug(f,q);
+            showFahrzeug(f);
 
         }
 
@@ -420,63 +461,65 @@ function showGeraet(g){
 
     card.innerHTML = `
 
-        ${g.bild
+        ${
+            g.bild
             ? `<img src="${g.bild}">`
             : ""
         }
 
-       <div class="content">
+        <div class="content">
 
-    <div class="title">
-        ${g.geraete || "-"}
-    </div>
+            <div class="title">
+                ${g.geraete || "-"}
+            </div>
 
-    <div class="line">
-        <b>Lagerort:</b>
-        ${g.lagerort || "-"}
-    </div>
+            <div class="line">
+                <b>Lagerort:</b>
+                ${g.lagerort || "-"}
+            </div>
 
-    <div class="line">
-        <b>Ort:</b>
-        ${g.ort || "-"}
-    </div>
+            <div class="line">
+                <b>Ort:</b>
+                ${g.ort || "-"}
+            </div>
 
-    <div class="line">
-        <b>Adresse:</b>
-        ${g.adresse || "-"}
-    </div>
+            <div class="line">
+                <b>Adresse:</b>
+                ${g.adresse || "-"}
+            </div>
 
-    <div class="line">
-        <b>Telefon:</b>
+            <div class="line">
+                <b>Telefon:</b>
 
-        ${
-            g.telefon
-            ? `
-            <a
-            class="phone"
-            href="tel:${g.telefon}">
-                ${g.telefon}
-            </a>
-            `
-            : "-"
-        }
+                ${
+                    g.telefon
+                    ? `
+                    <a
+                    class="phone"
+                    href="tel:${g.telefon}">
+                        ${g.telefon}
+                    </a>
+                    `
+                    : "-"
+                }
 
-    </div>
+            </div>
 
-    <div class="line">
-        <b>E-Mail:</b>
+            <div class="line">
+                <b>E-Mail:</b>
 
-        ${
-            g.email
-            ? `
-            <a
-            class="phone"
-            href="mailto:${g.email}">
-                ${g.email}
-            </a>
-            `
-            : "-"
-        }
+                ${
+                    g.email
+                    ? `
+                    <a
+                    class="phone"
+                    href="mailto:${g.email}">
+                        ${g.email}
+                    </a>
+                    `
+                    : "-"
+                }
+
             </div>
 
         </div>
@@ -488,10 +531,10 @@ function showGeraet(g){
 }
 
 /* Fahrzeugkarte */
-function showFahrzeug(f,q){
+function showFahrzeug(f){
 
-   let beladung =
-    f.beladung || "";
+    let beladung =
+        f.beladung || "";
 
     let card =
         document.createElement("div");
@@ -500,7 +543,8 @@ function showFahrzeug(f,q){
 
     card.innerHTML = `
 
-        ${f.bild
+        ${
+            f.bild
             ? `<img src="${f.bild}">`
             : ""
         }
@@ -554,7 +598,6 @@ function showFahrzeug(f,q){
     results.appendChild(card);
 
 }
-
 
 /* ENTER */
 search.addEventListener("keypress", e=>{
