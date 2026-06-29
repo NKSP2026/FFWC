@@ -317,7 +317,8 @@ import {
 onValue,
 ref,
 update,
-remove
+remove,
+set
 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -645,12 +646,7 @@ window.saveEntry = async function(
         status.innerHTML =
             "💾 Speichere...";
 
-        let neuerName =
-            document.getElementById(
-                `${type}_name_${key}`
-            ).value.trim();
-
-        let neueDaten = {
+        let daten = {
 
             ort:
                 document.getElementById(
@@ -699,26 +695,49 @@ window.saveEntry = async function(
 
         };
 
+        let neuerName =
+            document.getElementById(
+                `${type}_name_${key}`
+            ).value.trim();
+
         if(type === "geraete"){
 
-            neueDaten.geraete =
+            daten.geraete =
                 neuerName;
 
         }else{
 
-            neueDaten.fahrzeug =
+            daten.fahrzeug =
                 neuerName;
 
         }
 
-        await update(
+        /* KOMPLETT ÜBERSCHREIBEN */
+        await set(
             ref(db,`${type}/${key}`),
-            neueDaten
+            daten
         );
 
+        /* LOKAL AKTUALISIEREN */
+        if(type === "geraete"){
+
+            geraeteData[key] =
+                daten;
+
+        }else{
+
+            fahrzeugeData[key] =
+                daten;
+
+        }
+
+        /* SCHLIESSEN */
         document.getElementById(
             `edit_${type}_${key}`
         ).style.display = "none";
+
+        /* NEU LADEN */
+        renderAll();
 
         status.innerHTML =
             "✅ Gespeichert";
@@ -729,6 +748,8 @@ window.saveEntry = async function(
 
         status.innerHTML =
             "❌ Fehler beim Speichern";
+
+        alert(e);
 
     }
 
