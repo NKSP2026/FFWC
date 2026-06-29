@@ -64,94 +64,16 @@ const storage = getStorage(app);
 const auth = getAuth(app);
 
 /* =========================================
-   AUTO LOGOUT NACH 8 STUNDEN
-========================================= */
-
-const LOGIN_TIME_KEY = "loginTime";
-
-onAuthStateChanged(auth, async(user)=>{
-
-    /* NICHT EINGELOGGT */
-    if(!user){
-
-        /* login.html darf offen bleiben */
-        if(
-            !window.location.pathname.includes("login.html")
-        ){
-            window.location.href = "login.html";
-        }
-
-        return;
-    }
-
-    /* LOGIN ZEIT PRÜFEN */
-    let loginTime = localStorage.getItem(LOGIN_TIME_KEY);
-
-    if(!loginTime){
-
-        localStorage.setItem(
-            LOGIN_TIME_KEY,
-            Date.now()
-        );
-
-    }else{
-
-        let diff =
-            Date.now() - parseInt(loginTime);
-
-        /* 8 Stunden */
-        let max = 8 * 60 * 60 * 1000;
-
-        if(diff > max){
-
-            await signOut(auth);
-
-            localStorage.removeItem(LOGIN_TIME_KEY);
-
-            alert(
-                "Sitzung abgelaufen. Bitte erneut anmelden."
-            );
-
-            window.location.href = "login.html";
-
-            return;
-        }
-    }
-});
-
-/* =========================================
-   LOGOUT
-========================================= */
-
-window.logout = async function(){
-
-    try{
-
-        await signOut(auth);
-
-        localStorage.removeItem(LOGIN_TIME_KEY);
-
-        window.location.href = "login.html";
-
-    }catch(e){
-
-        console.error(e);
-
-        alert("Logout Fehler");
-
-    }
-
-};
-
-/* =========================================
-   GLOBALE FIREBASE OBJEKTE
+   GLOBAL EXPORT
 ========================================= */
 
 window.db = db;
-
 window.storage = storage;
-
 window.auth = auth;
+
+/* =========================================
+   FIREBASE FUNKTIONEN GLOBAL
+========================================= */
 
 /* Realtime Database */
 window.ref = ref;
@@ -170,19 +92,113 @@ window.getDownloadURL = getDownloadURL;
 window.deleteObject = deleteObject;
 
 /* =========================================
-   HELFER
+   AUTO LOGOUT NACH 8 STUNDEN
 ========================================= */
 
-/* Zeit */
-window.nowDate = function(){
+const LOGIN_TIME_KEY = "loginTime";
 
-    return new Date().toLocaleDateString("de-DE");
+onAuthStateChanged(auth, async(user)=>{
+
+    /* NICHT EINGELOGGT */
+    if(!user){
+
+        if(
+            !window.location.pathname.includes("login.html")
+        ){
+
+            window.location.href = "login.html";
+
+        }
+
+        return;
+    }
+
+    /* LOGIN ZEIT */
+    let loginTime =
+        localStorage.getItem(LOGIN_TIME_KEY);
+
+    if(!loginTime){
+
+        localStorage.setItem(
+            LOGIN_TIME_KEY,
+            Date.now()
+        );
+
+    }else{
+
+        let diff =
+            Date.now() -
+            parseInt(loginTime);
+
+        /* 8 STUNDEN */
+        let max =
+            8 * 60 * 60 * 1000;
+
+        if(diff > max){
+
+            await signOut(auth);
+
+            localStorage.removeItem(
+                LOGIN_TIME_KEY
+            );
+
+            alert(
+                "Sitzung abgelaufen. Bitte erneut anmelden."
+            );
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+    }
+
+});
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+window.logout = async function(){
+
+    try{
+
+        await signOut(auth);
+
+        localStorage.removeItem(
+            LOGIN_TIME_KEY
+        );
+
+        window.location.href =
+            "login.html";
+
+    }catch(e){
+
+        console.error(e);
+
+        alert("Logout Fehler");
+
+    }
 
 };
 
+/* =========================================
+   HELFER
+========================================= */
+
+/* DATUM */
+window.nowDate = function(){
+
+    return new Date()
+    .toLocaleDateString("de-DE");
+
+};
+
+/* UHRZEIT */
 window.nowTime = function(){
 
-    return new Date().toLocaleTimeString(
+    return new Date()
+    .toLocaleTimeString(
         "de-DE",
         {
             hour:"2-digit",
@@ -192,11 +208,13 @@ window.nowTime = function(){
 
 };
 
-/* sichere IDs */
+/* ID */
 window.makeId = function(){
 
     return Date.now().toString();
 
 };
 
+/* DEBUG */
 console.log("🔥 Firebase System geladen");
+console.log("🔥 DB:", db);
