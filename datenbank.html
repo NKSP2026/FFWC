@@ -307,9 +307,10 @@ class="grid">
 
 <script type="module">
 
-import {
-    db
-} from "./firebase.js";
+/* FIREBASE */
+import "./firebase.js";
+
+const db = window.db;
 
 import {
 
@@ -710,38 +711,14 @@ window.saveEntry = async function(
 
         }
 
-        let komplett = {
-
-            ...(type === "geraete"
-                ? geraeteData[key]
-                : fahrzeugeData[key]),
-
-            ...neueDaten
-
-        };
-
         await update(
             ref(db,`${type}/${key}`),
-            komplett
+            neueDaten
         );
-
-        if(type === "geraete"){
-
-            geraeteData[key] =
-                komplett;
-
-        }else{
-
-            fahrzeugeData[key] =
-                komplett;
-
-        }
 
         document.getElementById(
             `edit_${type}_${key}`
         ).style.display = "none";
-
-        renderAll();
 
         status.innerHTML =
             "✅ Gespeichert";
@@ -797,6 +774,5 @@ window.back = function(){
 };
 
 </script>
-
 </body>
 </html>
